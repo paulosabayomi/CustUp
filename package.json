@@ -1,0 +1,32 @@
+{
+  "name": "custup",
+  "version": "1.0.0",
+  "description": "Highly customisable file upload library",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulosabayomi/CustUp.git"
+  },
+  "keywords": [
+    "Custup",
+    "file",
+    "uploader",
+    "uploader",
+    "javascript",
+    "file",
+    "uploader",
+    "customisable",
+    "file",
+    "upload",
+    "library"
+  ],
+  "author": "Abayomi Amusa",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/paulosabayomi/CustUp/issues"
+  },
+  "homepage": "https://github.com/paulosabayomi/CustUp#readme"
+}
