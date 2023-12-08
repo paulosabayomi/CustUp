@@ -1,4 +1,5 @@
 # CustUp
+![example workflow](https://github.com/paulosabayomi/CustUp/actions/workflows/node.js.yml/badge.svg)
 CustUp is a highly customizable library with zero dependency, and can be easily adapted to a wide range of applications.   
    
 ## Quick Start
