@@ -123,7 +123,6 @@ export default class CustUpCore {
     _custupInnerContainerWrapperEl = undefined; // custup inner parent Element
     _custupDefaultUIEl = undefined; // Custup default UI that displays when no files is selected
     _custupDefaultUIInnerContentEl = undefined; // Inner container of the default UI that displays when no files is selected
-    position_container = undefined;  // specify if the upload container should be inserted before other contents in the container or after all contents in the container, or it should be the only content in the container, or it should be inserted before an element in the container, if this is not provided the upload container will overwrite every other elements in the `targetRootElement`
     fileDisplayUIEl = undefined; // file display UI, the container where selected files are displayed and listed
     UIToolEl = undefined; // UI tool container
     numberOfFilesDisplayTool = undefined; // the tool that displays number of selected files inside the UI tools
@@ -185,6 +184,7 @@ export default class CustUpCore {
         disable_scrollbar: false,
         persist_default_ui: false,
         use_default_file_display_ui: true,
+        position_container: undefined,
 
         // UI type
         ui_type: 'default', 
@@ -590,15 +590,15 @@ export default class CustUpCore {
             throw new Error(`${this.libraryName}: Target Root Element is required`);            
         }
 
-        this.options.allowed_file_types = allowed_file_types;
+        allowed_file_types !== undefined && (this.options.allowed_file_types = allowed_file_types);
         this.options.targetRootElement = targetRootElement;
-
-        this.options.maxNumberOfFiles = maxNumberOfFiles;
-        this.options.minNumberOfFiles = minNumberOfFiles;
-        this.options.minimumAllowedFileSize = minimumAllowedFileSize;
-        this.options.maximumAllowedFileSize = maximumAllowedFileSize;
+        
+        maxNumberOfFiles !== undefined && (this.options.maxNumberOfFiles = maxNumberOfFiles);
+        minNumberOfFiles !== undefined && (this.options.minNumberOfFiles = minNumberOfFiles);
+        minimumAllowedFileSize !== undefined && (this.options.minimumAllowedFileSize = minimumAllowedFileSize);
+        maximumAllowedFileSize !== undefined && (this.options.maximumAllowedFileSize = maximumAllowedFileSize);
         ui_type != undefined && (this.options.ui_type = ui_type);
-        this.position_container = position_container;
+        position_container !== undefined && (this.options.position_container = position_container);
 
         allowMultipleUpload && (this.options.allowMultipleUpload = allowMultipleUpload);
 
@@ -704,15 +704,15 @@ export default class CustUpCore {
         disable_select_files_from_device != undefined && (this.options.disable_select_files_from_device = disable_select_files_from_device);
 
         // this.options.file_upload_settings = {...this.options.file_upload_settings, ...file_upload}
-        this.options.file_upload_settings.files_field_name = file_upload.files_field_name
-        this.options.file_upload_settings.endpoint_url = file_upload.endpoint_url
-        this.options.file_upload_settings.additional_data = file_upload.additional_data
-        this.options.file_upload_settings.form_field = typeof file_upload.form_field == "string" ? document.querySelector(file_upload.form_field) : file_upload.form_field
-        this.options.file_upload_settings.files_field_name = file_upload.files_field_name == undefined ? 'file' : file_upload.files_field_name;
-        if (file_upload.axios_settings !== undefined) {
-            for (const key in file_upload.axios_settings) {
-                if (Object.hasOwnProperty.call(file_upload.axios_settings, key)) {
-                    const value = file_upload.axios_settings[key];
+        this.options.file_upload_settings.files_field_name = file_upload?.files_field_name
+        this.options.file_upload_settings.endpoint_url = file_upload?.endpoint_url
+        this.options.file_upload_settings.additional_data = file_upload?.additional_data
+        this.options.file_upload_settings.form_field = typeof file_upload?.form_field == "string" ? document.querySelector(file_upload?.form_field) : file_upload?.form_field
+        this.options.file_upload_settings.files_field_name = file_upload?.files_field_name == undefined ? 'file' : file_upload?.files_field_name;
+        if (file_upload?.axios_settings !== undefined) {
+            for (const key in file_upload?.axios_settings) {
+                if (Object.hasOwnProperty.call(file_upload?.axios_settings, key)) {
+                    const value = file_upload?.axios_settings[key];
                     this.options.file_upload_settings.axios_settings[key] = {...this.options.file_upload_settings.axios_settings[key], ...value}
                 }
             }
@@ -894,7 +894,10 @@ export default class CustUpCore {
             throw new Error(`${this.libraryName}: Target Root Element not found`);   
         }
 
-        if (targetEl.dataset.custupInit != undefined) return console.warn(`${this.libraryName} has already been initialized in the ${this.options.targetRootElement} container`);
+        if (targetEl.dataset.custupInit != undefined) {
+            console.warn(`${this.libraryName} has already been initialized in the ${this.options.targetRootElement} container`);
+            return false;
+        }
 
         targetEl.setAttribute('data-custup-init', '_custup')
 
@@ -940,11 +943,17 @@ export default class CustUpCore {
         this.set_class_name('close_popup_btn', this.close_popup_btn)
 
         this._custupInnerEl.append(this.close_popup_btn);
-
-        if (this.position_container == undefined) {
+        if (this.options.position_container == undefined || this.options.position_container == "overwrite") {
             targetEl.innerHTML = ""
             targetEl.append(this._custupEl)
+        }else if (this.options.position_container == "after") {
+            targetEl.append(this._custupEl)   
+        }else if (this.options.position_container == "before") {
+            targetEl.prepend(this._custupEl)   
+        }else if (typeof this.options.position_container == "object") {
+            targetEl.insertBefore(this._custupEl, document.querySelector(this.options.position_container.beforeEl))   
         }
+
         this.showDefaultUI();
         this.eventMethods.library_init && this.eventMethods.library_init();
         console.info(this.libraryName + " initialized!");
@@ -1394,82 +1403,80 @@ export default class CustUpCore {
 
         isUploadable && this.selectedFiles.push(file);
         file.isDefaultFile && this.defaultFiles.push(file);
+            
+        const fileUIContainer = document.createElement('div')
+        const fileUI = document.createElement('div')
+        const fileDetailsContainer = document.createElement('div')
+        const fileName = document.createElement('div')
+        const fileSize = document.createElement('div')
+        
+        const fileBottomDetails = document.createElement('div')
+        const fileUIBottomToolsContainer = document.createElement('div')
+        const fileBottomIconEdit = document.createElement('div')
+        fileBottomIconEdit.innerHTML = this.ui_icons.edit
+        fileBottomIconEdit.title = 'edit'
+        const fileBottomIconView = document.createElement('div')
+        fileBottomIconView.innerHTML = this.ui_icons.eye
+        fileBottomIconView.title = 'View'
 
-        // if (this.options.use_default_file_display_ui) {
-            
-            const fileUIContainer = document.createElement('div')
-            const fileUI = document.createElement('div')
-            const fileDetailsContainer = document.createElement('div')
-            const fileName = document.createElement('div')
-            const fileSize = document.createElement('div')
-            
-            const fileBottomDetails = document.createElement('div')
-            const fileUIBottomToolsContainer = document.createElement('div')
-            const fileBottomIconEdit = document.createElement('div')
-            fileBottomIconEdit.innerHTML = this.ui_icons.edit
-            fileBottomIconEdit.title = 'edit'
-            const fileBottomIconView = document.createElement('div')
-            fileBottomIconView.innerHTML = this.ui_icons.eye
-            fileBottomIconView.title = 'View'
-    
-            const remove_file_btn = document.createElement('div')
-            remove_file_btn.innerHTML = this.ui_icons.remove
-            remove_file_btn.onclick = (e) => _class.handleRemoveFile(file)
-            fileUIContainer.id = file.id
-            if (file.type.split('/')[0].toLowerCase() == 'image') {
-                const fr = new FileReader()
-                fr.onload = (e) => {
-                    _class.makeFileDisplayElement(file, fileUI, e.target.result) 
-                }
-                fr.readAsDataURL(file)            
-            }else{
-                _class.makeFileDisplayElement(file, fileUI) 
+        const remove_file_btn = document.createElement('div')
+        remove_file_btn.innerHTML = this.ui_icons.remove
+        remove_file_btn.onclick = (e) => _class.handleRemoveFile(file)
+        fileUIContainer.id = file.id
+        if (file.type.split('/')[0].toLowerCase() == 'image') {
+            const fr = new FileReader()
+            fr.onload = (e) => {
+                _class.makeFileDisplayElement(file, fileUI, e.target.result) 
             }
-            this.set_class_name("fileUIOuterContainer", fileUIContainer)
-            this.set_class_name("fileDetailsContainer", fileDetailsContainer)
-            this.set_class_name("custup_fileName", fileName)
-            this.set_class_name("fileBottomDetails", fileBottomDetails)
-            this.set_class_name("fileUIBottomToolsContainer", fileUIBottomToolsContainer)
-            this.set_class_name("custup_fileSize", fileSize)
-            this.set_class_name("fileUI", fileUI)
-            this.set_class_name("remove_file_btn", remove_file_btn)
-    
-            fileName.innerHTML = this.clipFileNameIfShouldClip(file.name)
-            fileName.title = file.name
-            fileSize.innerHTML = this.parseFileSize(file.size)
-            
-            this.options.show_preview_file_btn && fileUIBottomToolsContainer.append(fileBottomIconView)
-            // fileUIBottomToolsContainer.append(fileBottomIconEdit) --- suspended
-    
-            fileBottomDetails.append(fileSize)
-            const file_main_type = file.type.split('/')[0].toLowerCase()
-            if (file_main_type == 'image' || file_main_type == 'video' || file_main_type == 'audio') {
-                fileBottomIconView.onclick = (e) => this.makeFilePreviewer(file)
-                fileBottomDetails.append(fileUIBottomToolsContainer)            
-            }
-    
-            fileDetailsContainer.append(fileName)
-            fileDetailsContainer.append(fileBottomDetails)
-    
-            fileUI.style.userSelect = "none";
-            fileUI.draggable = false;
-            fileUIContainer.append(fileUI);
-            this.options.show_file_details_container && fileUIContainer.append(fileDetailsContainer);
-    
-            this.options.show_file_remove_btn && fileUIContainer.append(remove_file_btn);
-            /// Postponed - for changing file position on the UI
-            // fileUI.ondragstart = (e) => this.changeFileElementPosition(e)
-            // fileUI.ondragover = (e) => this.handleFileUIDragOver(e)
-            // fileUI.ondrop = (e) => this.handleFileUIDropped(e)
-    
-            this.options.use_default_file_display_ui && this.setNumberOfFiles();
-    
-            this.options.use_default_file_display_ui  && this.fileDisplayUIEl.append(fileUIContainer);
-    
-            this.eventMethods.file_afterAdded && this.eventMethods.file_afterAdded({file, element: fileUIContainer, count: this._get_total_file_count()});
-            
-            (!this.options.disable_scrollbar && this.options.use_default_file_display_ui) && this.updateScrollbarHeight();
-        // }
+            fr.readAsDataURL(file)            
+        }else{
+            _class.makeFileDisplayElement(file, fileUI) 
+        }
+        this.set_class_name("fileUIOuterContainer", fileUIContainer)
+        this.set_class_name("fileDetailsContainer", fileDetailsContainer)
+        this.set_class_name("custup_fileName", fileName)
+        this.set_class_name("fileBottomDetails", fileBottomDetails)
+        this.set_class_name("fileUIBottomToolsContainer", fileUIBottomToolsContainer)
+        this.set_class_name("custup_fileSize", fileSize)
+        this.set_class_name("fileUI", fileUI)
+        this.set_class_name("remove_file_btn", remove_file_btn)
+
+        fileName.innerHTML = this.clipFileNameIfShouldClip(file.name)
+        fileName.title = file.name
+        fileSize.innerHTML = this.parseFileSize(file.size)
+        
+        this.options.show_preview_file_btn && fileUIBottomToolsContainer.append(fileBottomIconView)
+        // fileUIBottomToolsContainer.append(fileBottomIconEdit) --- suspended
+
+        fileBottomDetails.append(fileSize)
+        const file_main_type = file.type.split('/')[0].toLowerCase()
+        if (file_main_type == 'image' || file_main_type == 'video' || file_main_type == 'audio') {
+            fileBottomIconView.onclick = (e) => this.makeFilePreviewer(file)
+            fileBottomDetails.append(fileUIBottomToolsContainer)            
+        }
+
+        fileDetailsContainer.append(fileName)
+        fileDetailsContainer.append(fileBottomDetails)
+
+        fileUI.style.userSelect = "none";
+        fileUI.draggable = false;
+        fileUIContainer.append(fileUI);
+        this.options.show_file_details_container && fileUIContainer.append(fileDetailsContainer);
+
+        this.options.show_file_remove_btn && fileUIContainer.append(remove_file_btn);
+        /// Postponed - for changing file position on the UI
+        // fileUI.ondragstart = (e) => this.changeFileElementPosition(e)
+        // fileUI.ondragover = (e) => this.handleFileUIDragOver(e)
+        // fileUI.ondrop = (e) => this.handleFileUIDropped(e)
+
+        this.options.use_default_file_display_ui && this.setNumberOfFiles();
+
+        this.options.use_default_file_display_ui  && this.fileDisplayUIEl.append(fileUIContainer);
+
+        this.eventMethods.file_afterAdded && this.eventMethods.file_afterAdded({file, element: fileUIContainer, count: this._get_total_file_count()});
+        
+        (!this.options.disable_scrollbar && this.options.use_default_file_display_ui) && this.updateScrollbarHeight();
+
         (this.options.upload_automatically && isUploadable) && _class.handleUploadFile(file);
         this.options.persist_files && this.update_file_storage();
     }

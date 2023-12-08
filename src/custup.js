@@ -1,6 +1,6 @@
-import CustUpCore from "./core/custupCore.js";
-import _customStyles from "./utils/_customStyles.js";
-import file_types from './utils/filetypes.js'
+import CustUpCore from "../core/custupCore.js";
+import _customStyles from "../utils/_customStyles.js";
+import file_types from '../utils/filetypes.js'
 
 export default class CustUp extends CustUpCore {
     /**
@@ -167,8 +167,8 @@ export default class CustUp extends CustUpCore {
         </div>`;
         this.options.allowed_tools = null;
         
-        if (document.querySelector("[href*='resumeUploaderUI.css']") === null) {
-            console.warn(this.libraryName + ": Please include the resumeUploaderUI.css css file")
+        if (document.querySelector("[href*='resumeUploaderUI.']") === null) {
+            console.warn(this.libraryName + ": Please include the resumeUploaderUI css file")
         }
     }
 
@@ -202,8 +202,8 @@ export default class CustUp extends CustUpCore {
         defaultUIInnerContentWrapper.appendChild(defaultUIInnerContent)
         this.options._custupDefaultUploadSentence = defaultUIInnerContentWrapper.innerHTML;
 
-        if (document.querySelector("[href*='bare.css']") === null) {
-            console.warn(this.libraryName + ": Please include the bare.css css file")
+        if (document.querySelector("[href*='bare.']") === null) {
+            console.warn(this.libraryName + ": Please include the bare css file")
         }
     }
 
@@ -371,8 +371,8 @@ export default class CustUp extends CustUpCore {
             }
         });
         
-        if (document.querySelector("[href*='detached.css']") === null) {
-            console.warn(this.libraryName + ": Please include the detached.css css file")
+        if (document.querySelector("[href*='detached.']") === null) {
+            console.warn(this.libraryName + ": Please include the detached css file")
         }
     }
 
@@ -439,8 +439,8 @@ export default class CustUp extends CustUpCore {
             this._custupFooterEl.querySelector('.inner').innerHTML = ''
         });
 
-        if (document.querySelector("[href*='profilePicture.css']") === null) {
-            console.warn(this.libraryName + ": Please include the profilePicture.css css file")
+        if (document.querySelector("[href*='profilePicture.']") === null) {
+            console.warn(this.libraryName + ": Please include the profilePicture css file")
         }
     }
 }
