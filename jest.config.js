@@ -12,6 +12,5 @@ export default {
      * don't want to deal with this.
      */
     customExportConditions: [''],
-  },
-  globals: { fetch }
+  }
 } 
