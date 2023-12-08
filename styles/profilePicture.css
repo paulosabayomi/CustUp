@@ -1,0 +1,90 @@
+.PPUIOuterContainer {
+    box-shadow: none !important;
+    width: 350px !important;
+    height: auto !important;
+    border-radius: 0px !important;
+    border: 0px !important;
+}
+
+.PPUIDefaultUI {
+    width: 100% !important;
+    height: 100% !important;
+    border-width: 2px !important;
+}
+
+.PPUIInnerContainer {
+    border-radius: 0px !important;
+}
+
+.PPUIInnerContainerWrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: rgb(230, 230, 230);
+    width: 350px !important;
+    height: 350px !important;
+    border-radius: 15px !important;
+}
+
+.PPUIFileUI {
+    margin-bottom: 0px !important;
+    border-radius: 50% !important;
+}
+
+.PPUIDefaultUIInnerIcon svg {
+    width: 60px;
+    height: 60px;
+}
+
+.PPUIFileDisplayUI {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    padding: 10px !important;
+}
+
+.PPUIFileUIOuter {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0px !important;
+    background-color: transparent !important;
+}
+
+.PPUIFooterContainer {
+    width: 100% !important;
+}
+
+.PPUIFooterContainer .inner button {
+    padding: 10px;
+    width: 45%;
+    margin-top: 10px;
+    font-size: 95%;
+    border: 0px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.PPUIButtonToolsContainer {
+    width: 100%;
+    justify-content: space-around;
+    display: flex;
+    justify-content: space-around;
+}
+
+.PPUIUploadBtn {
+    background-color: rgb(1, 153, 1);
+    color: white;
+}
+
+.PPUIUploadBtn:active {
+    background-color: rgb(1, 188, 1);
+}
+
+.PPUIUploadBtn:hover {
+    background-color: rgb(1, 172, 1);
+}
