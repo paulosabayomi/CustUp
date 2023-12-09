@@ -242,15 +242,15 @@ export default class CustUpCore {
             },
             google_drive_source: {
                 authConfig: {
-                    client_id: '428438400029-ua7f74tsdh1f6f2qrdlek4hl8m0egcjk.apps.googleusercontent.com',
-                    api_key: 'AIzaSyCLS9n2ntv0LROXzTXDW9QDxMp2-GU8k5w',
+                    client_id: '',
+                    api_key: '',
                     app_id: '',
                     scopes: 'https://www.googleapis.com/auth/drive.metadata.readonly'
                 },
             },
             dropbox_source: {
                 authConfig: {
-                    appKey: "bwoyy9ishl6p7nw",
+                    appKey: "",
                 },
                 options: {
                     cancel: function() {},
@@ -258,7 +258,7 @@ export default class CustUpCore {
             },
             box_source: {
                 authConfig: {
-                    developerToken: "L8ZtuUrHtwbefG3W9jW5k9xdNERecYED",
+                    developerToken: "",
                     cssLink: "https://cdn01.boxcdn.net/platform/elements/17.1.0/en-US/picker.css",
                     jsLink: "https://cdn01.boxcdn.net/platform/elements/17.1.0/en-US/picker.js",
                     folder_id: '0'
@@ -288,7 +288,7 @@ export default class CustUpCore {
             },
             openai_dalle_source: {
                 endpoint: "https://api.openai.com/v1/images/generations",
-                api_key: "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",
+                api_key: "",
                 size: "1024x1024", // 256x256, 512x512, or 1024x1024
                 n: 4,
                 model: "dall-e-3",

@@ -65,9 +65,7 @@ export default class ExternalSource {
         msalParams: {
             auth: {
                 authority: "https://login.microsoftonline.com/d5ccedd1-33d1-43e9-a934-c5e68381d83b",
-                clientId: "43d99db1-016a-493b-aa91-3b8990148aa0",
-                // clientId: "ee96f4a7-5521-4298-9718-35aa811b9b0f",
-                // clientId: "d5ccedd1-33d1-43e9-a934-c5e68381d83b",
+                clientId: "",
                 redirectUri: "http://localhost:5501"
             },
         },
@@ -94,7 +92,6 @@ export default class ExternalSource {
     }
     onedriveSetupConfig = {
         msalLink: "https://alcdn.msauth.net/browser/2.19.0/js/msal-browser.min.js",
-
         baseUrl: 'api://43d99db1-016a-493b-aa91-3b8990148aa0',
     }
     msalApp
@@ -123,7 +120,7 @@ export default class ExternalSource {
             authConfig: {
                 // client_id: '428438400029-ua7f74tsdh1f6f2qrdlek4hl8m0egcjk.apps.googleusercontent.com',
                 client_id: '',
-                api_key: 'AIzaSyCLS9n2ntv0LROXzTXDW9QDxMp2-GU8k5w',
+                api_key: '',
                 app_id: '',
                 scopes: 'https://www.googleapis.com/auth/drive.metadata.readonly'
             }
@@ -131,7 +128,7 @@ export default class ExternalSource {
         clipboard: {},
         box: {
             authConfig: {
-                developerToken: "L8ZtuUrHtwbefG3W9jW5k9xdNERecYED",
+                developerToken: "",
                 cssLink: "https://cdn01.boxcdn.net/platform/elements/17.1.0/en-US/picker.css",
                 jsLink: "https://cdn01.boxcdn.net/platform/elements/17.1.0/en-US/picker.js",
                 folder_id: '0'
@@ -162,7 +159,7 @@ export default class ExternalSource {
         },
         dalle: {
             endpoint: "https://api.openai.com/v1/images/generations",
-            api_key: "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",
+            api_key: "",
             model: "dall-e-3", // "dall-e-3" | "dall-e-2"
             quality: "standard", // standard | hd
             size: "1024x1024", // "1024x1024" | "1024x1792" | "1792x1024"
@@ -172,9 +169,7 @@ export default class ExternalSource {
             }
         },
         dropbox: {
-            authConfig: {
-                // appKey: "bwoyy9ishl6p7nw"
-            },
+            authConfig: {},
             options: {
                 // Optional. Called when the user closes the dialog without selecting a file
                 // and does not include any parameters.
