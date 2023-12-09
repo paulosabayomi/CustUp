@@ -2,5 +2,7 @@
 node_modules
 __test__
 jest.*.js
+package-lock.json
+package.json
 Gruntfile.js
 .npmignore
