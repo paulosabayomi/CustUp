@@ -1211,21 +1211,21 @@ export default class CustUpCore {
         this.addFilesUITool.innerHTML = this.ui_icons.add_file_2
 
         const tools_arr = {
-            tools_dragger: () => {
-                this.UIToolEl.append(this.toolDragger)
-            },
-            upload: () => {
-                this.UIToolEl.append(this.uploadFilesToServerTool)
+            added_files_count: () => {
+                this.UIToolEl.append(this.numberOfFilesDisplayTool)
             },
             add_file: () => {
                 this.UIToolEl.append(this.addFilesUITool)
             },
-            added_files_count: () => {
-                this.UIToolEl.append(this.numberOfFilesDisplayTool)
-            },
             clear_files: () => {
                 this.UIToolEl.append(this.clearAllFilesBtnTool)
             },
+            upload: () => {
+                this.UIToolEl.append(this.uploadFilesToServerTool)
+            },
+            tools_dragger: () => {
+                this.UIToolEl.append(this.toolDragger)
+            }
         }
         
         if (this.options.allowed_tools !== null && this.options.allowed_tools.length == 0) {
