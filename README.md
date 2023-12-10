@@ -4,7 +4,7 @@
 [![MIT License](https://img.shields.io/github/license/paulosabayomi/CustUp?style=flat-square)](https://github.com/paulosabayomi/CustUp/blob/master/LICENSE)
 [![Language](https://img.shields.io/badge/logo-javascript-blue?logo=javascript)](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/What_is_JavaScript)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg?style=flat-square)](https://github.com/paulosabayomi/CustUp/pulls)
-[![Tests](https://img.shields.io/github/workflow/status/paulosabayomi/CustUp/Release/master?logo=github&style=flat-square)](https://github.com/paulosabayomi/CustUp/actions/workflows/node.js.yml)
+[![Tests](https://github.com/paulosabayomi/CustUp/actions/workflows/node.js.yml/badge.svg)](https://github.com/paulosabayomi/CustUp/actions/workflows/node.js.yml)
 <!-- [END BADGES] -->
    
 CustUp is a highly customizable library with zero dependency, and can be easily adapted to a wide range of applications.   
