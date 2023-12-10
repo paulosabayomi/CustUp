@@ -703,11 +703,13 @@ export default class CustUpCore {
         disable_drag_n_drop != undefined && (this.options.disable_drag_n_drop = disable_drag_n_drop);
         disable_select_files_from_device != undefined && (this.options.disable_select_files_from_device = disable_select_files_from_device);
 
-        // this.options.file_upload_settings = {...this.options.file_upload_settings, ...file_upload}
-        this.options.file_upload_settings.files_field_name = file_upload?.files_field_name
-        this.options.file_upload_settings.endpoint_url = file_upload?.endpoint_url
-        this.options.file_upload_settings.additional_data = file_upload?.additional_data
-        this.options.file_upload_settings.form_field = typeof file_upload?.form_field == "string" ? document.querySelector(file_upload?.form_field) : file_upload?.form_field
+        this.options.file_upload_settings.files_field_name = file_upload?.files_field_name;
+        this.options.file_upload_settings.endpoint_url = file_upload?.endpoint_url;
+        this.options.file_upload_settings.additional_data = file_upload?.additional_data;
+
+        this.options.file_upload_settings.form_field = (typeof file_upload?.form_field == "string" && file_upload?.form_field != '') ? document.querySelector(file_upload?.form_field) : file_upload?.form_field;
+        this.options.file_upload_settings.form_field = this.options.file_upload_settings.form_field == '' ? undefined : this.options.file_upload_settings.form_field;
+
         this.options.file_upload_settings.files_field_name = file_upload?.files_field_name == undefined ? 'file' : file_upload?.files_field_name;
         if (file_upload?.axios_settings !== undefined) {
             for (const key in file_upload?.axios_settings) {
