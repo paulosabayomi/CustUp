@@ -17,4 +17,5 @@ const instance1 = new CustUp({
 })
 ```
 This will load the default UI which you can further customize to fit your need or the need of your application   
+   
 **More documentations in progress...**
