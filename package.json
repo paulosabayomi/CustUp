@@ -1,6 +1,6 @@
 {
   "name": "custup",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Highly customisable file upload library",
   "main": "src/custup.min.js",
   "scripts": {

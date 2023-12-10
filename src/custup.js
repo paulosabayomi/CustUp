@@ -167,7 +167,7 @@ export default class CustUp extends CustUpCore {
         </div>`;
         this.options.allowed_tools = null;
         
-        if (document.querySelector("[href*='resumeUploaderUI.']") === null) {
+        if (document.querySelector("[href*='all.min.']") === null && document.querySelector("[href*='resumeUploaderUI.']") === null) {
             console.warn(this.libraryName + ": Please include the resumeUploaderUI css file")
         }
     }
@@ -202,7 +202,7 @@ export default class CustUp extends CustUpCore {
         defaultUIInnerContentWrapper.appendChild(defaultUIInnerContent)
         this.options._custupDefaultUploadSentence = defaultUIInnerContentWrapper.innerHTML;
 
-        if (document.querySelector("[href*='bare.']") === null) {
+        if (document.querySelector("[href*='all.min.']") === null && document.querySelector("[href*='bare.']") === null) {
             console.warn(this.libraryName + ": Please include the bare css file")
         }
     }
@@ -371,7 +371,7 @@ export default class CustUp extends CustUpCore {
             }
         });
         
-        if (document.querySelector("[href*='detached.']") === null) {
+        if (document.querySelector("[href*='all.min.']") === null && document.querySelector("[href*='detached.']") === null) {
             console.warn(this.libraryName + ": Please include the detached css file")
         }
     }
@@ -439,7 +439,7 @@ export default class CustUp extends CustUpCore {
             this._custupFooterEl.querySelector('.inner').innerHTML = ''
         });
 
-        if (document.querySelector("[href*='profilePicture.']") === null) {
+        if (document.querySelector("[href*='all.min.']") === null && document.querySelector("[href*='profilePicture.']") === null) {
             console.warn(this.libraryName + ": Please include the profilePicture css file")
         }
     }
