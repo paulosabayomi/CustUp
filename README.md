@@ -1,4 +1,7 @@
 # CustUp
+<!-- [START BADGES] -->
+<!-- [END BADGES] -->   
+   
 CustUp is a highly customizable library with zero dependency, and can be easily adapted to a wide range of applications.   
    
 ## Quick Start
