@@ -1,7 +1,7 @@
 {
   "name": "custup",
-  "version": "0.0.1",
-  "description": "Highly customisable file upload library",
+  "version": "0.0.2",
+  "description": "Highly customisable file upload library with zero dependencies",
   "main": "src/custup.min.js",
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest"
