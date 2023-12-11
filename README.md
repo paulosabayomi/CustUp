@@ -467,6 +467,7 @@ uploader.on('file.beforeAdded', (ev) => {
 ```
 
 | Event name | Description | Returns |
+| ---- | ---- | ---- |
 | `'library.init'` | Called after the library has finished initializing and has been painted on the UI | `null` |
 | `'file.beforeAdded'` | Called just before file gets added to the memory and/or UI | `{file: File, base64: string}` |
 | `'file.afterAdded'` | Called after file has been added to the memory and/or browser storage and/or UI | `{file: File, element: HTMLElement, count: number}` |
