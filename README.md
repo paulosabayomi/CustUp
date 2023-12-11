@@ -259,6 +259,7 @@ instance4.upload();
 ## Options
 
 | Option | type | default | Required | Description |
+| ---- | ---- | ---- | ---- | ---- |
 targetRootElement | string | `<empty string>` | Required | The HTML element to spawn CustUp into
 _custupDefaultUploadSentence | `string` | Drag files to upload or Click to select file from device | Not Required | The HTML element that shows the description on the default UI
 disable_scrollbar | boolean | `false` | Not required | Whether to disable scroll bar or not
@@ -524,13 +525,13 @@ And many more events, read the documentation for more events
 There are several methods that can be used to customize the library to your taste, example, to dynamically call the `upload` method
 
 ```js
-    uploader.upload() // this will trigger upload to upload al files
+uploader.upload() // this will trigger upload to upload al files
 ```
 
 It can also take in the `id` of the file to upload in the case of uploading single file
 
 ```js
-    uploader.upload(file_id) // file id is the id that CustUp adds to the selected file using crypto.randomUUID()
+uploader.upload(file_id) // file id is the id that CustUp adds to the selected file using crypto.randomUUID()
 ```
 
 | Method name | Description | param |
