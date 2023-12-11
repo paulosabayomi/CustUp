@@ -535,13 +535,13 @@ It can also take in the `id` of the file to upload in the case of uploading sing
 | Method name | Description | param |
 | ---- | ---- | ---- | ---- |
 | upload | To trigger upload for all files or a single file | `file_id` . Not required
-retry_upload | To trigger upload retry for all files that were not uploaded due to an error or for a single file | `file_id` . Not required
-| show_add_file_ui | The method to show the default UI for selecting new files, will not work if `use_default_file_display_ui` is set to false | `None`
-| preview_file | To preview a file, it takes the cryptographically generated id added to the file by CustUp | `file_id` . Required
-| get_selected_files | To get all the selected files excluding the default loaded files in memory, it returns all the selected excluding the default loaded files files in memory | `None`
-| get_all_files | To get all the selected files including the default loaded files in memory, it returns all the selected including the default loaded files files in memory | `None`
-| clear_files | To clear all the added files from the memory, browser storage and UI | `None`
-| get_total_file_count | Returns all total number of added files, it will only return total number of selected files if `count_default_files` is set to false | `None`  
+retry_upload | To trigger upload retry for all files that were not uploaded due to an error or for a single file | `file_id` . Not required |
+| show_add_file_ui | The method to show the default UI for selecting new files, will not work if `use_default_file_display_ui` is set to false | `None` |
+| preview_file | To preview a file, it takes the cryptographically generated id added to the file by CustUp | `file_id` . Required |
+| get_selected_files | To get all the selected files excluding the default loaded files in memory, it returns all the selected excluding the default loaded files files in memory | `None` |
+| get_all_files | To get all the selected files including the default loaded files in memory, it returns all the selected including the default loaded files files in memory | `None` |
+| clear_files | To clear all the added files from the memory, browser storage and UI | `None` |
+| get_total_file_count | Returns all total number of added files, it will only return total number of selected files if `count_default_files` is set to false | `None`   |
   
 And many more, read more about CustUp methods in the documentation
 
