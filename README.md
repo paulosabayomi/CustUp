@@ -467,18 +467,18 @@ uploader.on('file.beforeAdded', (ev) => {
 ```
 
 | Event name | Description | Returns |
-`'library.init'` | Called after the library has finished initializing and has been painted on the UI | `null`
-`'file.beforeAdded'` | Called just before file gets added to the memory and/or UI | `{file: File, base64: string}`
-`'file.afterAdded'` | Called after file has been added to the memory and/or browser storage and/or UI | `{file: File, element: HTMLElement, count: number}`
-`'file.beforePassedChecks'` | For adding additional file checks, and must return either `true` or `false` or else it is not going to be effective | `null`
-`'file.removed'` | Called when a file has been removed from memory, UI and/or browser storage | `{file: File, files_count: number}`
-`'file.defaultFileRemoved'` | Called when a default loaded file is being removed | `File`
-`'file.all_removed'` | Called when all the files both selected and/or added to the UI by default has been removed from memory and/or browser storage
-`'video.recordingStarted'` | Called when video recording has started | `{media_recorder: MediaRecorder, media_devices: MediaDevices, display_el: HTMLElement}`
-`'upload.progress'` | Called on each file being uploaded or when files are being uploaded collectively | `{progressEvent: Event}`
-`'upload.success'` | Called when a file or all files has successfully been uploaded | `{data: 'being returned from the server', file: File, upload_element: HTMLElement | null, file_container: HTMLElement | null}`
-`'upload.error'` | Called when a file or collective upload was not successfully due to an error | `{err: Error, file: File, upload_element: HTMLELement | null, file_container: HTMLElement | null}`
-`'upload.retry'` | Called when an upload is about to be retried | `{file: File, file_container: HTMLElement | null}`  
+| `'library.init'` | Called after the library has finished initializing and has been painted on the UI | `null` |
+| `'file.beforeAdded'` | Called just before file gets added to the memory and/or UI | `{file: File, base64: string}` |
+| `'file.afterAdded'` | Called after file has been added to the memory and/or browser storage and/or UI | `{file: File, element: HTMLElement, count: number}` |
+| `'file.beforePassedChecks'` | For adding additional file checks, and must return either `true` or `false` or else it is not going to be effective | `null` |
+| `'file.removed'` | Called when a file has been removed from memory, UI and/or browser storage | `{file: File, files_count: number}` |
+| `'file.defaultFileRemoved'` | Called when a default loaded file is being removed | `File` |
+| `'file.all_removed'` | Called when all the files both selected and/or added to the UI by default has been removed from memory and/or browser storage | `Array<File>` |
+| `'video.recordingStarted'` | Called when video recording has started | `{media_recorder: MediaRecorder, media_devices: MediaDevices, display_el: HTMLElement}` |
+| `'upload.progress'` | Called on each file being uploaded or when files are being uploaded collectively | `{progressEvent: Event}` |
+| `'upload.success'` | Called when a file or all files has successfully been uploaded | `{data: 'being returned from the server', file: File, upload_element: HTMLElement | null, file_container: HTMLElement | null}` |
+| `'upload.error'` | Called when a file or collective upload was not successfully due to an error | `{err: Error, file: File, upload_element: HTMLELement | null, file_container: HTMLElement | null}` |
+| `'upload.retry'` | Called when an upload is about to be retried | `{file: File, file_container: HTMLElement | null}`  |
   
 And many more events, read the documentation for more events  
   
