@@ -1668,6 +1668,10 @@ export default class CustUpCore {
         return this.libraryName + '_' + file_name.replace(/[\s\.\'\"\(\)\[\]\{\}]+/g, '_')
     }
 
+    /**
+     * @protected @method get_unique_uuid
+     * @returns {string}
+     */
     get_unique_uuid () {
         return "custup_"+crypto.randomUUID()
     }
@@ -2120,7 +2124,7 @@ export default class CustUpCore {
 
         const upload_element = this.createFileUploadOverlay(file.id);
         this.handleUploadFileToEndpoint(file, upload_element);
-        this.eventMethods.upload_retry && this.eventMethods.upload_retry(file, this.fileDisplayUIEl.querySelector(`#${file.id}`));
+        this.eventMethods.upload_retry && this.eventMethods.upload_retry({file, file_container: this.fileDisplayUIEl.querySelector(`#${file.id}`)});
     }
 
     /**
@@ -2415,6 +2419,13 @@ export default class CustUpCore {
      */
     get_selected_files () {
         return this.selectedFiles
+    }
+
+    /**
+     * @method get_all_files - return all the selected files
+     */
+    get_all_files () {
+        return [...this.selectedFiles, ...this.defaultFiles]
     }
 
     /**
