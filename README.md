@@ -533,7 +533,7 @@ It can also take in the `id` of the file to upload in the case of uploading sing
 ```
 
 | Method name | Description | param |
-| ---- | ---- | ---- | ---- |
+| ---- | ---- | ---- |
 | upload | To trigger upload for all files or a single file | `file_id` . Not required
 retry_upload | To trigger upload retry for all files that were not uploaded due to an error or for a single file | `file_id` . Not required |
 | show_add_file_ui | The method to show the default UI for selecting new files, will not work if `use_default_file_display_ui` is set to false | `None` |
