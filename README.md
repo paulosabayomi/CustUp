@@ -7,7 +7,7 @@
 [![Tests](https://github.com/paulosabayomi/CustUp/actions/workflows/node.js.yml/badge.svg)](https://github.com/paulosabayomi/CustUp/actions/workflows/node.js.yml)
 <!-- [END BADGES] -->
    
-[CustUp Init](!https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png)   
+![CustUp Init](https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png)   
    
 CustUp is a highly customizable library with zero dependency, and can be easily adapted to a wide range of applications.   
    
