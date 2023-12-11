@@ -156,7 +156,7 @@ const options = {
 const uploader = new CustUp(options)
 ```
 
-To set CustUp to automatically upload files immediately after files has been added to the UI set the `upload_automatically` to true
+To set CustUp to automatically upload files immediately after files has been added to the UI set the `upload_automatically` to `true`
 
 ```js
 const options = {
@@ -202,7 +202,7 @@ const uploader = new CustUp(options)
 
 See more sources in the Options below.  
   
-If you don't like to use another HTML elements to control the upload, you can set the UI tools to not display on the default UI.
+If you wants to use another HTML elements to control the upload, you can set the UI tools to not display on the default UI.
 
 ```js
 const options = {
@@ -258,7 +258,7 @@ instance4.upload();
 
 ## Options
 
-Option | type | default | Required | Description
+| Option | type | default | Required | Description |
 targetRootElement | string | `<empty string>` | Required | The HTML element to spawn CustUp into
 _custupDefaultUploadSentence | `string` | Drag files to upload or Click to select file from device | Not Required | The HTML element that shows the description on the default UI
 disable_scrollbar | boolean | `false` | Not required | Whether to disable scroll bar or not
@@ -466,7 +466,7 @@ uploader.on('file.beforeAdded', (ev) => {
 })
 ```
 
-Event name | Description | Returns
+| Event name | Description | Returns |
 `'library.init'` | Called after the library has finished initializing and has been painted on the UI | `null`
 `'file.beforeAdded'` | Called just before file gets added to the memory and/or UI | `{file: File, base64: string}`
 `'file.afterAdded'` | Called after file has been added to the memory and/or browser storage and/or UI | `{file: File, element: HTMLElement, count: number}`
@@ -532,7 +532,7 @@ It can also take in the `id` of the file to upload in the case of uploading sing
     uploader.upload(file_id) // file id is the id that CustUp adds to the selected file using crypto.randomUUID()
 ```
 
-Method name | Description | param
+| Method name | Description | param |
 upload | To trigger upload for all files or a single file | `file_id` . Not required
 retry_upload | To trigger upload retry for all files that were not uploaded due to an error or for a single file | `file_id` . Not required
 show_add_file_ui | The method to show the default UI for selecting new files, will not work if `use_default_file_display_ui` is set to false | `None`
