@@ -797,7 +797,6 @@ export default class CustUpCore {
             if (typeof file_obj.file == 'string') {
                 URLFilesArr.push(file_obj)
             }else{
-                this.defaultFiles.push(file_obj.file);
                 file_obj.file.name == undefined && (file_obj.file.name = this.getRandChars('default'));
                 file_obj.file.isDefaultFile = !file_obj.isUploadable
                 this.handle_selected_files([file_obj.file], null, file_obj.isUploadable);

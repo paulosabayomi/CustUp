@@ -260,10 +260,11 @@ instance4.upload();
 
 | Option | type | default | Required | Description |
 | ---- | ---- | ---- | ---- | ---- |
-targetRootElement | string | `<empty string>` | Required | The HTML element to spawn CustUp into
+targetRootElement | `string` | `<empty string>` | Required | The HTML element to spawn CustUp into
 _custupDefaultUploadSentence | `string` | Drag files to upload or Click to select file from device | Not Required | The HTML element that shows the description on the default UI
-disable_scrollbar | boolean | `false` | Not required | Whether to disable scroll bar or not
-persist_default_ui | boolean | `false` | Not required | Whether the default UI should never be hidden
+disable_scrollbar | `boolean` | `false` | Not required | Whether to disable scroll bar or not
+persist_default_ui | `boolean` | `false` | Not required | Whether the default UI should never be hidden
+allowed_sources | `Array<'record_video' 'capture_image' 'record_audio' 'record_screen' 'link_source' 'google_drive_source' 'dropbox_source' 'box_source' 'openai_dalle_source'>` | `[]` | Not required | sources for selecting and adding files to CustUp
 use_default_file_display_ui | boolean | `true` | Not required | Whether to use the default file display UI, set it to `false` if you would like to use your own UI, if `false` the UI tools and scrollbar will not be shown and selected files will not be shown on the UI
 show_preview_file_btn | boolean | `true` | Not Required | whether to show file preview button or not
 autoInitialize | boolean | `true` | Not required | Whether to automatically initialize and add CustUp UI to the DOM
