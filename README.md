@@ -1,6 +1,8 @@
 # CustUp
 
-![Custup logo](https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup.png)
+<div style="width: 100%; display: flex; justify-content: center;">
+    <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup.png" alt="Custup logo" width="200" style="object-fit: contain;"/>
+</div>
 
 <!-- [START BADGES] -->
 <!-- Please keep comment here to allow auto update -->
