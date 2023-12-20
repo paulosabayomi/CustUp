@@ -1,4 +1,7 @@
 # CustUp
+
+![Custup logo](https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup.png)
+
 <!-- [START BADGES] -->
 <!-- Please keep comment here to allow auto update -->
 [![MIT License](https://img.shields.io/github/license/paulosabayomi/CustUp?style=flat-square)](https://github.com/paulosabayomi/CustUp/blob/master/LICENSE)
