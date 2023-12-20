@@ -600,7 +600,7 @@ export default class CustUpCore {
         ui_type != undefined && (this.options.ui_type = ui_type);
         position_container !== undefined && (this.options.position_container = position_container);
 
-        allowMultipleUpload && (this.options.allowMultipleUpload = allowMultipleUpload);
+        allowMultipleUpload !== undefined && (this.options.allowMultipleUpload = allowMultipleUpload);
 
         autoInitialize !== undefined && (this.options.autoInitialize = autoInitialize);
 
@@ -610,7 +610,7 @@ export default class CustUpCore {
         upload_automatically !== undefined && (this.options.upload_automatically = upload_automatically);
         show_upload_error_overlay !== undefined && (this.options.show_upload_error_overlay = show_upload_error_overlay);
 
-        _custupDefaultUploadSentence && (this.options._custupDefaultUploadSentence = _custupDefaultUploadSentence);
+        _custupDefaultUploadSentence !== undefined && (this.options._custupDefaultUploadSentence = _custupDefaultUploadSentence);
 
         if (file_source_icons != undefined) {
             for (const key in file_source_icons) {
@@ -734,10 +734,10 @@ export default class CustUpCore {
      * @param {string} identifyer
      * @returns {string}
      */
-    getRandChars (identifyer) {
+    getRandChars (identifyer, len=12) {
         const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         let randChars = ''
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < len; i++) {
             const randNum = Math.floor(Math.random() * (chars.length - 1))
             randChars += chars[randNum]
         }
@@ -1672,7 +1672,8 @@ export default class CustUpCore {
      * @returns {string}
      */
     get_unique_uuid () {
-        return "custup_"+crypto.randomUUID()
+        const __uuid = crypto.randomUUID ? crypto.randomUUID() : this.getRandChars('crypt',25);
+        return "custup_"+__uuid;
     }
 
     /**
@@ -1941,7 +1942,7 @@ export default class CustUpCore {
             }
             const customCheck = this.eventMethods.file_beforePassedChecks !== undefined ? this.eventMethods.file_beforePassedChecks(file) : undefined
             if (customCheck !== undefined && (customCheck[0] === false || customCheck === false)) {
-                this.show_message(customCheck?.[1], "error")
+                customCheck[1] && this.show_message(customCheck?.[1], "error");
                 continue;
             }
             before_add_callback_fn && before_add_callback_fn()
@@ -2086,7 +2087,7 @@ export default class CustUpCore {
 
         _class.__axios_instance.post('', _class.file_upload_form_data, {
             onUploadProgress: progressEvent => {
-                this.eventMethods.upload_progress && this.eventMethods.upload_progress({progressEvent});
+                this.eventMethods.upload_progress && this.eventMethods.upload_progress({progressEvent, all_files});
             }
         })
         .then((data) => {
@@ -2451,19 +2452,35 @@ export default class CustUpCore {
     }
 
     /**
-     * @method get_upload_unsuccessful_files - get total number of files that were not uploaded due to an error
+     * @method get_upload_unsuccessful_files_count - get total number of files that were not uploaded due to an error
      * @returns {number}
      */
-    get_upload_unsuccessful_files () {
+    get_upload_unsuccessful_files_count () {
         return this.filesNotSent.length
     }
 
     /**
-     * @method get_successfully_uploaded_files - get total number of files that were successfully uploaded
+     * @method get_successfully_uploaded_files_count - get total number of files that were successfully uploaded
+     * @returns {number}
+     */
+    get_successfully_uploaded_files_count () {
+        return this.successfullyUploadedFiles.length
+    }
+
+    /**
+     * @method get_upload_unsuccessful_files - get the files that were not uploaded due to an error
+     * @returns {number}
+     */
+    get_upload_unsuccessful_files () {
+        return this.filesNotSent
+    }
+
+    /**
+     * @method get_successfully_uploaded_files - get the files that were successfully uploaded
      * @returns {number}
      */
     get_successfully_uploaded_files () {
-        return this.successfullyUploadedFiles.length
+        return this.successfullyUploadedFiles
     }
 
     /**

@@ -247,7 +247,7 @@ export default class CustUp extends CustUpCore {
         upload_btn.className = "DUIUploadButton"
         upload_btn.innerHTML = "Upload"
         upload_btn.type = "button"
-        upload_btn.onclick = () => this.upload()
+            upload_btn.onclick = (e) => {e.currentTarget.innerHTML = "Uploading..."; this.upload()}
 
         const clear_all_btn = document.createElement('button')
         clear_all_btn.className = "DUIClearButton"
@@ -326,7 +326,6 @@ export default class CustUp extends CustUpCore {
         this.on("upload.beforeStart", () => {
             upload_btn.disabled = true
             clear_all_btn.disabled = true
-            upload_btn.innerHTML = "Uploading..."
         });
 
         this.on("upload.success", (e) => {
@@ -363,9 +362,9 @@ export default class CustUp extends CustUpCore {
             const progressInner = progress_container.querySelector('.DHIProgressInner')
             progressInner.style.backgroundColor = 'rgb(39, 39, 148)'
 
-            const progress_calc = ((e.progressEvent.loaded / e.progressEvent.total) * 100) + "%"
-            progressInner.style.width = progress_calc
-            progressText.innerHTML = progress_calc
+            const progress_calc = ((e.progressEvent.loaded / e.progressEvent.total) * 100)
+            progressInner.style.width = progress_calc + "%"
+            progressText.innerHTML = progress_calc.toFixed(1)
             if (e.progressEvent.loaded >= e.progressEvent.total) {
                 progressInner.style.backgroundColor = 'green'
             }

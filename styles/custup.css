@@ -1,6 +1,7 @@
 :root {
     --main-color: rgb(0, 150, 255);
     --border-radius: 15px;
+    --custup-gray: rgb(61, 61, 61);
 }
 
 div[class*="_custup_parent_container"] {
@@ -116,6 +117,7 @@ div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--custup-gray);
 }
 
 div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_default_ui_container ._custup_default_ui_inner_container ._custup_default_ui_upload_icons_container {
@@ -125,6 +127,8 @@ div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_
     z-index: +6;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_default_ui_container ._custup_default_ui_inner_container ._custup_default_ui_upload_icons_container > div {
@@ -228,7 +232,7 @@ div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_
     display: block;
     width: calc(33% - 10px);
     height: 150px;
-    margin-bottom: 50px;
+    margin-bottom: 65px;
     position: relative;
     border-radius: 10px;
     background-color: rgba(160, 160, 160, 0.4);
@@ -311,6 +315,9 @@ div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_
     box-shadow: 0px 2px 10px 1px rgba(10, 10, 10, 0.2);
     padding: 4px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_inner_container_wrapper_container ._custup_file_display_ui_container ._custup_file_ui_outer ._custup_upload_retry_upload_overlay_ui ._custup_upload_retry_upload_button svg {
@@ -389,7 +396,8 @@ div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_
 
 div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_inner_container_wrapper_container ._custup_file_display_ui_container  ._custup_file_ui_outer ._custup_file_details_ui ._custup_file_detail_file_name {
     font-size: 70%;
-    width: 100%
+    width: 100%;
+    color: var(--custup-gray);
 }
 
 div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_inner_container_wrapper_container ._custup_file_display_ui_container  ._custup_file_ui_outer ._custup_file_details_ui ._custup_file_detail_bottom_details_container {
