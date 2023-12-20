@@ -8,3 +8,4 @@ Gruntfile.js
 .npmignore
 _assets
 styles
+.vscode
