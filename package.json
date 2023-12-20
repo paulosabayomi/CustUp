@@ -28,7 +28,7 @@
   "bugs": {
     "url": "https://github.com/paulosabayomi/CustUp/issues"
   },
-  "homepage": "https://github.com/paulosabayomi/CustUp#readme",
+  "homepage": "https://custup.pryxy.com",
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@swc/core": "^1.3.100",

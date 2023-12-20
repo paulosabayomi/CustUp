@@ -549,6 +549,10 @@ retry_upload | To trigger upload retry for all files that were not uploaded due 
   
 And many more, read more about CustUp methods in the documentation
 
+## Documentation Homepage
+
+[CustUp documentation website](https://custup.pryxy.com)
+
 ## Inspiration
 
 When I was working on a freelance project that has a custom file upload UI design some years back, I searched for libraries that can fit into the design or ones that has an option to change the UI style to fit into my project and that does not have any dependencies but I couldn't find any that fit into the description and I had to write a custom implementation for the file uploader from scratch, then I decided to build a file upload library that fits into the description of the library I couldn't find then.
