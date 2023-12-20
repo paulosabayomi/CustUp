@@ -1,15 +1,11 @@
 # CustUp
 
 <div style="width: 100%; display: flex; justify-content: center;">
-    <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup.png" alt="Custup logo" width="200" style="object-fit: contain;"/>
+    <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup.png" alt="Custup logo" width="200" style="object-fit: contain; justify-self:center;"/>
 </div>
 
 <!-- [START BADGES] -->
 <!-- Please keep comment here to allow auto update -->
-[![MIT License](https://img.shields.io/github/license/paulosabayomi/CustUp?style=flat-square)](https://github.com/paulosabayomi/CustUp/blob/master/LICENSE)
-[![Language](https://img.shields.io/badge/logo-javascript-blue?logo=javascript)](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/What_is_JavaScript)
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg?style=flat-square)](https://github.com/paulosabayomi/CustUp/pulls)
-[![Tests](https://github.com/paulosabayomi/CustUp/actions/workflows/node.js.yml/badge.svg)](https://github.com/paulosabayomi/CustUp/actions/workflows/node.js.yml)
 <!-- [END BADGES] -->
   
 ![CustUp Init](https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png)  
