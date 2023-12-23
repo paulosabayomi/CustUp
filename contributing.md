@@ -1,7 +1,3 @@
----
-sidebar_position: 12
----
-
 # Contributing
 
 Contributions are welcome, my goal for CustUp is to make it a go to library for adding file uploader to any projects, your contributions are very important to make this possible.  
