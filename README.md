@@ -22,6 +22,10 @@ CustUp which is the short for Customizable Uploader was made to be >95% customiz
 - With the instance attachment feature, you can create multiple CustUp instances and upload all files at once together with form fields and/or additional data
 - You can get all the selected files and upload them manually
 - You don't need to worry about installing HTTP client to manage your upload requests because axios was bundled into CustUp which you can easily configure.
+
+## Documentation Homepage
+
+[CustUp documentation website](https://custup.pryxy.com)
   
 ## Quick Start
 
@@ -36,11 +40,11 @@ npm i custup
 OR include it via UNPKG
 
 ```js
-import CustUp from 'https://unpkg.com/custup@0.0.3/src/custup.min.js' 
+import CustUp from 'https://unpkg.com/custup@latest/src/custup.min.js' 
 
 // and the CSS file
 
-<link rel="stylesheet" href="https://unpkg.com/custup@0.0.3/src/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/custup@latest/src/all.min.css">
 ```
 
 ```js
@@ -549,10 +553,6 @@ retry_upload | To trigger upload retry for all files that were not uploaded due 
   
 And many more, read more about CustUp methods in the documentation
 
-## Documentation Homepage
-
-[CustUp documentation website](https://custup.pryxy.com)
-
 ## Inspiration
 
 When I was working on a freelance project that has a custom file upload UI design some years back, I searched for libraries that can fit into the design or ones that has an option to change the UI style to fit into my project and that does not have any dependencies but I couldn't find any that fit into the description and I had to write a custom implementation for the file uploader from scratch, then I decided to build a file upload library that fits into the description of the library I couldn't find then.
@@ -567,7 +567,7 @@ When I was working on a freelance project that has a custom file upload UI desig
 
 ## Contributing
 
-Contributions and PRs are welcome
+Contributions and PRs are welcome, learn ways you can contribute [here](https://github.com/paulosabayomi/CustUp/blob/master/contributing.md)
 
 ## License
 
