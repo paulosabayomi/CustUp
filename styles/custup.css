@@ -831,3 +831,34 @@ div[class*="_custup_parent_container"] ._custup_inner_parent_container ._custup_
     width: 100%;
     height: 100%;
 }
+
+/* Display widths */
+
+.w10perc {
+    width: calc(12% - 5px) !important;
+}
+
+.w14perc {
+    width: calc(14% - 10px) !important;
+}
+
+.w16perc {
+    width: calc(16% - 5px) !important;
+}
+
+.w25perc {
+    width: calc(25% - 10px) !important;
+}
+
+.w45perc {
+    width: 46% !important;
+}
+
+.w100perc {
+    width: 100% !important;
+}
+
+/* Flex boxes */
+.flexSpaceBetween {
+    justify-content: space-between !important;
+}

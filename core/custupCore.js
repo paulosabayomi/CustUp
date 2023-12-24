@@ -280,7 +280,6 @@ export default class CustUpCore {
                     isTouch: ( navigator.maxTouchPoints > 0 ) || ( navigator.msMaxTouchPoints > 0 ), // checks and automatically enables touch mode on devices that uses touch screen
                     autoFocus: false,
                     defaultView: 'files', // 'files' or 'recents'
-                    chooseButtonLabel: undefined, // String to re-label the Choose button
                     cancelButtonLabel: undefined, // String to re-label the Cancel button
                     requestInterceptor: undefined, // undefined | Function - like axios request interceptor
                     responseInterceptor: undefined, // undefined | Function - like axios response interceptor
@@ -386,70 +385,72 @@ export default class CustUpCore {
      *      allowed_sources: Array<'record_video' | 'capture_image' | 'record_audio' | 'record_screen' | 'link_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source'>;
      *      upload_automatically?: boolean;
      *      show_upload_error_overlay?: boolean;
-     *      video_recording: {
-     *           video_only: boolean;
-     *           show_image_capture_btn: boolean;
-     *       };
-     *       capture_image: {
-     *       };
-     *       record_audio: {
-     *       };
-     *       record_screen: {
-     *       };
-     *       url_source: {
-     *       };
-     *       google_drive_source: {
-     *           authConfig: {
-     *              client_id: string;
+     *      file_source_config: {
+     *        video_recording: {
+     *             video_only: boolean;
+     *             show_image_capture_btn: boolean;
+     *         };
+     *         capture_image: {
+     *         };
+     *         record_audio: {
+     *         };
+     *         record_screen: {
+     *         };
+     *         url_source: {
+     *         };
+     *         google_drive_source: {
+     *             authConfig: {
+     *                client_id: string;
+     *                api_key: string;
+     *                app_id: string;
+     *                scopes: string;
+     *             };
+     *         };
+     *         dropbox_source: {
+     *             authConfig: {
+     *                appKey: string;
+     *             };
+     *             options: {
+     *                cancel: Function;
+     *             };
+     *         };
+     *         box_source: {
+     *             authConfig: {
+     *                 developerToken: string;
+     *                 cssLink: string;
+     *                 jsLink: string;
+     *                 folder_id: string;
+     *             };
+     *             pickerConfig: {
+     *                 chooseButtonLabel?: string;
+     *                 sortBy?: 'name' | 'date';
+     *                 sortDirection?: 'ASC' | 'DESC';
+     *                 logoUrl?: string;
+     *                 canUpload?: boolean;
+     *                 canSetShareAccess?: boolean;
+     *                 canCreateNewFolder?: boolean;
+     *                 sharedLink?: string;
+     *                 sharedLinkPassword?: string;
+     *                 modal?: string;
+     *                 size?: 'large' | 'small';
+     *                 isTouch?: boolean;
+     *                 autoFocus?: boolean;
+     *                 defaultView?: 'files' | 'recents';
+     *                 chooseButtonLabel?: string;
+     *                 cancelButtonLabel?: string;
+     *                 requestInterceptor?: Function;
+     *                 responseInterceptor?: Function;
+     *             }
+     *         };
+     *         openai_dalle_source: {
+     *              endpoint: string;
      *              api_key: string;
-     *              app_id: string;
-     *              scopes: string;
-     *           };
-     *       };
-     *       dropbox_source: {
-     *           authConfig: {
-     *              appKey: string;
-     *           };
-     *           options: {
-     *              cancel: Function;
-     *           };
-     *       };
-     *       box_source: {
-     *           authConfig: {
-     *               developerToken: string;
-     *               cssLink: string;
-     *               jsLink: string;
-     *               folder_id: string;
-     *           };
-     *           pickerConfig: {
-     *               chooseButtonLabel?: string;
-     *               sortBy?: 'name' | 'date';
-     *               sortDirection?: 'ASC' | 'DESC';
-     *               logoUrl?: string;
-     *               canUpload?: boolean;
-     *               canSetShareAccess?: boolean;
-     *               canCreateNewFolder?: boolean;
-     *               sharedLink?: string;
-     *               sharedLinkPassword?: string;
-     *               modal?: string;
-     *               size?: 'large' | 'small';
-     *               isTouch?: boolean;
-     *               autoFocus?: boolean;
-     *               defaultView?: 'files' | 'recents';
-     *               chooseButtonLabel?: string;
-     *               cancelButtonLabel?: string;
-     *               requestInterceptor?: Function;
-     *               responseInterceptor?: Function;
-     *           }
-     *       };
-     *       openai_dalle_source: {
-     *            endpoint: string;
-     *            api_key: string;
-     *            size: "1024x1024" | "1024x1792" | "1792x1024";
-     *            n: number;
-     *            model: "dall-e-3" | "dall-e-2";
-     *            quality: "standard" | "hd";
-     *       };
+     *              size: "1024x1024" | "1024x1792" | "1792x1024";
+     *              n: number;
+     *              model: "dall-e-3" | "dall-e-2";
+     *              quality: "standard" | "hd";
+     *         };
+     * };
      *      default_files: Array<{file: string | File | Blob; isUploadable: boolean; headers: any}>;
      *      count_default_files: boolean;
      *      instance_attach: Array<CustUp>;
@@ -571,11 +572,8 @@ export default class CustUpCore {
         default_icons_override,
 
         // File sources config
-        video_recording,
-        google_drive_source,
-        dropbox_source,
-        box_source,
-        openai_dalle_source,
+        file_source_config,
+
         default_files,
         count_default_files,
         instance_attach,
@@ -621,49 +619,19 @@ export default class CustUpCore {
             }
         }
 
-        if (video_recording != undefined) {
-            for (const key in video_recording) {
-                if (Object.hasOwnProperty.call(video_recording, key)) {
-                    const value = video_recording[key];
-                    this.options.file_source_config.video_recording[key] = value
+        if (file_source_config !== undefined) {
+            Object.keys(file_source_config).forEach(mkey => {
+                for (const key in file_source_config[mkey]) {
+                    if (Object.hasOwnProperty.call(file_source_config[mkey], key)) {
+                        const value = file_source_config[mkey][key];
+                        if (typeof file_source_config[mkey][key] == 'object' && Object.keys(file_source_config[mkey][key]).length > 0) {
+                            this.options.file_source_config[mkey][key] = {...this.options.file_source_config[mkey][key], ...file_source_config[mkey][key]}
+                        }else{
+                            this.options.file_source_config[mkey][key] = value
+                        }
+                    }
                 }
-            }
-        }
-
-        if (google_drive_source != undefined) {
-            for (const key in google_drive_source) {
-                if (Object.hasOwnProperty.call(google_drive_source, key)) {
-                    const value = google_drive_source[key];
-                    this.options.file_source_config.google_drive_source[key] = value
-                }
-            }
-        }
-
-        if (dropbox_source != undefined) {
-            for (const key in dropbox_source) {
-                if (Object.hasOwnProperty.call(dropbox_source, key)) {
-                    const value = dropbox_source[key];
-                    this.options.file_source_config.dropbox_source[key] = value
-                }
-            }
-        }
-
-        if (box_source != undefined) {
-            for (const key in box_source) {
-                if (Object.hasOwnProperty.call(box_source, key)) {
-                    const value = box_source[key];
-                    this.options.file_source_config.box_source[key] = value
-                }
-            }
-        }
-
-        if (openai_dalle_source != undefined) {
-            for (const key in openai_dalle_source) {
-                if (Object.hasOwnProperty.call(openai_dalle_source, key)) {
-                    const value = openai_dalle_source[key];
-                    this.options.file_source_config.openai_dalle_source[key] = value
-                }
-            }
+            })
         }
 
 
@@ -1151,7 +1119,16 @@ export default class CustUpCore {
         }
         const handleOnClose = () => {
             _class._custupInnerEl.onwheel = (e) => _class.handleCustomScroll(e)
+            _class.set_scroll_pointer_event(this._custupInnerEl)
         }
+        const handleSetPointerEV = (el, targetEl) => {
+            const targetElScrollBarEl = targetEl.parentElement.querySelector(`div[class*='scroll_bar']`)
+            _class.set_scroll_pointer_event(el, targetEl, targetElScrollBarEl)
+        }
+        const setElementMediaQuery = (el) => {
+            _class.file_display_width_setter(el)
+        }
+
         const sType = {}
         sType[type] = config[type]
         
@@ -1161,11 +1138,12 @@ export default class CustUpCore {
             callbackFn: media_callback,
             custup_close_btn: this.close_popup_btn,
             custup_show_message_fn: show_message_ui,
-            handle_custom_scroll: {customScroll,customScrollbar},
+            handle_custom_scroll: {customScroll,customScrollbar,handleSetPointerEV},
             allowed_mime_types: this.options.allowed_file_types,
             onclose: handleOnClose,
             config_override: sType,
             style_override: this.options.external_source_style_override,
+            setElementMediaQuery
         })
     }
 
@@ -1180,10 +1158,40 @@ export default class CustUpCore {
         this.set_class_name("fileDisplayUI", this.fileDisplayUIEl);
         this.make_ui_tools();
         !this.options.disable_scrollbar && this.createScrollBar();
-        this._custupInnerEl.onmousedown = (e) => this.handleInnerElementContainerMouseDown(e);
-        this._custupInnerEl.onmouseup = (e) => this.handleInnerElementContainerMouseUp(e)
-        this._custupInnerContainerWrapperEl.append(this.fileDisplayUIEl)
-        this._custupInnerEl.onwheel = (e) => this.handleCustomScroll(e)
+        this._custupInnerContainerWrapperEl.append(this.fileDisplayUIEl);
+        this._custupInnerEl.onwheel = (e) => this.handleCustomScroll(e);
+        this.set_scroll_pointer_event(this._custupInnerEl);
+    }
+
+    /**
+     * @protected @method set_scroll_pointer_event
+     * @param {HTMLElement} el
+     */
+
+    set_scroll_pointer_event (el, targetEl=undefined, targetScrollBarEl=undefined) {
+        el.onpointerdown = (e) => {
+            e.stopPropagation();
+            // e.preventDefault();
+            if (e.target.classList.contains('_custup_dragger_tool')) {       
+                return this.handleInnerElementContainerMouseDown(e);
+            }
+            this.layerMoved = e.layerY
+            el.onpointermove = (e) => {e.preventDefault();e.stopPropagation();this.handleCustomScroll(e, targetEl, targetScrollBarEl);};
+        }
+        el.onpointerup = (e) => {
+            el.onpointermove = () => null;
+            this.handleInnerElementContainerMouseUp(e);
+        }
+
+        el.onpointerleave = (e) => {
+            el.onpointermove = () => null;
+            this.handleInnerElementContainerMouseUp(e);
+        }
+
+        el.onpointercancel = (e) => {
+            el.onpointermove = () => null;
+            this.handleInnerElementContainerMouseUp(e);
+        }
     }
 
     /**
@@ -1310,7 +1318,13 @@ export default class CustUpCore {
         e.preventDefault();
         e.stopPropagation();
         const outsetElementsHeight = Math.abs(this._custupInnerContainerWrapperEl?.clientHeight - (targetEl ?? this.fileDisplayUIEl)?.scrollHeight);
-        this.fileDisplayUIElCurrentScrollHeight += Math.floor(e.deltaY);
+        
+        if (e.type == "wheel") {
+            this.fileDisplayUIElCurrentScrollHeight += Math.floor(e.deltaY);
+        }else{
+            this.fileDisplayUIElCurrentScrollHeight += this.layerMoved - e.layerY;
+        }
+
         if (this.fileDisplayUIElCurrentScrollHeight >= outsetElementsHeight) {
             this.fileDisplayUIElCurrentScrollHeight = outsetElementsHeight;
         }
@@ -1330,11 +1344,15 @@ export default class CustUpCore {
      * @protected handleInnerElementContainerMouseDown
      */
     handleInnerElementContainerMouseDown (e) {
-        e.stopPropagation()
+        e.preventDefault();
+        e.stopPropagation();
         this.lastToolOffsetBottom = e.clientY
         this.lastToolOffsetLeft = e.clientX
         if (e.target.classList.contains("_custup_dragger_tool")) {
             this._custupInnerEl.onmousemove = (e) => this.handleToolDraggerMouseMove(e)           
+            this._custupInnerEl.onpointermove = (e) => this.handleToolDraggerMouseMove(e)           
+            this._custupInnerEl.onmouseup = (e) => this.handleInnerElementContainerMouseUp(e)
+            this._custupInnerEl.onpointerup = (e) => {e.stopPropagation();this.handleInnerElementContainerMouseUp(e)} 
         }else if (e.target.classList.contains("_custup_file_ui") || e.target.parentElement.classList.contains("_custup_file_ui")) {
             /**
              * TODO: implement changing of file position on the UI
@@ -1347,13 +1365,15 @@ export default class CustUpCore {
      */
     handleInnerElementContainerMouseUp (e) {
         this._custupInnerEl.onmousemove = null
+        this._custupInnerEl.onpointermove = null
     }
 
     /**
      * @protected handleToolDraggerMouseMove
      */
     handleToolDraggerMouseMove (e) {
-        e.stopPropagation()
+        e.preventDefault();
+        e.stopPropagation();
         const addToolElStyleLeft = this.currentToolElOffsetLeft == 0 ? this.UIToolEl.offsetLeft : 0;
         
         if (e.clientX > this.lastToolOffsetLeft) {
@@ -1424,6 +1444,7 @@ export default class CustUpCore {
         remove_file_btn.innerHTML = this.ui_icons.remove
         remove_file_btn.onclick = (e) => _class.handleRemoveFile(file)
         fileUIContainer.id = file.id
+        
         if (file.type.split('/')[0].toLowerCase() == 'image') {
             const fr = new FileReader()
             fr.onload = (e) => {
@@ -1441,6 +1462,8 @@ export default class CustUpCore {
         this.set_class_name("custup_fileSize", fileSize)
         this.set_class_name("fileUI", fileUI)
         this.set_class_name("remove_file_btn", remove_file_btn)
+
+        this.file_display_width_setter(fileUIContainer)
 
         fileName.innerHTML = this.clipFileNameIfShouldClip(file.name)
         fileName.title = file.name
@@ -1480,6 +1503,26 @@ export default class CustUpCore {
 
         (this.options.upload_automatically && isUploadable) && _class.handleUploadFile(file);
         this.options.persist_files && this.update_file_storage();
+    }
+
+    file_display_width_setter (el) {
+        const custupElWidth = this._custupEl.clientWidth;
+        if (custupElWidth >= 1400) {
+            el.classList.add('w10perc');
+        }else if (custupElWidth >= 1200 && custupElWidth < 1400) {
+            el.classList.add('w14perc');
+        }else if (custupElWidth >= 890 && custupElWidth < 1200) {
+            el.classList.add('w16perc');
+        }else if (custupElWidth >= 700 && custupElWidth < 890) {
+            el.classList.add('w25perc');
+        }else if (custupElWidth >= 500 && custupElWidth < 700) {
+            el.classList.add('w33perc');
+        }else if (custupElWidth >= 340 && custupElWidth < 500) {
+            this.fileDisplayUIEl.classList.add('flexSpaceBetween');
+            el.classList.add('w45perc');
+        }else{
+            el.classList.add('w100perc');
+        }
     }
 
     /**
@@ -2094,6 +2137,7 @@ export default class CustUpCore {
             this.eventMethods.upload_success && this.eventMethods.upload_success({data, files: all_files, formData: _class.file_upload_form_data});
         })
         .catch(err => {
+            this.show_message(err.message, 'error');
             this.eventMethods.upload_error && this.eventMethods.upload_error({err, files: all_files, formData: _class.file_upload_form_data});
         });
 
@@ -2189,6 +2233,7 @@ export default class CustUpCore {
             this.options.show_upload_error_overlay && _class.createRetryUploadOverlay(file, file.id);
             _class.removeFileUploadOverlay(upload_element, fileContainer, false);
             _class.filesNotSent.push(file);
+            this.show_message(err.message, 'error');
             this.eventMethods.upload_error && this.eventMethods.upload_error({err, file, upload_element, file_container: fileContainer});
         });
     }

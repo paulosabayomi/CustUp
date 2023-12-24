@@ -50,70 +50,72 @@ export default class CustUp extends CustUpCore {
     *      allowed_sources: Array<'record_video' | 'capture_image' | 'record_audio' | 'record_screen' | 'link_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source'>;
     *      upload_automatically?: boolean;
     *      show_upload_error_overlay?: boolean;
-    *      video_recording: {
-    *           video_only: boolean;
-    *           show_image_capture_btn: boolean;
-    *       };
-    *       capture_image: {
-    *       };
-    *       record_audio: {
-    *       };
-    *       record_screen: {
-    *       };
-    *       url_source: {
-    *       };
-    *       google_drive_source: {
-    *           authConfig: {
-    *              client_id: string;
+    *      file_source_config: {
+    *        video_recording: {
+    *             video_only: boolean;
+    *             show_image_capture_btn: boolean;
+    *         };
+    *         capture_image: {
+    *         };
+    *         record_audio: {
+    *         };
+    *         record_screen: {
+    *         };
+    *         url_source: {
+    *         };
+    *         google_drive_source: {
+    *             authConfig: {
+    *                client_id: string;
+    *                api_key: string;
+    *                app_id: string;
+    *                scopes: string;
+    *             };
+    *         };
+    *         dropbox_source: {
+    *             authConfig: {
+    *                appKey: string;
+    *             };
+    *             options: {
+    *                cancel: Function;
+    *             };
+    *         };
+    *         box_source: {
+    *             authConfig: {
+    *                 developerToken: string;
+    *                 cssLink: string;
+    *                 jsLink: string;
+    *                 folder_id: string;
+    *             };
+    *             pickerConfig: {
+    *                 chooseButtonLabel?: string;
+    *                 sortBy?: 'name' | 'date';
+    *                 sortDirection?: 'ASC' | 'DESC';
+    *                 logoUrl?: string;
+    *                 canUpload?: boolean;
+    *                 canSetShareAccess?: boolean;
+    *                 canCreateNewFolder?: boolean;
+    *                 sharedLink?: string;
+    *                 sharedLinkPassword?: string;
+    *                 modal?: string;
+    *                 size?: 'large' | 'small';
+    *                 isTouch?: boolean;
+    *                 autoFocus?: boolean;
+    *                 defaultView?: 'files' | 'recents';
+    *                 chooseButtonLabel?: string;
+    *                 cancelButtonLabel?: string;
+    *                 requestInterceptor?: Function;
+    *                 responseInterceptor?: Function;
+    *             }
+    *         };
+    *         openai_dalle_source: {
+    *              endpoint: string;
     *              api_key: string;
-    *              app_id: string;
-    *              scopes: string;
-    *           };
-    *       };
-    *       dropbox_source: {
-    *           authConfig: {
-    *              appKey: string;
-    *           };
-    *           options: {
-    *              cancel: Function;
-    *           };
-    *       };
-    *       box_source: {
-    *           authConfig: {
-    *               developerToken: string;
-    *               cssLink: string;
-    *               jsLink: string;
-    *               folder_id: string;
-    *           };
-    *           pickerConfig: {
-    *               chooseButtonLabel?: string;
-    *               sortBy?: 'name' | 'date';
-    *               sortDirection?: 'ASC' | 'DESC';
-    *               logoUrl?: string;
-    *               canUpload?: boolean;
-    *               canSetShareAccess?: boolean;
-    *               canCreateNewFolder?: boolean;
-    *               sharedLink?: string;
-    *               sharedLinkPassword?: string;
-    *               modal?: string;
-    *               size?: 'large' | 'small';
-    *               isTouch?: boolean;
-    *               autoFocus?: boolean;
-    *               defaultView?: 'files' | 'recents';
-    *               chooseButtonLabel?: string;
-    *               cancelButtonLabel?: string;
-    *               requestInterceptor?: Function;
-    *               responseInterceptor?: Function;
-    *           }
-    *       };
-    *       openai_dalle_source: {
-    *           authConfig: {
-    *               endpoint: string;
-    *               api_key: string;
-    *               size: "1024x1024" | "1024x1792" | "1792x1024";
-    *               n: number;
-    *           }
-    *       };
+    *              size: "1024x1024" | "1024x1792" | "1792x1024";
+    *              n: number;
+    *              model: "dall-e-3" | "dall-e-2";
+    *              quality: "standard" | "hd";
+    *         };
+    * };
     *      default_files: Array<{file: string | File | Blob; isUploadable: boolean; headers: any}>;
     *      count_default_files: boolean;
     *      instance_attach: Array<CustUp>;

@@ -37,6 +37,15 @@ Install from npm
 npm i custup
 ```
 
+```js
+import CustUp from 'path/to/custup/src/custup.min.js'
+const instance1 = new CustUp({
+    targetRootElement: '#container',
+})
+```
+
+if you get `Uncaught SyntaxError: import declarations may only appear at top level of a module` error add `type="module"` to the javascript file where `CustUp` was imported into.  
+  
 OR include it via UNPKG
 
 ```js
@@ -46,15 +55,6 @@ import CustUp from 'https://unpkg.com/custup@latest/src/custup.min.js'
 
 <link rel="stylesheet" href="https://unpkg.com/custup@latest/src/all.min.css">
 ```
-
-```js
-import CustUp from 'path/to/custup/src/custup.min.js'
-const instance1 = new CustUp({
-    targetRootElement: '#container',
-})
-```
-
-if you get `Uncaught SyntaxError: import declarations may only appear at top level of a module` error add `type="module"` to the javascript file where `CustUp` was imported into
 
 This will load the default UI which you can further customize to fit your need or the need of your application  
   

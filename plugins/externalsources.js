@@ -21,10 +21,12 @@ export default class ExternalSource {
     custup_show_message_fn
     handle_custom_scroll = {
         customScroll: () => null,
-        customScrollbar: () => null
+        customScrollbar: () => null,
+        handleSetPointerEV: () => null
     }
     allowed_mime_types = []
     onclose
+    setElementMediaQuery
 
     /**
      * @private @param {string} source_type
@@ -245,7 +247,8 @@ export default class ExternalSource {
         allowed_mime_types,
         onclose,
         config_override,
-        style_override
+        style_override,
+        setElementMediaQuery
     }) {
         if (inner_container == undefined && !standalone) {
             throw new Error('inner container of custup initialization is required')
@@ -264,16 +267,18 @@ export default class ExternalSource {
         this.allowed_mime_types = allowed_mime_types;
         this.onclose = onclose;
 
-        for (const key in config_override) {
-            if (Object.hasOwnProperty.call(config_override, key)) {
-                const value = config_override[key];
-                if (typeof this.config_override[key] == 'object' && Object.keys(this.config_override[key]).length > 0) {
-                    this.config_override =  this.updateObjectData(this.config_override, key, config_override[key])
-                }else{
-                    this.config_override[key] = value
+        Object.keys(config_override).forEach(mkey => {
+            for (const key in config_override[mkey]) {
+                if (Object.hasOwnProperty.call(config_override[mkey], key)) {
+                    const value = config_override[mkey][key];
+                    if (typeof config_override[mkey][key] == 'object' && Object.keys(config_override[mkey][key]).length > 0) {
+                        this.config_override[mkey][key] = {...this.config_override[mkey][key], ...config_override[mkey][key]}
+                    }else{
+                        this.config_override[mkey][key] = value
+                    }
                 }
             }
-        }
+        })
 
         if (style_override !== undefined) {
             for (const key in style_override) {
@@ -288,11 +293,14 @@ export default class ExternalSource {
             }
         }
 
+        this.setElementMediaQuery = setElementMediaQuery
+
 
         this.initialize();
     }
 
     /**
+     * @deprecated because this method is very buggy and I found a new way to implement it
      * @private @method updateObjectData - sets second level object key's value
      * @param {object} targetObject - the object to update
      * @param {string} key - the first-level key to update
@@ -916,7 +924,7 @@ export default class ExternalSource {
         const dalleIntialPageButtonContainer = document.createElement('div')
 
         const dalleIntialPageTitleText = document.createElement('div')
-        dalleIntialPageTitleText.innerText = "Generate Image with OpenAI DALL.E-2"
+        dalleIntialPageTitleText.innerText = "Generate Image with OpenAI DALL.E"
 
         const dalleIntialPageSearchInput = document.createElement('input')
         dalleIntialPageSearchInput.placeholder = "Type a prompt for DALL.E"
@@ -1014,13 +1022,13 @@ export default class ExternalSource {
         this.dallePreviewPageContainer = document.createElement('div')
 
         this.dalleOuterContainer.onwheel = (e) => this.handle_custom_scroll.customScroll(e, this.dallePreviewPageContainer)
-        
+
         const utils_button_container = document.createElement('div')
         const accept_files_btn = document.createElement('button')
         const accept_files_btn_check_mark = document.createElement('div')
-        const accept_files_btn_files_counter = document.createElement('div')
-        accept_files_btn_check_mark.innerHTML = icons.check
-        accept_files_btn_files_counter.innerHTML = this.dalleResponseData.length
+        const accept_files_btn_files_counter = document.createElement('div');
+        accept_files_btn_check_mark.innerHTML = icons.check;
+        accept_files_btn_files_counter.innerHTML = this.dalleResponseData.length;
 
         accept_files_btn.onclick = (e) => this.acceptDalleGeneratedFiles();
 
@@ -1044,6 +1052,7 @@ export default class ExternalSource {
             const preview_image_el = document.createElement('img')
             image_preview_container.append(preview_image_el)
             this.set_class_name("image_preview_container", image_preview_container)
+            this.setElementMediaQuery(image_preview_container)
 
 
             const fileInBlobFormat = this.base64ToBlob(image.b64_json)
@@ -1077,6 +1086,7 @@ export default class ExternalSource {
         this.dalleOuterContainer.append(this.dallePreviewPageContainer)
         this.dalleOuterContainer.append(utils_button_container)
         this.handle_custom_scroll.customScrollbar(this.dallePreviewPageContainer)
+        this.handle_custom_scroll.handleSetPointerEV(this.dalleOuterContainer, this.dallePreviewPageContainer);
 
     }
 
