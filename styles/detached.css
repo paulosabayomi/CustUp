@@ -48,6 +48,7 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
+    padding: 3px 10px;
 }
 
 .DHIFilePreviewEl {
@@ -79,6 +80,7 @@
 .DHIFileDetails {
     width: 80%;
     display: block;
+    margin-left: 5px;
 }
 
 .DHICloseBtnContainer {
@@ -100,6 +102,10 @@
     width: 100%;
     font-size: 85%;
     color: rgb(39, 39, 148); 
+}
+
+.DHIFilesizeContainer {
+    font-size: 80%;
 }
 
 .DHIUploadProgressContainer {
@@ -157,4 +163,5 @@
     padding: 6px 12px;
     border-radius: 15px;
     font-size: 85%;
+    cursor: pointer;
 }

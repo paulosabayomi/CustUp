@@ -220,8 +220,8 @@ export default class ExternalSource {
     *      custup_show_message_fn?: Function;
     *      onclose?: Function;
     *      handle_custom_scroll?: {
-    *       customScroll: Function,
-    *       customScrollbar: Function
+    *       customScroll: Function;
+    *       customScrollbar: Function;
     *      };
     *      allowed_mime_types: Array<keyof file_types>;
     *      config_override: {

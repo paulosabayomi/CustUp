@@ -1,6 +1,6 @@
 {
   "name": "custup",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Highly customisable file upload library with zero dependencies",
   "main": "src/custup.min.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "upload",
     "library"
   ],
-  "type": "module",
+  "type": "commonjs",
   "author": "Abayomi Amusa",
   "license": "MIT",
   "bugs": {

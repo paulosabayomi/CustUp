@@ -31,6 +31,7 @@ export default class CustUp extends CustUpCore {
     *      maximumAllowedFileSize: number; 
     *      ui_type: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture'; 
     *      display_ui_tools: boolean;
+    *      show_ui_tools_on_mobile_devices: boolean;
     *      disable_drag_n_drop: boolean;
     *      disable_select_files_from_device: boolean;
     *      allowed_tools: Array<'tools_dragger' | 'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
@@ -245,11 +246,11 @@ export default class CustUp extends CustUpCore {
         const button_container = document.createElement('div')
         button_container.className = "DUIBottomButtonContainer"
 
-        const upload_btn = document.createElement('button')
-        upload_btn.className = "DUIUploadButton"
-        upload_btn.innerHTML = "Upload"
-        upload_btn.type = "button"
-            upload_btn.onclick = (e) => {e.currentTarget.innerHTML = "Uploading..."; this.upload()}
+        const upload_btn = document.createElement('button');
+        upload_btn.className = "DUIUploadButton";
+        upload_btn.innerHTML = "Upload";
+        upload_btn.type = "button";
+        upload_btn.onclick = (e) => this.upload();
 
         const clear_all_btn = document.createElement('button')
         clear_all_btn.className = "DUIClearButton"
@@ -284,6 +285,9 @@ export default class CustUp extends CustUpCore {
             const textContainer = document.createElement('div')
             textContainer.className = "DHITextContainer"
             const file_name = document.createElement('div')
+            const file_size = document.createElement('div')
+            file_size.className = "DHIFilesizeContainer"
+            file_size.innerHTML = this.parseFileSize(e.file.size);
             const progress_text = document.createElement('div')
             progress_text.className = "DHIProgressText"
             file_name.innerHTML = this.clipFileNameIfShouldClip(e.file.name)
@@ -301,6 +305,7 @@ export default class CustUp extends CustUpCore {
             progressInner.style.width = '0%'
 
             file_details.appendChild(textContainer)
+            file_details.appendChild(file_size)
             file_details.appendChild(uploadProgressContainer)
 
             const close_btn_container = document.createElement('div');
@@ -327,7 +332,8 @@ export default class CustUp extends CustUpCore {
 
         this.on("upload.beforeStart", () => {
             upload_btn.disabled = true
-            clear_all_btn.disabled = true
+            clear_all_btn.disabled = true;
+            upload_btn.innerHTML = "Uploading...";
         });
 
         this.on("upload.success", (e) => {
@@ -366,7 +372,7 @@ export default class CustUp extends CustUpCore {
 
             const progress_calc = ((e.progressEvent.loaded / e.progressEvent.total) * 100)
             progressInner.style.width = progress_calc + "%"
-            progressText.innerHTML = progress_calc.toFixed(1)
+            progressText.innerHTML = progress_calc == 100 ? '100%' : progress_calc.toFixed(1) + "%";
             if (e.progressEvent.loaded >= e.progressEvent.total) {
                 progressInner.style.backgroundColor = 'green'
             }

@@ -210,6 +210,7 @@ export default class CustUpCore {
         disable_drag_n_drop: false,
         disable_select_files_from_device: false,
         allowed_tools: [],
+        show_ui_tools_on_mobile_devices: true,
 
         // File source icons customization
         file_source_icons: {
@@ -366,6 +367,7 @@ export default class CustUpCore {
      *      maximumAllowedFileSize: number; 
      *      ui_type: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture'; 
      *      display_ui_tools: boolean;
+     *      show_ui_tools_on_mobile_devices: boolean;
      *      disable_drag_n_drop: boolean;
      *      disable_select_files_from_device: boolean;
      *      allowed_tools: Array<'tools_dragger' | 'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
@@ -565,6 +567,7 @@ export default class CustUpCore {
         file_source_icons,
         allowed_sources,
         display_ui_tools,
+        show_ui_tools_on_mobile_devices,
         disable_drag_n_drop,
         disable_select_files_from_device,
         allowed_tools,
@@ -668,6 +671,7 @@ export default class CustUpCore {
         default_files != undefined && (this.options.default_files = default_files);
 
         display_ui_tools != undefined && (this.options.display_ui_tools = display_ui_tools);
+        show_ui_tools_on_mobile_devices !== undefined && (this.options.show_ui_tools_on_mobile_devices = show_ui_tools_on_mobile_devices);
         disable_drag_n_drop != undefined && (this.options.disable_drag_n_drop = disable_drag_n_drop);
         disable_select_files_from_device != undefined && (this.options.disable_select_files_from_device = disable_select_files_from_device);
 
@@ -1160,6 +1164,7 @@ export default class CustUpCore {
         !this.options.disable_scrollbar && this.createScrollBar();
         this._custupInnerContainerWrapperEl.append(this.fileDisplayUIEl);
         this._custupInnerEl.onwheel = (e) => this.handleCustomScroll(e);
+        this._custupInnerEl.onpointerdown = (e) => this.handleInnerElementContainerMouseDown(e);
         this.set_scroll_pointer_event(this._custupInnerEl);
     }
 
@@ -1169,27 +1174,17 @@ export default class CustUpCore {
      */
 
     set_scroll_pointer_event (el, targetEl=undefined, targetScrollBarEl=undefined) {
-        el.onpointerdown = (e) => {
+        el.ontouchstart = (e) => {
             e.stopPropagation();
-            // e.preventDefault();
-            if (e.target.classList.contains('_custup_dragger_tool')) {       
-                return this.handleInnerElementContainerMouseDown(e);
-            }
             this.layerMoved = e.layerY
-            el.onpointermove = (e) => {e.preventDefault();e.stopPropagation();this.handleCustomScroll(e, targetEl, targetScrollBarEl);};
+            el.ontouchmove = (e) => {
+                e.preventDefault();
+                document.querySelector('#test-div').innerHTML = document.querySelector('#test-div').innerHTML + "<br />" + e.layerY
+                window.requestAnimationFrame(() => this.handleCustomScroll(e, targetEl, targetScrollBarEl));
+            };
         }
-        el.onpointerup = (e) => {
-            el.onpointermove = () => null;
-            this.handleInnerElementContainerMouseUp(e);
-        }
-
-        el.onpointerleave = (e) => {
-            el.onpointermove = () => null;
-            this.handleInnerElementContainerMouseUp(e);
-        }
-
-        el.onpointercancel = (e) => {
-            el.onpointermove = () => null;
+        el.ontouchend = (e) => {
+            el.ontouchmove = () => null;
             this.handleInnerElementContainerMouseUp(e);
         }
     }
@@ -1205,7 +1200,6 @@ export default class CustUpCore {
         this.clearAllFilesBtnTool = document.createElement('div')
         this.addFilesUITool = document.createElement('div')
         this.uploadFilesToServerTool = document.createElement('div')
-        // this.addFilesToo = document.createElement('div')
         this.toolDragger = document.createElement('div')
         this.toolDragger.className = "_custup_dragger_tool"
         this.setNumberOfFiles()
@@ -1221,19 +1215,23 @@ export default class CustUpCore {
 
         const tools_arr = {
             added_files_count: () => {
-                this.UIToolEl.append(this.numberOfFilesDisplayTool)
+                this.UIToolEl.append(this.numberOfFilesDisplayTool);
+                (this.options.display_ui_tools && screen.width <= 768 && this.options.show_ui_tools_on_mobile_devices) && this._custupHeaderEl.querySelector('.inner').append(this.numberOfFilesDisplayTool);
             },
             add_file: () => {
-                this.UIToolEl.append(this.addFilesUITool)
+                this.UIToolEl.append(this.addFilesUITool);
+                (this.options.display_ui_tools && screen.width <= 768 && this.options.show_ui_tools_on_mobile_devices) && this._custupHeaderEl.querySelector('.inner').append(this.addFilesUITool);
             },
             clear_files: () => {
-                this.UIToolEl.append(this.clearAllFilesBtnTool)
+                this.UIToolEl.append(this.clearAllFilesBtnTool);
+                (this.options.display_ui_tools && screen.width <= 768 && this.options.show_ui_tools_on_mobile_devices) && this._custupHeaderEl.querySelector('.inner').append(this.clearAllFilesBtnTool);
             },
             upload: () => {
-                this.UIToolEl.append(this.uploadFilesToServerTool)
+                this.UIToolEl.append(this.uploadFilesToServerTool);
+                (this.options.display_ui_tools && screen.width <= 768 && this.options.show_ui_tools_on_mobile_devices) && this._custupHeaderEl.querySelector('.inner').append(this.uploadFilesToServerTool);
             },
             tools_dragger: () => {
-                this.UIToolEl.append(this.toolDragger)
+                this.UIToolEl.append(this.toolDragger);
             }
         }
         
@@ -1245,8 +1243,14 @@ export default class CustUpCore {
             }
         }
         
-        
-        this.options.display_ui_tools && this._custupInnerEl.append(this.UIToolEl)
+        if (screen.width > 768) {
+            this.options.display_ui_tools && this._custupInnerEl.append(this.UIToolEl)            
+        }else{
+            if (this.options.display_ui_tools && this.options.allowed_tools !== null) {
+                this._custupHeaderEl.classList.add('_custup_mobile_768_screen_tools_container');
+                this._custupInnerContainerWrapperEl.classList.add('_custup_inner_container_wrapper_container_768');
+            }
+        }
     }
     
     /**
@@ -1256,6 +1260,15 @@ export default class CustUpCore {
         if (this.options.maxNumberOfFiles != undefined && this._get_total_file_count() == this.options.maxNumberOfFiles) return this.show_message("Maximum number of allowed files reached", 'info')
         this.showDefaultUI(true)
     }
+
+    /**
+     * @protected @method attempt_clear_mobile_tools - This methods clears the ui tools if on mobile devices, if no tools were displayed it does nothing
+     */
+    attempt_clear_mobile_tools () {
+        this._custupHeaderEl.classList.contains('_custup_mobile_768_screen_tools_container') && (this._custupHeaderEl.querySelector('.inner').innerHTML = '');
+        this._custupHeaderEl.classList.remove('_custup_mobile_768_screen_tools_container');
+        this._custupInnerContainerWrapperEl.classList.remove('_custup_inner_container_wrapper_container_768');
+    }
     
     /**
      * @protected handleClearAllFiles
@@ -1263,9 +1276,10 @@ export default class CustUpCore {
      */
     handleClearAllFiles () {
         this.fileDisplayUIEl?.remove()
-        this.fileDisplayUIEl = undefined
-        this.UIToolEl?.remove()
-        this.UIToolEl = undefined
+        this.fileDisplayUIEl = undefined;
+        this.UIToolEl?.remove();
+        this.attempt_clear_mobile_tools();
+        this.UIToolEl = undefined;
         this.eventMethods.file_all_removed && this.eventMethods.file_all_removed([...this.defaultFiles, ...this.selectedFiles]);
         this.selectedFiles = []
         this.defaultFiles = []
@@ -1335,8 +1349,7 @@ export default class CustUpCore {
         const scrollBody = targetEl ?? this.fileDisplayUIEl;
         scrollBody && (scrollBody.style.top = -this.fileDisplayUIElCurrentScrollHeight + "px");
         const percentageScrolled = (Math.abs((targetEl ?? this.fileDisplayUIEl)?.offsetTop) / (targetEl ?? this.fileDisplayUIEl)?.scrollHeight) * 100;
-
-        const scrollBarEl = targetScrollBarEl ?? this.scrollBarEl
+        const scrollBarEl = targetScrollBarEl ?? this.scrollBarEl;
         scrollBarEl && (scrollBarEl.style.top = percentageScrolled + "%");
     }
 
@@ -1518,7 +1531,7 @@ export default class CustUpCore {
         }else if (custupElWidth >= 500 && custupElWidth < 700) {
             el.classList.add('w33perc');
         }else if (custupElWidth >= 340 && custupElWidth < 500) {
-            this.fileDisplayUIEl.classList.add('flexSpaceBetween');
+            this.fileDisplayUIEl?.classList.add('flexSpaceBetween');
             el.classList.add('w45perc');
         }else{
             el.classList.add('w100perc');
