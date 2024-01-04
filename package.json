@@ -22,7 +22,7 @@
     "upload",
     "library"
   ],
-  "type": "commonjs",
+  "type": "module",
   "author": "Abayomi Amusa",
   "license": "MIT",
   "bugs": {
