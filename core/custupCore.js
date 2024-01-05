@@ -1179,7 +1179,6 @@ export default class CustUpCore {
             this.layerMoved = e.layerY
             el.ontouchmove = (e) => {
                 e.preventDefault();
-                document.querySelector('#test-div').innerHTML = document.querySelector('#test-div').innerHTML + "<br />" + e.layerY
                 window.requestAnimationFrame(() => this.handleCustomScroll(e, targetEl, targetScrollBarEl));
             };
         }
