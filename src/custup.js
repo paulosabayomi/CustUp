@@ -102,7 +102,6 @@ export default class CustUp extends CustUpCore {
     *                 isTouch?: boolean;
     *                 autoFocus?: boolean;
     *                 defaultView?: 'files' | 'recents';
-    *                 chooseButtonLabel?: string;
     *                 cancelButtonLabel?: string;
     *                 requestInterceptor?: Function;
     *                 responseInterceptor?: Function;
