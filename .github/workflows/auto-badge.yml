@@ -43,7 +43,7 @@ jobs:
                 "link": "${{ env.repo_url }}/actions/workflows/setup-node.yml"
               },
               {
-                "badge": "https://github.com/paulosabayomi/CustUp/actions/workflows/ts-test.js.yml/badge.svg",
+                "badge": "https://github.com/paulosabayomi/CustUp/actions/workflows/test-ts.js.yml/badge.svg",
                 "alt": "TypeScript Test",
                 "link": "${{ env.repo_url }}/actions/workflows/test-ts.js.yml"
               }
