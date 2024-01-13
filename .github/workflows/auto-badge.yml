@@ -43,8 +43,13 @@ jobs:
                 "link": "${{ env.repo_url }}/actions/workflows/setup-node.yml"
               },
               {
+                "badge": "https://img.shields.io/badge/logo-typescript-blue?logo=typescript",
+                "alt": "TypeScript",
+                "link": "${{ env.repo_url }}/actions/workflows/test-ts.js.yml"
+              },
+              {
                 "badge": "https://github.com/paulosabayomi/CustUp/actions/workflows/test-ts.js.yml/badge.svg",
                 "alt": "TypeScript Test",
-                "link": "${{ env.repo_url }}/actions/workflows/test-ts.js.yml"
+                "link": "https://www.typescriptlang.org/"
               }
             ]
