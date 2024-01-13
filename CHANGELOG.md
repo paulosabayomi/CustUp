@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.8
+
+- New: Added typescript support
+
 ## 0.0.7 (2023-01-05)
 
 - Fix: a bug in custom scroll on touch devices caused by a test case that I forgot to remove.

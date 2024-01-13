@@ -438,7 +438,6 @@ export default class CustUpCore {
      *                 isTouch?: boolean;
      *                 autoFocus?: boolean;
      *                 defaultView?: 'files' | 'recents';
-     *                 chooseButtonLabel?: string;
      *                 cancelButtonLabel?: string;
      *                 requestInterceptor?: Function;
      *                 responseInterceptor?: Function;
@@ -455,7 +454,7 @@ export default class CustUpCore {
      * };
      *      default_files: Array<{file: string | File | Blob; isUploadable: boolean; headers: any}>;
      *      count_default_files: boolean;
-     *      instance_attach: Array<CustUp>;
+     *      instance_attach: Array<object>;
      *      single_upload: boolean;
      *      persist_files: boolean;
      *      persist_type: 'soft' | 'hard';

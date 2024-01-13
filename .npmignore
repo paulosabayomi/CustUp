@@ -11,3 +11,4 @@ styles
 .vscode
 contributing.md
 CHANGELOG.md
+tsconfig.json

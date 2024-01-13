@@ -1,6 +1,6 @@
 {
   "name": "custup",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "Highly customisable file upload library with zero dependencies",
   "main": "src/custup.min.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "library"
   ],
   "type": "module",
-  "types": "./custup.d.ts",
+  "types": "./src/custup.d.ts",
   "author": "Abayomi Amusa",
   "license": "MIT",
   "bugs": {
@@ -42,6 +42,10 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "msw": "^2.0.10",
+    "tsd": "^0.30.3",
     "undici": "^6.0.1"
+  },
+  "tsd": {
+    "directory": "__test__"
   }
 }

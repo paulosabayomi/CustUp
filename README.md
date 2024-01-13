@@ -562,7 +562,7 @@ When I was working on a freelance project that has a custom file upload UI desig
 - [ ] Upload resumable
 - [ ] Chunk upload
 - [ ] React js version
-- [ ] Typescript version
+- [x] Typescript version/support
 - [ ] Onedrive implementation
 
 ## Contributing
