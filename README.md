@@ -1,6 +1,6 @@
 # CustUp
 
-<div style="width: 100%; display: flex; justify-content: center;">
+<div align="center">
     <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup.png" alt="Custup logo" width="200" style="object-fit: contain; justify-self:center;"/>
 </div>
 
@@ -8,9 +8,7 @@
 <!-- Please keep comment here to allow auto update -->
 <!-- [END BADGES] -->
   
-<center>
-    <img width="100" height="100" src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png">
-</center>
+![CustUp Init](https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png)  
   
 CustUp is a highly customizable library with zero dependency, and can be easily adapted to a wide range of applications.  
   
