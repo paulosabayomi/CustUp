@@ -8,7 +8,9 @@
 <!-- Please keep comment here to allow auto update -->
 <!-- [END BADGES] -->
   
-![CustUp Init](https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png)  
+<center>
+    <img width="100" height="100" src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png">
+</center>
   
 CustUp is a highly customizable library with zero dependency, and can be easily adapted to a wide range of applications.  
   
@@ -39,6 +41,15 @@ npm i custup
 
 ```js
 import CustUp from 'path/to/custup/src/custup.min.js'
+const instance1 = new CustUp({
+    targetRootElement: '#container',
+})
+```
+
+**TypeScript**
+
+```js
+import CustUp from 'path/to/custup/'
 const instance1 = new CustUp({
     targetRootElement: '#container',
 })
