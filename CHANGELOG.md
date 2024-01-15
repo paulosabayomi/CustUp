@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- New: Added custup options typescript types
+
 ## 0.1.0
 
 - New: Added typescript support
