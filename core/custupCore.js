@@ -868,7 +868,7 @@ export default class CustUpCore {
 
         if (targetEl.dataset.custupInit != undefined) {
             console.warn(`${this.libraryName} has already been initialized in the ${this.options.targetRootElement} container`);
-            return false;
+            return this;
         }
 
         targetEl.setAttribute('data-custup-init', '_custup')
