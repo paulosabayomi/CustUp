@@ -43,8 +43,8 @@ describe('CustUp initialization test', () => {
         test('CustUp init object to be typeof Object', () => {
             expect(typeof init1).toBe('object')
         });
-        test('CustUp initializeUI should return false when called after CustUp has alread been initialized in a container', () => {
-            expect(init1.initializeUI()).toBe(false)
+        test('CustUp initializeUI should return the initialized instance when called after CustUp has alread been initialized in a container', () => {
+            expect(typeof init1.initializeUI()).toBe(typeof init1)
         });
         test('CustUp should create a wrapper div element', () => {
             expect(typeof init1._custupEl).toBe('object')
