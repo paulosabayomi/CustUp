@@ -8,7 +8,12 @@
 <!-- Please keep comment here to allow auto update -->
 <!-- [END BADGES] -->
   
-![CustUp Default UI type](https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png)  
+<div align="center">
+    <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png" alt="Custup logo" width="50%" style="object-fit: contain; justify-self:center;"/>
+    <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-2.png" alt="Custup logo" width="50%" style="object-fit: contain; justify-self:center;"/>
+    <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-3.png" alt="Custup logo" width="50%" style="object-fit: contain; justify-self:center;"/>
+    <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-4.png" alt="Custup logo" width="50%" style="object-fit: contain; justify-self:center;"/>
+</div>
   
 CustUp is a highly customizable library with zero dependency, and can be easily adapted to a wide range of applications.  
   
