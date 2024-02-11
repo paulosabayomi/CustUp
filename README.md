@@ -8,7 +8,7 @@
 <!-- Please keep comment here to allow auto update -->
 <!-- [END BADGES] -->
   
-<div align="center" style="display: flex;">
+<div style="display: flex;">
     <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png" alt="Custup logo" width="50%" style="object-fit: contain; justify-self:center;"/>
     <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-2.png" alt="Custup logo" width="50%" style="object-fit: contain; justify-self:center;"/>
     <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-3.png" alt="Custup logo" width="50%" style="object-fit: contain; justify-self:center;"/>
