@@ -1,9 +1,19 @@
 # Changelog
 
+## 1.0.5
+
+- Fix: Unhandled fetch exception when loading default files.
+
+## 1.0.4
+
+- Fix: Added toggle button to toggle add new file UI visible or hidden to the Elegant UI type.
+- New: Added hide_add_file_ui method
+- New: Added is_add_file_ui_shown
+
 ## 1.0.0
 
-- Added chunk upload
-- Added new UI type: elegant
+- New: Added chunk upload
+- New: Added new UI type: elegant
 - Fix: file persistent storage method, files are now stored as ObjectURL on https and base64 on http
 - New: Added auto upload for files added to the UI when files are still uploading
 - New: Added option display_file_sources: if set to false the file sources will not be listed on the default UI.

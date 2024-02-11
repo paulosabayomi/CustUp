@@ -890,7 +890,7 @@ export default class CustUpCore {
                 file.name = this.getRandChars('default')
                 file.isDefaultFile = !file_obj.isUploadable
                 this.handle_selected_files([file], null, file_obj.isUploadable)
-            })
+            }).catch(err => this.show_message('An error occured could not load a default file', 'error'));                
         })
 
     }
