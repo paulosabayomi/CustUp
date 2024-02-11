@@ -28,7 +28,11 @@ module.exports = function(grunt) {
                     ext: '.min.css'
                 },
                 {
-                    'src/all.min.css': ['styles/bare.css', 'styles/custup.css', 'styles/detached.css', 'styles/profilePicture.css', 'styles/resumeUploaderUI.css']
+                    'src/all.min.css': [
+                      'styles/bare.css', 'styles/custup.css', 
+                      'styles/detached.css', 'styles/profilePicture.css', 
+                      'styles/resumeUploaderUI.css', 'styles/elegant.css'
+                    ]
                 }
             ]
         }

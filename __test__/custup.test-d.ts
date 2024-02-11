@@ -4,4 +4,4 @@ import CustUp from '../src/custup'
 const instance1 = new CustUp({})
 
 expectType<CustUp>(instance1);
-expectType<false | undefined>(instance1.initializeUI());
+expectType<CustUp | undefined>(instance1.initializeUI());

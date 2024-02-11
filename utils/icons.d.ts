@@ -1,6 +1,7 @@
 declare const _default: {
     add_file: string;
     add_file_2: string;
+    add_file_filled: string;
     delete_filled: string;
     delete: string;
     edit: string;
@@ -54,6 +55,11 @@ declare const _default: {
     openai_logo: string;
     red_circle_cancel: string;
     upload_circle: string;
+    loading_partial: string;
+    desktop_device: string;
+    mobile_device: string;
+    search_icon: string;
+    bars: string;
 };
 export default _default;
 //# sourceMappingURL=icons.d.ts.map

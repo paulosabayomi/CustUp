@@ -43,6 +43,8 @@ export interface ICustUpOptions {
             headers: {};
             configs: {};
         };
+        chunk_size: number;
+        should_chunk: boolean;
     };
     allowed_sources?: Array<'record_video' | 'capture_image' | 'record_audio' | 'record_screen' | 'link_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source'>;
     upload_automatically?: boolean;
@@ -119,4 +121,10 @@ export interface ICustUpOptions {
     persist_files?: boolean;
     persist_type?: 'soft' | 'hard';
     alert_timeout_time?: number;
+    messages: {
+        timeout: number;
+    };
+    display_file_sources: boolean;
+    show_upload_progress_bar?: boolean;
+
 }

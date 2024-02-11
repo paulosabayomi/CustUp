@@ -68,7 +68,9 @@ export default class ExternalSource {
             ami: string;
             apk: string;
             appcache: string;
-            application: string;
+            application: string; /**
+             * URL Source
+             */
             apr: string;
             arc: string;
             asc: string;
@@ -366,7 +368,11 @@ export default class ExternalSource {
             igs: string;
             igx: string;
             iif: string;
-            imp: string;
+            imp: string; /**
+             * @private getRandChars
+             * @param {string} identifyer
+             * @returns {string}
+             */
             ims: string;
             in: string;
             ink: string;
@@ -1083,7 +1089,6 @@ export default class ExternalSource {
     accessToken: null;
     googleDrivePickerInited: boolean;
     gisInited: boolean;
-    dropboxInitialized: boolean;
     dropboxUIContainer: any;
     /**
      * OneDrive source
@@ -1126,11 +1131,16 @@ export default class ExternalSource {
     onedrivePickerPort: any;
     /**
      * @private @param {HTMLDivElement} dalleOuterContainer
+     */
+    private dalleOuterContainer;
+    /**
      * @public @param {HTMLDivElement} dalleInitialPageContainer
      */
-    public private dalleOuterContainer;
-    dalleInitialPageContainer: any;
-    dallePreviewPageContainer: any;
+    public dalleInitialPageContainer: any;
+    /**
+     * @public @param {HTMLDivElement} dallePreviewPageContainer
+     */
+    public dallePreviewPageContainer: any;
     dalleResponseData: any[];
     dalle_file_data: any[];
     dalle_selected_files: any[];
@@ -1230,9 +1240,10 @@ export default class ExternalSource {
     loadOneDrivePickerScript(): void;
     setupCustupCloseBtn(): void;
     createContainerUI(): void;
-    destroyContainerUI(): void;
+    destroyContainerUI(silent?: boolean): void;
     makeURLSourceUi(): void;
     handleAddFileFromURLSource(): Promise<void>;
+    dropboxIsInitialized(): boolean;
     handleAddFileFromDropbox(): void;
     addDropboxToUI(): void;
     /**
@@ -1251,6 +1262,7 @@ export default class ExternalSource {
     googleAPIisLoaded(): void;
     createGoogleDrivePicker(): void;
     googleDrivePickerCallback(data: any): Promise<void>;
+    isBoxScriptLoaded(): boolean;
     handleAddFileFromBox(): void;
     addBoxPickerToUI(): void;
     handleAddFileFromOneDrive(): void;

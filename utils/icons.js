@@ -28,6 +28,10 @@ export default {
             <path fill="#000000" d="M832 384H576V128H192v768h640V384zm-26.496-64L640 154.496V320h165.504zM160 64h480l256 256v608a32 32 0 0 1-32 32H160a32 32 0 0 1-32-32V96a32 32 0 0 1 32-32zm320 512V448h64v128h128v64H544v128h-64V640H352v-64h128z"/>
         </svg>
     `,
+    add_file_filled: `
+        <svg width="44" height="58" viewBox="0 0 44 58" xmlns="http://www.w3.org/2000/svg"><title>Combined Shape</title><path d="M22 32v-6h-2v6h-6v2h6v6h2v-6h6v-2h-6zM34.997 0H3.007A2.998 2.998 0 0 0 0 2.996v52.008A3.006 3.006 0 0 0 3.007 58h37.986A2.998 2.998 0 0 0 44 55.004V8.998 15L29 0h5.997zM29 5l10 10h-9.005c-.55 0-.995-.456-.995-.995V5z" fill="#BDBDBD" fill-rule="evenodd"/>
+        </svg>
+    `,
     delete_filled: `
         <svg width="800px" height="800px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
             <path fill="#000000" d="M352 192V95.936a32 32 0 0 1 32-32h256a32 32 0 0 1 32 32V192h256a32 32 0 1 1 0 64H96a32 32 0 0 1 0-64h256zm64 0h192v-64H416v64zM192 960a32 32 0 0 1-32-32V256h704v672a32 32 0 0 1-32 32H192zm224-192a32 32 0 0 0 32-32V416a32 32 0 0 0-64 0v320a32 32 0 0 0 32 32zm192 0a32 32 0 0 0 32-32V416a32 32 0 0 0-64 0v320a32 32 0 0 0 32 32z"/>
@@ -120,14 +124,13 @@ export default {
         </svg>
     `,
     cancel: `
-        <svg width="800px" height="800px" viewBox="0 0 512 512" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <g id="_x37_12-_close__x2C__cross__x2C__cancel__x2C_">
-                <g>
-                    <line style="fill:none;stroke:#000000;stroke-width:13.4167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:2.6131;" x1="486.21" x2="26.739" y1="26.814" y2="486.139"/>
-                    <line style="fill:none;stroke:#000000;stroke-width:13.4167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:2.6131;" x1="486.21" x2="26.739" y1="486.139" y2="26.814"/>
-                </g>
+        <svg fill="#000000" viewBox="0 0 200 200" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier">
+                <title></title>
+                <path d="M114,100l49-49a9.9,9.9,0,0,0-14-14L100,86,51,37A9.9,9.9,0,0,0,37,51l49,49L37,149a9.9,9.9,0,0,0,14,14l49-49,49,49a9.9,9.9,0,0,0,14-14Z"></path>
             </g>
-            <g id="Layer_1"/>
         </svg>
     `,
     remove: `
@@ -706,6 +709,46 @@ export default {
                         <path d="M376,1117 C368.268,1117 362,1110.73 362,1103 C362,1095.27 368.268,1089 376,1089 C383.732,1089 390,1095.27 390,1103 C390,1110.73 383.732,1117 376,1117 L376,1117 Z M376,1087 C367.163,1087 360,1094.16 360,1103 C360,1111.84 367.163,1119 376,1119 C384.837,1119 392,1111.84 392,1103 C392,1094.16 384.837,1087 376,1087 L376,1087 Z M376.879,1096.46 C376.639,1096.22 376.311,1096.15 376,1096.21 C375.689,1096.15 375.361,1096.22 375.121,1096.46 L369.465,1102.12 C369.074,1102.51 369.074,1103.14 369.465,1103.54 C369.854,1103.93 370.488,1103.93 370.879,1103.54 L375,1099.41 L375,1110 C375,1110.55 375.447,1111 376,1111 C376.553,1111 377,1110.55 377,1110 L377,1099.41 L381.121,1103.54 C381.512,1103.93 382.145,1103.93 382.535,1103.54 C382.926,1103.14 382.926,1102.51 382.535,1102.12 L376.879,1096.46 L376.879,1096.46 Z" id="arrow-up-circle" sketch:type="MSShapeGroup"> </path> 
                     </g> 
                 </g> 
+            </g>
+        </svg>
+    `,
+    loading_partial: `
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Download_x5F_25_x25_"> </g> <g id="Download_x5F_50_x25_"> </g> <g id="Download_x5F_75_x25_"> </g> <g id="Download_x5F_100_x25_"> </g> <g id="Upload"> </g> <g id="Next"> </g> <g id="Last"> </g> <g id="OK"> </g> <g id="Fail"> </g> <g id="Add"> </g> <g id="Spinner_x5F_0_x25_"> </g> <g id="Spinner_x5F_25_x25_"> </g> <g id="Spinner_x5F_50_x25_"> </g> <g id="Spinner_x5F_75_x25_"> <g> <path fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d=" M50.915,26.824C63.385,27.208,73.375,37.437,73.375,50c0,12.806-10.381,23.188-23.188,23.188c-11.303,0-20.717-8.087-22.771-18.79 c-0.154-0.804-0.262-1.566-0.331-2.397"></path> <g> <ellipse transform="matrix(0.9962 -0.0867 0.0867 0.9962 -3.713 2.567)" cx="27.71" cy="44.049" rx="1.959" ry="1.959"></ellipse> <ellipse transform="matrix(0.9962 -0.0867 0.0867 0.9962 -3.079 2.8158)" cx="30.892" cy="36.872" rx="1.959" ry="1.959"></ellipse> <ellipse transform="matrix(0.9962 -0.0867 0.0867 0.9962 -2.567 3.266)" cx="36.334" cy="31.199" rx="1.959" ry="1.959"></ellipse> <ellipse transform="matrix(0.9962 -0.0867 0.0867 0.9962 -2.2318 3.8617)" cx="43.363" cy="27.636" rx="1.959" ry="1.959"></ellipse> </g> </g> </g> <g id="Brightest_x5F_25_x25_"> </g> <g id="Brightest_x5F_50_x25_"> </g> <g id="Brightest_x5F_75_x25_"> </g> <g id="Brightest_x5F_100_x25_"> </g> <g id="Reload"> </g> <g id="Forbidden"> </g> <g id="Clock"> </g> <g id="Compass"> </g> <g id="World"> </g> <g id="Speed"> </g> <g id="Microphone"> </g> <g id="Options"> </g> <g id="Chronometer"> </g> <g id="Lock"> </g> <g id="User"> </g> <g id="Position"> </g> <g id="No_x5F_Signal"> </g> <g id="Low_x5F_Signal"> </g> <g id="Mid_x5F_Signal"> </g> <g id="High_x5F_Signal"> </g> <g id="Options_1_"> </g> <g id="Flash"> </g> <g id="No_x5F_Signal_x5F_02"> </g> <g id="Low_x5F_Signal_x5F_02"> </g> <g id="Mid_x5F_Signal_x5F_02"> </g> <g id="High_x5F_Signal_x5F_02"> </g> <g id="Favorite"> </g> <g id="Search"> </g> <g id="Stats_x5F_01"> </g> <g id="Stats_x5F_02"> </g> <g id="Turn_x5F_On_x5F_Off"> </g> <g id="Full_x5F_Height"> </g> <g id="Full_x5F_Width"> </g> <g id="Full_x5F_Screen"> </g> <g id="Compress_x5F_Screen"> </g> <g id="Chat"> </g> <g id="Bluetooth"> </g> <g id="Share_x5F_iOS"> </g> <g id="Share_x5F_Android"> </g> <g id="Love__x2F__Favorite"> </g> <g id="Hamburguer"> </g> <g id="Flying"> </g> <g id="Take_x5F_Off"> </g> <g id="Land"> </g> <g id="City"> </g> <g id="Nature"> </g> <g id="Pointer"> </g> <g id="Prize"> </g> <g id="Extract"> </g> <g id="Play"> </g> <g id="Pause"> </g> <g id="Stop"> </g> <g id="Forward"> </g> <g id="Reverse"> </g> <g id="Next_1_"> </g> <g id="Last_1_"> </g> <g id="Empty_x5F_Basket"> </g> <g id="Add_x5F_Basket"> </g> <g id="Delete_x5F_Basket"> </g> <g id="Error_x5F_Basket"> </g> <g id="OK_x5F_Basket"> </g> </g></svg>
+    `,
+    desktop_device: `
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier"> 
+                <path d="M3 19H21M6 17H18C19.1046 17 20 16.1046 20 15V8C20 6.89543 19.1046 6 18 6H6C4.89543 6 4 6.89543 4 8V15C4 16.1046 4.89543 17 6 17Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+            </g>
+        </svg>
+    `,
+    mobile_device: `
+        <svg fill="#000000" viewBox="0 -8 72 72" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier">
+                <title>mobile</title>
+                <path d="M49.75,0H22.25a4,4,0,0,0-4.16,3.78V52.22A4,4,0,0,0,22.25,56h27.5a4,4,0,0,0,4.16-3.78V3.78A4,4,0,0,0,49.75,0ZM31.6,2.73h8.8a.48.48,0,0,1,.5.46.47.47,0,0,1-.5.45H31.6a.47.47,0,0,1-.5-.45A.48.48,0,0,1,31.6,2.73ZM36,54.11a1.9,1.9,0,1,1,2.08-1.89A2,2,0,0,1,36,54.11ZM51,49H21V6H51Z"></path>
+            </g>
+        </svg>
+    `,
+    search_icon: `
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier"> 
+                <path d="M14.9536 14.9458L21 21M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="#7c7c7c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+            </g>
+        </svg>
+    `,
+    bars: `
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier"> 
+                <path stroke="#666666" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6H20M4 12H20M4 18H20"></path> 
             </g>
         </svg>
     `

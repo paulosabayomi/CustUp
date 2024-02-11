@@ -16,13 +16,13 @@ export default class CustUpCore {
 
     /**
      * Array that holds default loaded files
-     * @public @property {File[]} defaultFiles
+     * @protected @property {File[]} defaultFiles
      */
     defaultFiles = [];
 
     /**
      * Array that holds all selected files
-     * @public @property {File[]} selectedFiles
+     * @protected @property {File[]} selectedFiles
      */
     selectedFiles = [];
     
@@ -37,6 +37,12 @@ export default class CustUpCore {
      * @protected @property {File[]} successfullyUploadedFiles
      */
     successfullyUploadedFiles = [];
+    
+    /**
+     * An array that holds successfully uploaded files
+     * @protected @property {File[]} currentlyUploadingFiles
+     */
+    currentlyUploadingFiles = [];
 
     /**
      * UI messages items offset counter
@@ -69,6 +75,32 @@ export default class CustUpCore {
     __axios_instance = undefined;
 
     /**
+     * @private @property {Object} file_chunks
+     */
+    file_chunks = {}
+
+    /**
+     * @private @property {Object} file_progress
+     */
+    file_progress = {}
+
+    /**
+     * @private @property {any} _custup_media_source_instance
+     */
+    _custup_media_source_instance = undefined
+    
+
+    /**
+     * @private @property {any} _custup_external_source_instance
+     */
+    _custup_external_source_instance = undefined
+
+    /**
+     * @private @property {any} _is_secured_context
+     */
+    _is_secured_context = window.location.protocol === 'https:'
+
+    /**
      * Events
      * @private @property {any} eventMethods
      */
@@ -85,6 +117,10 @@ export default class CustUpCore {
         upload_success: undefined,
         upload_error: undefined,
         upload_retry: undefined,
+        upload_all_finished: undefined,
+        file_source_closed: undefined,
+        default_ui_shown: undefined,
+        default_ui_closed: undefined,
     };
 
     /**
@@ -130,8 +166,15 @@ export default class CustUpCore {
     addFilesUITool = undefined; // tool that opens the default UI to add more files
     uploadFilesToServerTool = undefined; // the tool that calls the method that uploads all selected file to the server
     close_popup_btn = undefined; // Custup close popup btn
+
+    /**
+     * @private @property {Array} file_preview_animation_arr
+     */
     file_preview_animation_arr = []; // Custup close popup btn
 
+    /**
+     * @private @property {Object} previewerAnimations
+     */
     // file preview animations 
     previewerAnimations = {
         slideInLeft: [
@@ -163,21 +206,42 @@ export default class CustUpCore {
 
     // tool dragger
     toolDragger = undefined; // the tool for dragging the UI tool on the UI
+
+    /**
+     * @private @property {number} currentToolElOffsetLeft
+     */
     currentToolElOffsetLeft = 0;
+    
+    /**
+     * @private @property {number} currentToolElOffsetBottom
+     */
     currentToolElOffsetBottom = 0;
+
+    /**
+     * @private @property {number} lastToolOffsetBottom
+     */
     lastToolOffsetBottom = 0;
+
+    /**
+     * @private @property {number} lastToolOffsetLeft
+     */
     lastToolOffsetLeft = 0;
 
     // Custom Scrolling
+    /**
+     * @private @property {number} fileDisplayUIElCurrentScrollHeight
+     */
     fileDisplayUIElCurrentScrollHeight = 0; // scolling position tracker
+
+    /**
+     * @public @property {number} scrollBarEl
+     */
     scrollBarEl = undefined; // custom scroll bar
 
 
     /** Custup Options
      * @protected @param {{}} options
-     * 
     */
-
     options = {
         // Core Options
         autoInitialize: true,
@@ -226,6 +290,7 @@ export default class CustUpCore {
         },
 
         allowed_sources: [],
+        display_file_sources: true,
 
         // Upload source config
         file_source_config: {
@@ -317,10 +382,13 @@ export default class CustUpCore {
             axios_settings: {
                 headers: {},
                 configs: {}
-            }
+            },
+            chunk_size: 1024 * 1024,
+            should_chunk: false
         },
         upload_automatically: false, // whether to upload file to the server automatically
         show_upload_error_overlay: true,
+        show_upload_progress_bar: true,
 
         // Default files File | Blob | link | base64
         default_files: [],
@@ -334,7 +402,11 @@ export default class CustUpCore {
         persist_type: 'soft',
 
         // notification
-        alert_timeout_time: 300
+        alert_timeout_time: 300,
+
+        messages: {
+            timeout: 4000
+        }
     }
 
 
@@ -383,10 +455,14 @@ export default class CustUpCore {
      *               headers: {};
      *               configs: {};
      *          };
+     *          chunk_size: number;
+     *          should_chunk: boolean;
      *      };
      *      allowed_sources: Array<'record_video' | 'capture_image' | 'record_audio' | 'record_screen' | 'link_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source'>;
+     *      display_file_sources: boolean;
      *      upload_automatically?: boolean;
      *      show_upload_error_overlay?: boolean;
+     *      show_upload_progress_bar?: boolean;
      *      file_source_config: {
      *        video_recording: {
      *             video_only: boolean;
@@ -459,6 +535,9 @@ export default class CustUpCore {
      *      persist_files: boolean;
      *      persist_type: 'soft' | 'hard';
      *      alert_timeout_time: number;
+     *      messages: {
+     *          timeout: number;
+     *      };
      * }}  
      * 
      * @param autoInitialize - Whether to automatically initialize the library
@@ -563,8 +642,10 @@ export default class CustUpCore {
         file_upload,
         upload_automatically,
         show_upload_error_overlay,
+        show_upload_progress_bar,
         file_source_icons,
         allowed_sources,
+        display_file_sources,
         display_ui_tools,
         show_ui_tools_on_mobile_devices,
         disable_drag_n_drop,
@@ -583,7 +664,8 @@ export default class CustUpCore {
 
         persist_files,
         persist_type,
-        alert_timeout_time
+        alert_timeout_time,
+        messages
     }) { 
 
         if (targetRootElement == undefined) {
@@ -609,6 +691,7 @@ export default class CustUpCore {
         
         upload_automatically !== undefined && (this.options.upload_automatically = upload_automatically);
         show_upload_error_overlay !== undefined && (this.options.show_upload_error_overlay = show_upload_error_overlay);
+        show_upload_progress_bar !== undefined && (this.options.show_upload_progress_bar = show_upload_progress_bar);
 
         _custupDefaultUploadSentence !== undefined && (this.options._custupDefaultUploadSentence = _custupDefaultUploadSentence);
 
@@ -650,6 +733,7 @@ export default class CustUpCore {
         use_default_file_display_ui !== undefined && (this.options.use_default_file_display_ui = use_default_file_display_ui);
 
         allowed_sources !== undefined && (this.options.allowed_sources = allowed_sources);
+        display_file_sources !== undefined && (this.options.display_file_sources = display_file_sources);
         allowed_tools !== undefined && (this.options.allowed_tools = allowed_tools);
         file_preview_animation_types !== undefined && (this.options.file_preview_animation_types = file_preview_animation_types);
         
@@ -677,6 +761,8 @@ export default class CustUpCore {
         this.options.file_upload_settings.files_field_name = file_upload?.files_field_name;
         this.options.file_upload_settings.endpoint_url = file_upload?.endpoint_url;
         this.options.file_upload_settings.additional_data = file_upload?.additional_data;
+        file_upload?.chunk_size !== undefined && (this.options.file_upload_settings.chunk_size = file_upload?.chunk_size);
+        file_upload?.should_chunk !== undefined && (this.options.file_upload_settings.should_chunk = file_upload?.should_chunk);
 
         this.options.file_upload_settings.form_field = (typeof file_upload?.form_field == "string" && file_upload?.form_field != '') ? document.querySelector(file_upload?.form_field) : file_upload?.form_field;
         this.options.file_upload_settings.form_field = this.options.file_upload_settings.form_field == '' ? undefined : this.options.file_upload_settings.form_field;
@@ -687,6 +773,15 @@ export default class CustUpCore {
                 if (Object.hasOwnProperty.call(file_upload?.axios_settings, key)) {
                     const value = file_upload?.axios_settings[key];
                     this.options.file_upload_settings.axios_settings[key] = {...this.options.file_upload_settings.axios_settings[key], ...value}
+                }
+            }
+        }
+        
+        if (messages !== undefined && Object.keys(messages).length > 0) {
+            for (const key in messages) {
+                if (Object.hasOwnProperty.call(messages, key)) {
+                    const value = messages[key];
+                    this.options.messages[key] = value
                 }
             }
         }
@@ -735,6 +830,10 @@ export default class CustUpCore {
         document.head.append(font_link)
     }
 
+    /**
+     * @protected @method map_override_styles_to_default_styles - maps the provided styles to the default styles
+     * @param {Object} o_style - The style to map to the default styles
+     */
     map_override_styles_to_default_styles (o_style) {
         if (this.options.persist_styles_override_across_instances == true) {
             this.ui_styles = ui_styles // override cloning to the object itself
@@ -753,6 +852,9 @@ export default class CustUpCore {
 
     }
 
+    /**
+     * @protected @method map_override_icons_to_default_icons - Maps the provided icons to the current icons
+     */
     map_override_icons_to_default_icons () {
         for (const key in this.options.default_icons_override) {
             if (Object.hasOwnProperty.call(this.options.default_icons_override, key)) {
@@ -762,6 +864,9 @@ export default class CustUpCore {
         }
     }
 
+    /**
+     * @protected @method load_default_files - Loads default files
+     */
     load_default_files () {
         const URLFilesArr = []
         this.options.default_files.map(file_obj => {
@@ -790,25 +895,30 @@ export default class CustUpCore {
      */
     async update_file_storage () {
         const _regexp = /[^\w\d]/g
-        const session_name = this.options.targetRootElement.replace(_regexp, '')
-        const storage_type = this.options.persist_type == 'soft' ? sessionStorage : localStorage
-        const sess_files = []
+        const session_name = this.options.targetRootElement.replace(_regexp, '');
+        const storage_type = this.options.persist_type == 'soft' ? window.sessionStorage : window.localStorage;
+        const sess_files = [];
         let counter = 0;
-        this.selectedFiles.reverse()
-        this.selectedFiles.map(file => {
-            const reader = new FileReader();
+        const selected_files_clone = [...this.selectedFiles];
+        if (this._is_secured_context) {
+            const objURLs = selected_files_clone.map(file => ({file: URL.createObjectURL(file), name: file.name, id: file.id}))
+            storage_type.setItem(session_name, JSON.stringify(objURLs));            
+        }else{
+            selected_files_clone.map(file => {
+                const reader = new FileReader();
+    
+                reader.onload = (event) => {
+                    const b64 = event.target.result;
+                    sess_files.push({file: b64, name: file.name, id: file.id})
+                    counter += 1
+                    if (counter == selected_files_clone.length) {
+                        storage_type.setItem(session_name, JSON.stringify(sess_files))
+                    }
+                };
 
-            reader.onload = (event) => {
-                const b64 = event.target.result;
-                sess_files.push({file: b64, name: file.name, id: file.id})
-                counter += 1
-                if (counter == this.selectedFiles.length) {
-                    storage_type.setItem(session_name, JSON.stringify(sess_files))
-                }
-            };
-
-            reader.readAsDataURL(file);
-        })
+                reader.readAsDataURL(file);
+            })
+        }
 
     }
 
@@ -842,8 +952,8 @@ export default class CustUpCore {
         const session_name = this.options.targetRootElement.replace(_regexp, '');
         const storage_type = this.options.persist_type == 'soft' ? sessionStorage : localStorage
         const sess_files_out = JSON.parse(storage_type.getItem(session_name) || '[]');
-        const filter_files = sess_files_out.filter(file => file.id != file_id)
-        this.update_file_storage(filter_files)
+        const filter_files = sess_files_out.filter(file => file.id != file_id);
+        this.options.persist_files && this.update_file_storage(filter_files);
     }
 
     /**
@@ -859,7 +969,6 @@ export default class CustUpCore {
     /**
      * @public initializeUI
      */
-
     initializeUI () {
         const targetEl = document.querySelector(this.options.targetRootElement);
         if (targetEl == null) {
@@ -940,6 +1049,7 @@ export default class CustUpCore {
      */
 
     showDefaultUI (after_container_init = false) {
+        if (this._custupDefaultUIEl != undefined) return;
         this._custupDefaultUIEl = document.createElement('div')
         this._custupDefaultUIInnerContentEl = document.createElement('div')
         const defaultUIUploadSentenceContainer = document.createElement('div')
@@ -953,79 +1063,9 @@ export default class CustUpCore {
             iconsContainer.append(cancelIcon)            
         }
 
-        const file_sources_arr = {
-            record_video: () => {
-                const recordVideoIcon = document.createElement('div')
-                recordVideoIcon.innerHTML = this.options.file_source_icons.video_camera
-                recordVideoIcon.title = `Record Video`
-                recordVideoIcon.onclick = (e) => {e.stopPropagation(); this.handleMediaSource('video')}
-                iconsContainer.append(recordVideoIcon)  
-            },
-            capture_image: () => {
-                const captureImageIcon = document.createElement('div')
-                captureImageIcon.innerHTML = this.options.file_source_icons.capture_image 
-                captureImageIcon.title = `Capture Image`
-                captureImageIcon.onclick = (e) => {e.stopPropagation(); this.handleMediaSource('image')}
-                iconsContainer.append(captureImageIcon) 
-            },
-            record_audio: () => {
-                const recordAudioIcon = document.createElement('div')
-                recordAudioIcon.innerHTML = this.options.file_source_icons.record_audio
-                recordAudioIcon.title = `Record Audio`
-                recordAudioIcon.onclick = (e) => {e.stopPropagation(); this.handleMediaSource('audio')}
-                iconsContainer.append(recordAudioIcon)  
-            },
-            record_screen: () => {
-                const recordScreenIcon = document.createElement('div')
-                recordScreenIcon.innerHTML = this.options.file_source_icons.record_screen
-                recordScreenIcon.title = `Record Screen`
-                recordScreenIcon.onclick = (e) => {e.stopPropagation(); this.handleMediaSource('screen')}
-                iconsContainer.append(recordScreenIcon) 
-            },
-            link_source: () => {
-                const linkSourceIcon = document.createElement('div')
-                linkSourceIcon.innerHTML = this.options.file_source_icons.url_source
-                linkSourceIcon.title = `Link`
-                linkSourceIcon.onclick = (e) => {e.stopPropagation(); this.handleExternalSource("url")}
-                iconsContainer.append(linkSourceIcon) 
-            },
-            google_drive_source: () => {
-                const googleDriveSourceIcon = document.createElement('div')
-                googleDriveSourceIcon.innerHTML = this.options.file_source_icons.google_drive_source
-                googleDriveSourceIcon.title = `Google Drive`
-                googleDriveSourceIcon.onclick = (e) => {e.stopPropagation(); this.handleExternalSource('google_drive')}
-                iconsContainer.append(googleDriveSourceIcon)   
-            },
-            dropbox_source: () => {
-                const dropboxSourceIcon = document.createElement('div')
-                dropboxSourceIcon.innerHTML = this.options.file_source_icons.dropbox_source
-                dropboxSourceIcon.title = `Dropbox`
-                dropboxSourceIcon.onclick = (e) => {e.stopPropagation(); this.handleExternalSource('dropbox')}
-                iconsContainer.append(dropboxSourceIcon) 
-            },
-            box_source: () => {
-                const boxSourceIcon = document.createElement('div')
-                boxSourceIcon.innerHTML = this.options.file_source_icons.box_source 
-                boxSourceIcon.title = `Box`
-                boxSourceIcon.onclick = (e) => {e.stopPropagation(); this.handleExternalSource('box')}
-                iconsContainer.append(boxSourceIcon)  
-            },
-            openai_dalle_source: () => {
-                const openAIDALLESourceIcon = document.createElement('div')
-                openAIDALLESourceIcon.innerHTML = this.options.file_source_icons.openai_dalle_source
-                openAIDALLESourceIcon.title = `DALL.E-2`
-                openAIDALLESourceIcon.onclick = (e) => {e.stopPropagation(); this.handleExternalSource('dalle')}
-                iconsContainer.append(openAIDALLESourceIcon)  
-            }
-        }
+        
+        this.options.display_file_sources && this.get_file_sources(iconsContainer);
 
-        if (this.options.allowed_sources !== null && this.options.allowed_sources.length == 0) {
-            Object.keys(file_sources_arr).forEach(key => file_sources_arr[key]())
-        }else{
-            if (this.options.allowed_sources !== null && Array.isArray(this.options.allowed_sources)) {
-                this.options.allowed_sources.map(source => file_sources_arr[source]())                
-            }
-        }
 
         // Onedrive external source --- suspended
         // const oneDriveSourceIcon = document.createElement('div')
@@ -1044,21 +1084,25 @@ export default class CustUpCore {
         this.set_class_name('defaultUIUploadSentenceContainer', defaultUIUploadSentenceContainer);
         this.set_class_name('defaultUIUploadIconsContainer', iconsContainer);
         this._custupInnerEl.append(this._custupDefaultUIEl);
-        !this.options.disable_select_files_from_device && (this._custupDefaultUIEl.onclick = (e) => this.select_file_from_device(e));
+        !this.options.disable_select_files_from_device && (this._custupDefaultUIEl.onclick = (e) => this._select_file_from_device(e));
+        this.eventMethods.default_ui_shown && this.eventMethods.default_ui_shown();
     }
 
 
     /**
      * @protected removeDefaultUI
      */
-
     removeDefaultUI () {
         if (this._custupDefaultUIEl != undefined && !this.options.persist_default_ui) {
-            this._custupDefaultUIEl.remove()
-            this._custupDefaultUIEl = undefined            
+            this._custupDefaultUIEl.remove();
+            this._custupDefaultUIEl = undefined;    
+            this.eventMethods.default_ui_closed && this.eventMethods.default_ui_closed();
         }
     }
 
+    /**
+     * @protected @method set_file_preview_animations
+     */
     set_file_preview_animations () {
         if (this.options.file_preview_animation_types !== null && this.options.file_preview_animation_types.length == 0) {
             Object.keys(this.previewerAnimations).forEach(key => this.file_preview_animation_arr.push(this.previewerAnimations[key]));
@@ -1070,7 +1114,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @public @method handleRecordVideo
+     * @protected @method handleRecordVideo
      * @param {'video' | 'image' | 'audio' | 'screen'} type 
      */
     handleMediaSource (type) {
@@ -1084,18 +1128,27 @@ export default class CustUpCore {
         const media_callback = (file) => {
             _class.handle_selected_files([file])
         }
-        new CustUpMediaSource({
+
+        const handleClose = () => {
+            _class.eventMethods.file_source_closed && this.eventMethods.file_source_closed();
+        }
+
+        this._custup_external_source_instance?.destroyContainerUI(true);
+        this._custup_media_source_instance?.closeMediaPopup(true); // destroy CustUpMediaSource instance if already exists
+
+        this._custup_media_source_instance = new CustUpMediaSource({
             inner_container: this._custupInnerEl,
             media_type: type,
             callbackFn: media_callback,
+            onclose: handleClose,
             config: config[type],
             eventMethods: this.deviceFileSourceEventMethods,
             ui_styles: this.options.media_capture_source_style_override
-        })
+        });
     }
 
     /**
-     * @public @method handleOpenaiDALLESource
+     * @protected @method handleOpenaiDALLESource
      * @param {'url' | 'onedrive' | 'google_drive' | 'clipboard' | 'box' | 'dalle' | 'dropbox'} type - source type
      */
     handleExternalSource (type) {
@@ -1110,8 +1163,8 @@ export default class CustUpCore {
         const media_callback = (file) => {
             _class.handle_selected_files([file])
         }
-        const show_message_ui = (msg, type) => {
-            _class.show_message(msg, type)
+        const show_message_ui = (msg, type, async) => {
+            return _class.show_message(msg, type, async)
         }
         const customScroll = (e, targetEl) => {
             const targetElScrollBarEl = targetEl.parentElement.querySelector(`div[class*='scroll_bar']`)
@@ -1122,7 +1175,8 @@ export default class CustUpCore {
         }
         const handleOnClose = () => {
             _class._custupInnerEl.onwheel = (e) => _class.handleCustomScroll(e)
-            _class.set_scroll_pointer_event(this._custupInnerEl)
+            _class.set_scroll_pointer_event(this._custupInnerEl);
+            _class.eventMethods.file_source_closed && this.eventMethods.file_source_closed();
         }
         const handleSetPointerEV = (el, targetEl) => {
             const targetElScrollBarEl = targetEl.parentElement.querySelector(`div[class*='scroll_bar']`)
@@ -1134,8 +1188,10 @@ export default class CustUpCore {
 
         const sType = {}
         sType[type] = config[type]
+
+        this._custup_media_source_instance?.closeMediaPopup(true)
         
-        new ExternalSource({
+        this._custup_external_source_instance = new ExternalSource({
             inner_container: this._custupInnerEl,
             source_type: type,
             callbackFn: media_callback,
@@ -1152,18 +1208,19 @@ export default class CustUpCore {
 
 
     /**
-     * @protected makeFileDisplayUI
+     * @protected @method makeFileDisplayUI
      */
-
     makeFileDisplayUI () {
         if (this.fileDisplayUIEl !== undefined || !this.options.use_default_file_display_ui) return
+        // if (this.fileDisplayUIEl !== undefined) return
         this.fileDisplayUIEl = document.createElement('div')
         this.set_class_name("fileDisplayUI", this.fileDisplayUIEl);
         this.make_ui_tools();
         !this.options.disable_scrollbar && this.createScrollBar();
         this._custupInnerContainerWrapperEl.append(this.fileDisplayUIEl);
         this._custupInnerEl.onwheel = (e) => this.handleCustomScroll(e);
-        this._custupInnerEl.onpointerdown = (e) => this.handleInnerElementContainerMouseDown(e);
+        // removed because tool dragging is no more available on touch devices, the tool on
+        // this._custupInnerEl.onpointerdown = (e) => this.handleInnerElementContainerPointerDown(e);
         this.set_scroll_pointer_event(this._custupInnerEl);
     }
 
@@ -1171,7 +1228,6 @@ export default class CustUpCore {
      * @protected @method set_scroll_pointer_event
      * @param {HTMLElement} el
      */
-
     set_scroll_pointer_event (el, targetEl=undefined, targetScrollBarEl=undefined) {
         el.ontouchstart = (e) => {
             e.stopPropagation();
@@ -1188,7 +1244,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected make_ui_tools
+     * @protected @method make_ui_tools
      */
     make_ui_tools () {
         this.UIToolEl = document.createElement('div')
@@ -1252,7 +1308,7 @@ export default class CustUpCore {
     }
     
     /**
-     * @protected handleAddNewFileButton
+     * @protected @method handleAddNewFileButton
      */
     handleAddNewFileButton () {
         if (this.options.maxNumberOfFiles != undefined && this._get_total_file_count() == this.options.maxNumberOfFiles) return this.show_message("Maximum number of allowed files reached", 'info')
@@ -1300,6 +1356,11 @@ export default class CustUpCore {
         }
     }
 
+    /**
+     * @protected @method createScrollBar
+     * @param {HTMLElement | undefined} targetEl - The scrollbar parent container
+     * @returns {HTMLElement}
+     */
     createScrollBar (targetEl=undefined) {
         const custupCustomScrollBar = document.createElement("div")
         this.set_class_name("scrollBarEl", custupCustomScrollBar)
@@ -1313,6 +1374,10 @@ export default class CustUpCore {
         return custupCustomScrollBar;
     }
 
+    /**
+     * @protected @method updateScrollbarHeight
+     * @param {HTMLElement} targetEl - The scrollbar parent container
+     */
     updateScrollbarHeight (targetEl=undefined) {
         setTimeout(() => {
             const targetScrollbarEl = targetEl ? targetEl.parentElement.querySelector(`.${this.get_element_class_name("scrollBarEl")}`) : this.scrollBarEl
@@ -1323,9 +1388,11 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handleCustomScroll
+     * @protected @method handleCustomScroll
+     * @param {Event} e - Mouse wheel event or touch event for touch devices
+     * @param {HTMLElement | undefined} targetEl - The scrolling container parent container
+     * @param {HTMLElement | undefined} targetScrollBarEl - The main scroll bar element
      */
-
     handleCustomScroll (e, targetEl=undefined, targetScrollBarEl=undefined) {
         e.preventDefault();
         e.stopPropagation();
@@ -1352,9 +1419,11 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handleInnerElementContainerMouseDown
+     * removed because tool dragging has been removed for touch devices, 
+     * the upload tool on bigger screens has been changed to a static tool which is displayed inside the header on mobile devices
+     * @deprecated @protected @method handleInnerElementContainerPointerDown
      */
-    handleInnerElementContainerMouseDown (e) {
+    handleInnerElementContainerPointerDown (e) {
         e.preventDefault();
         e.stopPropagation();
         this.lastToolOffsetBottom = e.clientY
@@ -1372,7 +1441,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handleInnerElementContainerMouseUp
+     * @protected @method handleInnerElementContainerMouseUp
      */
     handleInnerElementContainerMouseUp (e) {
         this._custupInnerEl.onmousemove = null
@@ -1380,7 +1449,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handleToolDraggerMouseMove
+     * @protected @method handleToolDraggerMouseMove
      */
     handleToolDraggerMouseMove (e) {
         e.preventDefault();
@@ -1409,11 +1478,12 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected addFileToUI
+     * @protected @method addFileToUI
      * @param {File} file
      * @param {boolean} isUploadable
+     * @param {number | null} index
      */
-    addFileToUI (file, isUploadable=true) {
+    addFileToUI (file, isUploadable=true, index=null) {
         const _class = this
         file.id = _class.get_unique_uuid()
         if (_class.fileDisplayUIEl == undefined) {
@@ -1433,7 +1503,7 @@ export default class CustUpCore {
                 }
             })();
 
-        isUploadable && this.selectedFiles.push(file);
+        isUploadable && (index !== null ? this.selectedFiles.splice(index, 0, file) : this.selectedFiles.push(file));
         file.isDefaultFile && this.defaultFiles.push(file);
             
         const fileUIContainer = document.createElement('div')
@@ -1484,8 +1554,7 @@ export default class CustUpCore {
         // fileUIBottomToolsContainer.append(fileBottomIconEdit) --- suspended
 
         fileBottomDetails.append(fileSize)
-        const file_main_type = file.type.split('/')[0].toLowerCase()
-        if (file_main_type == 'image' || file_main_type == 'video' || file_main_type == 'audio') {
+        if (this.is_file_previewable(file)) {
             fileBottomIconView.onclick = (e) => this.makeFilePreviewer(file)
             fileBottomDetails.append(fileUIBottomToolsContainer)            
         }
@@ -1494,7 +1563,7 @@ export default class CustUpCore {
         fileDetailsContainer.append(fileBottomDetails)
 
         fileUI.style.userSelect = "none";
-        fileUI.draggable = false;
+        fileUIContainer.draggable = true;
         fileUIContainer.append(fileUI);
         this.options.show_file_details_container && fileUIContainer.append(fileDetailsContainer);
 
@@ -1512,10 +1581,23 @@ export default class CustUpCore {
         
         (!this.options.disable_scrollbar && this.options.use_default_file_display_ui) && this.updateScrollbarHeight();
 
-        (this.options.upload_automatically && isUploadable) && _class.handleUploadFile(file);
+        ((this.options.upload_automatically && isUploadable) || this.currentlyUploadingFiles.length > 0) && _class.handleUploadFile(file);
         this.options.persist_files && this.update_file_storage();
     }
 
+    /**
+     * @public @method is_file_previewable
+     * @param {File} file - The file to check whether CustUp can preview it
+     * @returns {boolean}
+     */
+    is_file_previewable (file) {
+        return ['image', 'video', 'audio'].includes(file.type.split('/')[0].toLowerCase());
+    }
+
+    /**
+     * @protected @method file_display_width_setter
+     * @param {HTMLElement} el - The file display width setter only for default UI type
+     */
     file_display_width_setter (el) {
         const custupElWidth = this._custupEl.clientWidth;
         if (custupElWidth >= 1400) {
@@ -1537,7 +1619,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected makeFileDisplayElement
+     * @protected @method makeFileDisplayElement
      * @param {File} file - file data of the file to display
      * @param {HTMLDivElement} fileContainer
      * @param {ArrayBuffer} fileBase64 - optional to be provided only for image files
@@ -1562,7 +1644,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected makeFilePreviewer
+     * @protected @method makeFilePreviewer
      * @param {File} file - File object of the element to be previewed
      */
     makeFilePreviewer (file) {
@@ -1622,7 +1704,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected getFileIcon
+     * @protected @method getFileIcon
      * @param {string} file_type - the full file type of the file to return its icons
      * @returns {SVGElement}
      */
@@ -1680,7 +1762,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handleRemoveFile
+     * @protected @method handleRemoveFile
      * @param {File} fileData
      * @param {Function} callback_fn
      */
@@ -1713,7 +1795,7 @@ export default class CustUpCore {
 
     /**
      * Removes unwanted characters from file name
-     * @protected cleanFileName
+     * @protected @method cleanFileName
      * @param {string} file_name - the file name to remove unwanted characters from
      * @returns {string}
      */
@@ -1731,7 +1813,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected clipFileNameIfShouldClip
+     * @protected @method clipFileNameIfShouldClip
      * @param {string} file_name
      * @returns {string}
      */
@@ -1745,8 +1827,9 @@ export default class CustUpCore {
 
     
     /**
-     /// Postponed
-     * @protected changeFileElementPosition
+     * /// Postponed
+     * @protected @method changeFileElementPosition 
+     * @param {Event} e 
      */
     changeFileElementPosition (e) {
         // e.preventDefault()
@@ -1756,7 +1839,8 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handleFileUIDragOver
+     * @protected @method handleFileUIDragOver
+     * @param {Event} e 
      */
     handleFileUIDragOver (e) {
         e.preventDefault()
@@ -1765,7 +1849,8 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handleFileUIDragOver
+     * @protected @method handleFileUIDragOver
+     * @param {Event} e 
      */
     handleFileUIDropped (e) {
         e.preventDefault()
@@ -1774,7 +1859,7 @@ export default class CustUpCore {
     
     /**
      * 
-     * @private set_class_name
+     * @private @method set_class_name
      * 
      * @param style_key_name string the name of the style
      * @param element_to_style HTMLElement
@@ -1787,7 +1872,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @private get_element_class_name
+     * @private @method get_element_class_name
      * @param {string} style_key_name 
      * @returns {string}
      */
@@ -1796,13 +1881,12 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected select_file_from_device
-     * @param {MouseEvent} e
+     * @protected @method _select_file_from_device
+     * @param {MouseEvent | TouchEvent} e
      */
 
-    select_file_from_device (e) {
+    _select_file_from_device (e) {
         const _class = this;
-        // if (e != undefined && targetEl != this._custupDefaultUIInnerContentEl ) return
         const fileEl = document.createElement('input')
         fileEl.type = "file"
         fileEl.multiple = this.options.allowMultipleUpload
@@ -1825,8 +1909,8 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handle_drag_over
-     * @param {Event} e
+     * @protected @method handle_drag_over
+     * @param {DragEvent} e
      */
     handle_drag_over (e) {
         e.preventDefault()
@@ -1838,8 +1922,8 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handle_drag_leave
-     * @param {EventListener} e
+     * @protected @method handle_drag_leave
+     * @param {DragEvent} e
      */
     handle_drag_leave (e) {
         e.preventDefault()
@@ -1850,11 +1934,13 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected show_message
+     * @protected @method show_message
      * @param {string} msg
      * @param {"error" | "success" | "info"} type
+     * @param {boolean} async - for async messages that doesn't hide until the request is done
+     * @param {number} timeout - timeout for hiding the message
      */
-    show_message (msg, type) {
+    show_message (msg, type, async = false, timeout = this.options.messages.timeout) {
         const _class = this
         const message_container = document.createElement("div")
         _class.set_class_name("message_container", message_container)
@@ -1870,12 +1956,19 @@ export default class CustUpCore {
         }else{
             currentElOffsetBottom += _class.last_message_el_offset_bottom + 5
         }
-        if (type == "error") {
-            message_icon.innerHTML = this.ui_icons.warning            
-        }else if (type == "success") {
-            message_icon.innerHTML = this.ui_icons.success     
-        }else if (type == "info") {
-            message_icon.innerHTML = this.ui_icons.info    
+        if (async) {
+            message_icon.innerHTML = this.ui_icons.loading_partial;
+            message_icon.animate(
+                [{transform: 'rotate(360deg)'}], 
+                {duration: 500, iterations: Infinity})
+        }else{
+            if (type == "error") {
+                message_icon.innerHTML = this.ui_icons.warning            
+            }else if (type == "success") {
+                message_icon.innerHTML = this.ui_icons.success     
+            }else if (type == "info") {
+                message_icon.innerHTML = this.ui_icons.info    
+            }
         }
         message_content.innerHTML = msg
         message_container.append(message_icon)
@@ -1889,48 +1982,42 @@ export default class CustUpCore {
         _class._custupInnerEl.append(message_container)
         _class.last_message_el_offset_bottom = currentElOffsetBottom
 
-        message_container.onclick = (e) => _class.message_element_exit_call(e.currentTarget)  
+        message_container.onclick = (e) => async ? null : _class.message_element_exit_call(e.currentTarget)  
         
-        _class.message_element_exit_call(message_container, false)            
+        if (async) {
+            return () => _class.message_element_exit_call(message_container);
+        }
+
+        setTimeout(() => {
+            _class.message_element_exit_call(message_container, false)             
+        }, timeout);
     }
 
     /**
-     * @protected message_element_exit_call
+     * @protected @method message_element_exit_call
      * This method is executed when a message element is exiting
      * @param {HTMLElement} message_container 
-     * @param {boolean} no_wait - specifies if the exit call should be ran inside a setTimeout or not 
      */
 
-    message_element_exit_call (message_container, no_wait = true) {
-        const _class = this
-        const _run = () => {
-            message_container.classList.add("peakout-anim")
-            setTimeout(() => {
-                const message_container_height = message_container.offsetHeight
-                message_container.remove()  
-                if (_class._custupInnerEl.querySelectorAll('._custup_message_container').length == 0) {
-                    _class.last_message_el_offset_bottom = 0
-                }
-                _class._custupInnerEl.querySelectorAll('._custup_message_container')
-                .forEach(messageEl => {
-                    const distance_to_be_displaced_downward = (_class._custupInnerEl.clientHeight - (messageEl.offsetTop + messageEl.clientHeight)) - message_container_height
-                    messageEl.style.bottom = distance_to_be_displaced_downward + 'px'
-                }) 
-                _class.last_message_el_offset_bottom = _class.last_message_el_offset_bottom == 0 ? 0 : (_class.last_message_el_offset_bottom - message_container_height)
-            }, _class.options.alert_timeout_time);
-        }
-
-        if (no_wait) {
-            _run()
-        }else{
-            setTimeout(() => {
-                _run()
-            }, 4000);
-        }
+    message_element_exit_call (message_container) {
+        message_container.classList.add("peakout-anim")
+        setTimeout(() => {
+            const message_container_height = message_container.offsetHeight
+            message_container.remove()  
+            if (this._custupInnerEl.querySelectorAll('._custup_message_container').length == 0) {
+                this.last_message_el_offset_bottom = 0
+            }
+            this._custupInnerEl.querySelectorAll('._custup_message_container')
+            .forEach(messageEl => {
+                const distance_to_be_displaced_downward = (this._custupInnerEl.clientHeight - (messageEl.offsetTop + messageEl.clientHeight)) - message_container_height
+                messageEl.style.bottom = distance_to_be_displaced_downward + 'px'
+            }) 
+            this.last_message_el_offset_bottom = this.last_message_el_offset_bottom == 0 ? 0 : (this.last_message_el_offset_bottom - message_container_height)
+        }, this.options.alert_timeout_time);
     }
 
     /**
-     * @protected handle_file_drop
+     * @protected @method handle_file_drop
      * @param {Event} e
      */
     handle_file_drop (e) {
@@ -1944,7 +2031,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @property isfileAreadyAdded
+     * @property @method isfileAreadyAdded
      * @param {File} file
      */
     isfileAreadyAdded (file) {
@@ -1953,7 +2040,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected parseFileSize
+     * @protected @method parseFileSize
      * @param {number} size
      */
     parseFileSize = (size) => {
@@ -1970,10 +2057,13 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handle_selected_files
+     * @protected @method handle_selected_files
      * @param {Array<File>} files
+     * @param {Function | null} before_add_callback_fn
+     * @param {boolean} isUploadable
+     * @param {number | null} index
      */
-    handle_selected_files (files, before_add_callback_fn=null, isUploadable=true) {
+    handle_selected_files (files, before_add_callback_fn=null, isUploadable=true, index=null) {
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             if (this.isfileAreadyAdded(file)) {
@@ -2000,7 +2090,7 @@ export default class CustUpCore {
                 continue;
             }
             before_add_callback_fn && before_add_callback_fn()
-            this.addFileToUI(file, isUploadable)
+            this.addFileToUI(file, isUploadable, index)
         }
     }
 
@@ -2009,7 +2099,7 @@ export default class CustUpCore {
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @protected createFileUploadOverlay
+     * @protected @method createFileUploadOverlay
      * @param {string} file_id - id of the file to add file upload overlay to
      * @returns {HTMLDivElement}
      */
@@ -2033,11 +2123,11 @@ export default class CustUpCore {
         this.set_class_name('file_upload_progress', file_upload_progress)
         this.set_class_name('file_upload_progress_inner', file_upload_progress_inner)
 
-        file_upload_progress.append(file_upload_progress_inner)
-        upload_progress_container.append(file_upload_progress)
-        upload_progress_container.append(file_upload_progress_text_left)
-        file_upload_overlay_inner_container.append(upload_progress_container)
-        file_upload_overlay_ui.append(file_upload_overlay_inner_container)
+        file_upload_progress.append(file_upload_progress_inner);
+        upload_progress_container.append(file_upload_progress);
+        upload_progress_container.append(file_upload_progress_text_left);
+        this.options.show_upload_progress_bar && file_upload_overlay_inner_container.append(upload_progress_container);
+        file_upload_overlay_ui.append(file_upload_overlay_inner_container);
 
         upload_file_element.append(file_upload_overlay_ui)
         file_upload_overlay_ui.animate([{opacity: 0}, {opacity: 1}], {duration: 500})
@@ -2046,7 +2136,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected createRetryUploadOverlay
+     * @protected @method createRetryUploadOverlay
      * @param {File} file
      * @param {string} file_id - id of the file element to append the retry upload overlay to
      */
@@ -2068,6 +2158,10 @@ export default class CustUpCore {
         upload_file_element.append(retry_upload_overlay_ui)
     }
 
+    /**
+     * @protected @method isUploadConditionsSatisfied
+     * @returns {boolean}
+     */
     isUploadConditionsSatisfied () {
         if (this.options.maxNumberOfFiles != undefined && this._get_total_file_count() > this.options.maxNumberOfFiles) {
             this.show_message('Number of file to be uploaded should not be greater than ' + this.options.maxNumberOfFiles, 'error')
@@ -2080,7 +2174,7 @@ export default class CustUpCore {
     }
     
     /**
-     * @protected handleUploadFile
+     * @protected @method handleUploadFile
      * @param {File} file - the file to be uploaded
      */
     handleUploadFile (file=undefined) {
@@ -2102,6 +2196,10 @@ export default class CustUpCore {
 
     }
 
+    /**
+     * @private @method handleUploadAllFiles
+     * @returns {Promise<void>}
+     */
     async handleUploadAllFiles () {
         if (!this.isUploadConditionsSatisfied()) return;
         const _class = this
@@ -2116,7 +2214,7 @@ export default class CustUpCore {
             }
         }
 
-        this.selectedFiles.map(file => _class.file_upload_form_data.append(_class.options.file_upload_settings.files_field_name + '[]', file))
+        this.selectedFiles.map(file => _class.file_upload_form_data.append(_class.options.file_upload_settings.files_field_name, file))
 
         let attached_files = []
         this.options.instance_attach.map(_instance => {
@@ -2130,7 +2228,7 @@ export default class CustUpCore {
                 }
             }
         })
-        attached_files.map(file => _class.file_upload_form_data.append(_class.options.file_upload_settings.files_field_name + '[]', file))
+        attached_files.map(file => _class.file_upload_form_data.append(_class.options.file_upload_settings.files_field_name, file))
         
         const all_files = [...this.selectedFiles, ...attached_files];
         const beforeUploadStartCheck = this.eventMethods.upload_beforeStart && (await this.eventMethods.upload_beforeStart({files: all_files, formData: _class.file_upload_form_data, form: this.options.file_upload_settings.form_field}));
@@ -2139,7 +2237,7 @@ export default class CustUpCore {
             return;
         }
 
-        _class.__axios_instance.post('', _class.file_upload_form_data, {
+        await _class.__axios_instance.post('', _class.file_upload_form_data, {
             onUploadProgress: progressEvent => {
                 this.eventMethods.upload_progress && this.eventMethods.upload_progress({progressEvent, all_files});
             }
@@ -2152,10 +2250,12 @@ export default class CustUpCore {
             this.eventMethods.upload_error && this.eventMethods.upload_error({err, files: all_files, formData: _class.file_upload_form_data});
         });
 
+        this.eventMethods.upload_all_finished({not_uploaded_files: this.filesNotSent, uploaded_files: this.successfullyUploadedFiles});
+
     }
 
     /**
-     * @protected fileUploadHandler
+     * @protected @method fileUploadHandler
      * @param {File} file - the file to be uploaded
      */
     fileUploadHandler (file=undefined) {
@@ -2167,7 +2267,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected handleRetryFileUpload
+     * @protected @method handleRetryFileUpload
      * @param {File} file - Blob of the file to retry
      * @param {HTMLDivElement} retry_upload_overlay_ui - html element of the retry upload overlay
      */
@@ -2183,7 +2283,7 @@ export default class CustUpCore {
     }
 
     /**
-     * @protected configure_axios
+     * @protected @method configure_axios
      */
     configure_axios () {
         this.__axios_instance = axios.create({
@@ -2199,16 +2299,42 @@ export default class CustUpCore {
     }
 
     /**
-     * @private handleUploadFileToEndpoint
+     * @private @method handleUploadFileToEndpoint
      * @param {File} file - file to upload to the server
      * @param {HTMLDivElement} upload_element - html element containing elements to display upload data and status
+     * @param {boolean} chunking
      */
-    handleUploadFileToEndpoint (file, upload_element) {
-        const _class = this
-        _class.file_upload_form_data.append(_class.options.file_upload_settings.files_field_name, file);
+    
+    handleUploadFileToEndpoint (file, upload_element, chunking = false) {
+        const _class = this;
+        const chunk_size = _class.options.file_upload_settings.chunk_size;
+
+        const uniq_formdata = new FormData(_class.options.file_upload_settings.form_field)
+
+        if (_class.options.file_upload_settings.should_chunk) {
+            if (Object.keys(this.file_chunks).includes(file.id)) {
+                const fileChunkObj = this.file_chunks[file.id]
+                this.file_chunks[file.id].endByte = Math.min(fileChunkObj.startByte + chunk_size, file.size)
+                this.file_chunks[file.id].batch += 1
+            }else{
+                this.file_chunks[file.id] = {
+                    startByte: 0,
+                    endByte: chunk_size > file.size ? file.size : Math.min(chunk_size, file.size),
+                    batch: 1,
+                }
+            }
+    
+            const file_split = file.slice(this.file_chunks[file.id].startByte, this.file_chunks[file.id].endByte)
+    
+            uniq_formdata.set(file.id, file_split, file.name);            
+        }else{
+            uniq_formdata.append(_class.options.file_upload_settings.files_field_name, file);
+        }
+
+        
 
 
-        if (this.filesNotSent.length > 0 && this.options.use_default_file_display_ui) {
+        if (!chunking && this.filesNotSent.length > 0 && this.options.use_default_file_display_ui) {
             upload_element.style.boxShadow = 'none'
             const upload_file_element = this.fileDisplayUIEl.querySelector(`#${file.id}`).querySelector('._custup_file_ui')
             upload_file_element.querySelector(`.${this.get_element_class_name('retry_upload_overlay_ui')}`)?.remove()
@@ -2217,28 +2343,59 @@ export default class CustUpCore {
         }
 
         // if additional data to be sent along with request was provided then add it to the request
-        if (_class.options.file_upload_settings.additional_data != undefined) { 
+        if (((_class.options.file_upload_settings.should_chunk && this.file_chunks[file.id].endByte >= file.size) && _class.options.file_upload_settings.additional_data != undefined) ||
+        (_class.options.file_upload_settings.additional_data != undefined && !_class.options.file_upload_settings.should_chunk)) { 
             for (const key in _class.options.file_upload_settings.additional_data) {
                 if (Object.hasOwnProperty.call(_class.options.file_upload_settings.additional_data, key)) {
                     const data = _class.options.file_upload_settings.additional_data[key];
-                    _class.file_upload_form_data.append(key, data)
+                    uniq_formdata.append(key, data);
                 }
             }
         }
 
         this.eventMethods.upload_beforeStart && this.eventMethods.upload_beforeStart({file, upload_element});
 
-        const fileContainer = _class.fileDisplayUIEl?.querySelector(`#${file.id}`)
-        _class.__axios_instance.post('', _class.file_upload_form_data, {
+        const fileContainer = _class.fileDisplayUIEl?.querySelector(`#${file.id}`);
+
+        _class.successfullyUploadedFiles.map(file => uniq_formdata.delete(file.id));
+
+        _class.options.file_upload_settings.should_chunk && (_class.__axios_instance.defaults.headers.post['Content-Range'] = "bytes " + this.file_chunks[file.id].startByte + "-" + this.file_chunks[file.id].endByte + "/" + file.size);
+        this.currentlyUploadingFiles.push(file)
+        _class.__axios_instance.post('', uniq_formdata, {
             onUploadProgress: progressEvent => {
+                const should_use_chunking = this.options.file_upload_settings.should_chunk;
+                if (should_use_chunking) {
+                    const chunk_loaded = this.file_chunks[file.id].startByte + progressEvent.loaded;
+                    this.file_progress[file.id] = {
+                        total: file.size,
+                        loaded: chunk_loaded > file.size ? file.size : chunk_loaded,
+                        progress: (chunk_loaded > file.size ? file.size : chunk_loaded) / file.size,
+                    }                    
+                }
+                progressEvent.loaded = should_use_chunking ? this.file_progress[file.id].loaded : progressEvent.loaded;
+                progressEvent.total = should_use_chunking ? this.file_progress[file.id].total : progressEvent.total;
+                progressEvent.progress = should_use_chunking ? this.file_progress[file.id].progress : progressEvent.progress;
                 this.eventMethods.upload_progress && this.eventMethods.upload_progress({progressEvent, file, upload_element});
                 _class.handleUploadProgressEvent(progressEvent, upload_element);
             }
         })
         .then((data) => {
-            _class.successfullyUploadedFiles.push(file);
-            _class.removeFileUploadOverlay(upload_element, fileContainer, true);
-            this.eventMethods.upload_success && this.eventMethods.upload_success({data, file, upload_element, file_container: fileContainer});
+            _class.options.file_upload_settings.should_chunk && (this.file_chunks[file.id].startByte = this.file_chunks[file.id].endByte);
+            
+            this.currentlyUploadingFiles.splice(this.currentlyUploadingFiles.indexOf(file), 1);
+
+            if (_class.options.file_upload_settings.should_chunk && this.file_chunks[file.id].startByte < file.size) {
+                _class.handleUploadFileToEndpoint (file, upload_element, true)
+            }else{
+                _class.successfullyUploadedFiles.push(file);
+                _class.removeFileUploadOverlay(upload_element, fileContainer, true);
+                this.eventMethods.upload_success && this.eventMethods.upload_success({data, file, upload_element, file_container: fileContainer});
+                delete this.file_chunks[file.id];
+                delete this.file_progress[file.id];
+                (this.currentlyUploadingFiles.length == 0 && this.eventMethods.upload_all_finished !== undefined) && this.eventMethods.upload_all_finished({not_uploaded_files: this.filesNotSent, uploaded_files: this.successfullyUploadedFiles});
+            }
+
+
         })
         .catch(err => {
             this.options.show_upload_error_overlay && _class.createRetryUploadOverlay(file, file.id);
@@ -2246,11 +2403,12 @@ export default class CustUpCore {
             _class.filesNotSent.push(file);
             this.show_message(err.message, 'error');
             this.eventMethods.upload_error && this.eventMethods.upload_error({err, file, upload_element, file_container: fileContainer});
+            this.currentlyUploadingFiles.splice(this.currentlyUploadingFiles.indexOf(file), 1);
         });
     }
 
     /**
-     * @private removeFileUploadOverlay
+     * @private @method removeFileUploadOverlay
      * @param {HTMLDivElement} upload_element - html element of the overlay element
      * @param {HTMLDivElement} fileContainer - html element of the of the file container
      * @param {boolean} isSuccessful - boolean to specify if the request was successful or not
@@ -2267,7 +2425,7 @@ export default class CustUpCore {
 
 
     /**
-     * @protected handleUploadProgressEvent
+     * @protected @method handleUploadProgressEvent
      * @param {ProgressEvent} event - upload progress event
      * @param {HTMLDivElement} upload_element - HTML element to display the file upload status
      */
@@ -2275,11 +2433,13 @@ export default class CustUpCore {
         if (!this.options.use_default_file_display_ui) return;
         const upload_progress_inner = upload_element.querySelector(`.${this.get_element_class_name('file_upload_progress_inner')}`)
         const percentage_uploaded_element = upload_element.querySelector('.upload-text')
-        upload_progress_inner.style.width = Math.floor(event.progress * 100) + '%'
-        percentage_uploaded_element.innerHTML = Math.floor(event.progress * 100) + '%'
+        upload_progress_inner != null && (upload_progress_inner.style.width = Math.floor(event.progress * 100) + '%');
+        percentage_uploaded_element != null && (percentage_uploaded_element.innerHTML = Math.floor(event.progress * 100) + '%');
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////// Event Handlers //////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * on - listen for an event
      * @param { 'file.beforeAdded' | 
@@ -2309,9 +2469,13 @@ export default class CustUpCore {
      *  'upload.progress' | 
      *  'upload.success' | 
      *  'upload.error' |
-     *  'upload.retry' 
+     *  'upload.retry' |
+     *  'upload.all_finished' |
+     *  'file_source.closed' |
+     *  'default_ui.shown' |
+     *  'default_ui.closed'
      * } event - event name
-     * @param {*} callbackFn - the callback function
+     * @param {Function} callbackFn - the callback function
      */    
 
     on (event, callbackFn) {
@@ -2427,13 +2591,31 @@ export default class CustUpCore {
             case 'upload.retry':
                 this.eventMethods.upload_retry = callbackFn
                 break;
+
+            case 'upload.all_finished':
+                this.eventMethods.upload_all_finished = callbackFn
+                break;
+
+            case 'file_source.closed':
+                this.eventMethods.file_source_closed = callbackFn
+                break;
+
+            case 'default_ui.shown':
+                this.eventMethods.default_ui_shown = callbackFn
+                break;
+
+            case 'default_ui.closed':
+                this.eventMethods.default_ui_closed = callbackFn
+                break;
         
             default:
                 break;
         }
     }
 
+    /////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////// Methods ////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
 
     /**
      * @method upload - the method to upload file to the endpoint
@@ -2467,7 +2649,8 @@ export default class CustUpCore {
      */
     preview_file (file_id) {
         const file = this.selectedFiles.find(f => f.id == file_id)
-        this.makeFilePreviewer(file)
+        if (!this.is_file_previewable(file)) return;
+        this.makeFilePreviewer(file);
     }
 
     /**
@@ -2475,6 +2658,13 @@ export default class CustUpCore {
      */
     get_selected_files () {
         return this.selectedFiles
+    }
+
+    /**
+     * @method get_default_files - return all the default files
+     */
+    get_default_files () {
+        return this.defaultFiles
     }
 
     /**
@@ -2552,13 +2742,16 @@ export default class CustUpCore {
 
     /**
      * @method add_file - add a file to the UI
+     * @param {File} file 
+     * @param {boolean} [skip_file_check=false] 
+     * @param {number | null} [index=null] 
      */
-    add_file (file, skip_file_check=false) {
+    add_file (file, skip_file_check=false, index=null) {
         const fileArr = Array.isArray(file) ? file : [file]
         if (skip_file_check === true) {
-            fileArr.map(file => this.addFileToUI(file))
+            fileArr.map(file => this.addFileToUI(file, undefined, index))
         }else{
-            this.handle_selected_files(fileArr)
+            this.handle_selected_files(fileArr, undefined, undefined, index)
         }
     }
 
@@ -2618,5 +2811,177 @@ export default class CustUpCore {
         this.handleExternalSource('dalle')
     }
 
+    /**
+     * @method clear_persisted_files
+     */
+    clear_persisted_files () {
+        this.clear_files_from_storage();
+    }
+
+    /**
+     * @method select_file_from_device
+     */
+    select_file_from_device () {
+        this._select_file_from_device();
+    }
+
+    /**
+     * @method close_file_source_popup
+     */
+    close_file_source_popup () {
+        this._custup_external_source_instance?.destroyContainerUI(true);
+        this._custup_media_source_instance?.closeMediaPopup(true); // destroy CustUpMediaSource instance if already exists
+    }
+
+    /**
+     * @method get_file_sources - Returns all the allowed file sources icons wrapped in HTML element
+     * @param {HTMLElement | null} iconsContainer - An HTML element to automatically append the icons to
+     * @param {Function | null} allElOnClick - A callback function to be attached to the onClick event of every icons
+     * @param {Object<Function> | {}} additionalElOnClickEv - An object containing the function to be attached to the onClick event of the specified icons
+     * @returns {Array<HTMLElement>}
+     */
+    get_file_sources (iconsContainer=null, allElOnClick=null, additionalElOnClickEv = {}) {
+        const file_sources = []
+        
+        const file_sources_arr = {
+            record_video: () => {
+                const recordVideoIcon = document.createElement('div')
+                recordVideoIcon.innerHTML = this.options.file_source_icons.video_camera
+                recordVideoIcon.title = `Record Video`
+                recordVideoIcon.onclick = (e) => {
+                    e.stopPropagation(); 
+                    this.handleMediaSource('video');
+                    additionalElOnClickEv['record_video'] && additionalElOnClickEv['record_video'](e);
+                    allElOnClick && allElOnClick(e);
+                }
+                iconsContainer && iconsContainer.append(recordVideoIcon);
+                file_sources.push(recordVideoIcon);
+            },
+            capture_image: () => {
+                const captureImageIcon = document.createElement('div')
+                captureImageIcon.innerHTML = this.options.file_source_icons.capture_image 
+                captureImageIcon.title = `Capture Image`
+                captureImageIcon.onclick = (e) => {
+                    e.stopPropagation(); 
+                    this.handleMediaSource('image');
+                    additionalElOnClickEv['capture_image'] && additionalElOnClickEv['capture_image'](e);
+                    allElOnClick && allElOnClick(e);
+                }
+                iconsContainer && iconsContainer.append(captureImageIcon);
+                file_sources.push(captureImageIcon);
+            },
+            record_audio: () => {
+                const recordAudioIcon = document.createElement('div')
+                recordAudioIcon.innerHTML = this.options.file_source_icons.record_audio
+                recordAudioIcon.title = `Record Audio`
+                recordAudioIcon.onclick = (e) => {
+                    e.stopPropagation(); 
+                    this.handleMediaSource('audio');
+                    additionalElOnClickEv['record_audio'] && additionalElOnClickEv['record_audio'](e);
+                    allElOnClick && allElOnClick(e);
+                }
+                iconsContainer && iconsContainer.append(recordAudioIcon);
+                file_sources.push(recordAudioIcon);
+            },
+            record_screen: () => {
+                const recordScreenIcon = document.createElement('div')
+                recordScreenIcon.innerHTML = this.options.file_source_icons.record_screen
+                recordScreenIcon.title = `Record Screen`
+                recordScreenIcon.onclick = (e) => {
+                    e.stopPropagation(); 
+                    this.handleMediaSource('screen');
+                    additionalElOnClickEv['record_screen'] && additionalElOnClickEv['record_screen'](e);
+                    allElOnClick && allElOnClick(e);
+                }
+                iconsContainer && iconsContainer.append(recordScreenIcon);
+                file_sources.push(recordScreenIcon);
+            },
+            link_source: () => {
+                const linkSourceIcon = document.createElement('div')
+                linkSourceIcon.innerHTML = this.options.file_source_icons.url_source
+                linkSourceIcon.title = `Link`
+                linkSourceIcon.onclick = (e) => {
+                    e.stopPropagation(); 
+                    this.handleExternalSource("url");
+                    additionalElOnClickEv['link_source'] && additionalElOnClickEv['link_source'](e);
+                    allElOnClick && allElOnClick(e);
+                }
+                iconsContainer && iconsContainer.append(linkSourceIcon);
+                file_sources.push(linkSourceIcon);
+            },
+            google_drive_source: () => {
+                const googleDriveSourceIcon = document.createElement('div')
+                googleDriveSourceIcon.innerHTML = this.options.file_source_icons.google_drive_source
+                googleDriveSourceIcon.title = `Google Drive`
+                googleDriveSourceIcon.onclick = (e) => {
+                    e.stopPropagation(); 
+                    this.handleExternalSource('google_drive');
+                    additionalElOnClickEv['google_drive_source'] && additionalElOnClickEv['google_drive_source'](e);
+                    allElOnClick && allElOnClick(e);
+                }
+                iconsContainer && iconsContainer.append(googleDriveSourceIcon);
+                file_sources.push(googleDriveSourceIcon);
+            },
+            dropbox_source: () => {
+                const dropboxSourceIcon = document.createElement('div')
+                dropboxSourceIcon.innerHTML = this.options.file_source_icons.dropbox_source
+                dropboxSourceIcon.title = `Dropbox`
+                dropboxSourceIcon.onclick = (e) => {
+                    e.stopPropagation(); 
+                    this.handleExternalSource('dropbox');
+                    additionalElOnClickEv['dropbox_source'] && additionalElOnClickEv['dropbox_source'](e);
+                    allElOnClick && allElOnClick(e);
+                }
+                iconsContainer && iconsContainer.append(dropboxSourceIcon);
+                file_sources.push(dropboxSourceIcon);
+            },
+            box_source: () => {
+                const boxSourceIcon = document.createElement('div')
+                boxSourceIcon.innerHTML = this.options.file_source_icons.box_source 
+                boxSourceIcon.title = `Box`
+                boxSourceIcon.onclick = (e) => {
+                    e.stopPropagation(); 
+                    this.handleExternalSource('box');
+                    additionalElOnClickEv['box_source'] && additionalElOnClickEv['box_source'](e);
+                    allElOnClick && allElOnClick(e);
+                }
+                iconsContainer && iconsContainer.append(boxSourceIcon);
+                file_sources.push(boxSourceIcon);
+            },
+            openai_dalle_source: () => {
+                const openAIDALLESourceIcon = document.createElement('div')
+                openAIDALLESourceIcon.innerHTML = this.options.file_source_icons.openai_dalle_source
+                openAIDALLESourceIcon.title = `DALL.E`
+                openAIDALLESourceIcon.onclick = (e) => {
+                    e.stopPropagation(); 
+                    this.handleExternalSource('dalle');
+                    additionalElOnClickEv['openai_dalle_source'] && additionalElOnClickEv['openai_dalle_source'](e);
+                    allElOnClick && allElOnClick(e);
+                }
+                iconsContainer && iconsContainer.append(openAIDALLESourceIcon);
+                file_sources.push(openAIDALLESourceIcon);
+            }
+        }
+
+        if (this.options.allowed_sources.length > 0) {
+            this.options.allowed_sources.map(source => file_sources_arr[source]());              
+        }else{
+            Object.keys(file_sources_arr).forEach(source => file_sources_arr[source]())
+        }
+
+        return file_sources;
+    }
+
+    /**
+     * @public @method display_message - display pop up message
+     * @param {string} msg - The message to be displayed
+     * @param {"error" | "success" | "info"} type - The message type
+     * @param {boolean} async - for async messages that doesn't hide until the request is done
+     * @param {number} timeout - timeout for hiding the message
+     * @returns {Function | void}
+     */
+    display_message (msg, type, async = false, timeout = this.options.messages.timeout) {
+        return this.show_message(msg, type, async, timeout)
+    }
 }
 

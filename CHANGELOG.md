@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.0
+
+- Added chunk upload
+- Fix: file persistent storage method, files are now stored as ObjectURL on https and base64 on http
+- New: Added auto upload for files added to the UI when files are still uploading
+- New: Added option display_file_sources: if set to false the file sources will not be listed on the default UI.
+- New: New event: 'file_source.closed' event that gets triggered when file source popup is closed.
+- New: New method: display_message
+- New: New method: get_file_sources
+- New: Added two options to file_upload option: chunk_size and should_chunk.
+- New: Added messages option for configuring messages with timeout option.
+- New: Added event 'default_ui.shown' and 'default_ui.closed'.
+- New: Added clear_persisted_files method.
+- New: Added close_file_source_popup method.
+- New: Added new option show_upload_progress_bar.
+- New: Added upload_all_finished event.
+- New: Added select_file_from_device method.
+
 ## 0.2.0
 
 - New: Added custup options typescript types

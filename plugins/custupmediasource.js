@@ -3,9 +3,9 @@ import icons from "../utils/icons.js"
 
 export default class CustUpMediaSource {
     /**
-     * @protected @property {HTMLDivElement} _funkupInnerContainer
+     * @protected @property {HTMLDivElement} _custupInnerContainer
      */
-    _funkupInnerContainer
+    _custupInnerContainer
 
     /**
      * @protected @property {'audio' | 'video' | 'image' | 'screen'} media_type
@@ -80,6 +80,11 @@ export default class CustUpMediaSource {
     callbackFn
 
     /**
+     * @protected @property {Function} onPopupCloseCallback
+     */
+    onPopupCloseCallback
+
+    /**
      * @protected @property {Function} media_config
      */
     media_config
@@ -138,13 +143,14 @@ export default class CustUpMediaSource {
         callbackFn,
         config,
         eventMethods,
-        ui_styles
+        ui_styles,
+        onclose
     }) {
         if (inner_container == undefined && !standalone) {
             throw new Error('inner container of CustUp initialization is required')
         }
 
-        this._funkupInnerContainer = inner_container;
+        this._custupInnerContainer = inner_container;
         this.media_type = media_type == undefined ? 'video' : media_type;
         this.standalone_mode = !standalone ? false : true;
 
@@ -171,6 +177,13 @@ export default class CustUpMediaSource {
                 }
             }
         }
+
+
+        if (document.querySelector('._custup_media_capture_container') != null) {
+            document.querySelector('._custup_media_capture_container')?.remove();
+        }
+
+        onclose !== undefined && (this.onPopupCloseCallback = onclose);
 
         this.initialize();
     }
@@ -202,7 +215,8 @@ export default class CustUpMediaSource {
      * @returns MediaStream
      */
     async initializeMediaDevices (constraint_type) {
-        return this.media_devices_instance = await navigator.mediaDevices.getUserMedia(this.media_constraints[constraint_type]);
+        this.media_devices_instance = await navigator.mediaDevices.getUserMedia(this.media_constraints[constraint_type]);
+        return this.media_devices_instance
     }
 
     /**
@@ -238,12 +252,12 @@ export default class CustUpMediaSource {
      * 
      */
     set_class_name (style_key_name, element_to_style) {
-        const get_style_classname = media_capture_ui_styles[style_key_name];
+        const get_style_classname = this.ui_styles[style_key_name];
         element_to_style.className = get_style_classname        
     }
 
     get_style_classname (style_key_name) {
-        return media_capture_ui_styles[style_key_name];
+        return this.ui_styles[style_key_name];
     }
 
     /**
@@ -355,27 +369,33 @@ export default class CustUpMediaSource {
 
         this.media_capture_ui_container.append(this.media_capture_main_container)
         this.media_capture_ui_container.append(this.media_capture_bottom_tools_container)
-        this._funkupInnerContainer.append(this.media_capture_ui_container)
+        this._custupInnerContainer.append(this.media_capture_ui_container)
     }
 
     removeMediaCaptureUI () {
-        this.media_capture_ui_container.remove()
+        this.media_capture_ui_container?.remove()
         this.media_devices_instance = undefined
         this.media_devices_instance = undefined
         this.media_data = []
     }
 
-    closeMediaPopup () {
+    stopTracks () {
         this.media_devices_instance?.getTracks().forEach(function(track) {
             track.stop();
         });
-        this.media_capture_ui_container.remove();
-        this.media_capture_bottom_tools_container.remove();
-        this.media_capture_main_container.remove();
+    }
+    
+
+    closeMediaPopup (silent=false) {
+        this.stopTracks()
+        this.media_capture_ui_container?.remove();
+        this.media_capture_bottom_tools_container?.remove();
+        this.media_capture_main_container?.remove();
         this.removeMediaCaptureUI();
         (this.media_type == 'video' && this.eventMethods.video_recordCancel !== undefined) && this.eventMethods.video_recordCancel();
         (this.media_type == 'audio' && this.eventMethods.audio_recordCancel !== undefined) && this.eventMethods.audio_recordCancel();
         (this.media_type == 'screen' && this.eventMethods.screen_recordCancel !== undefined) && this.eventMethods.screen_recordCancel();
+        (this.onPopupCloseCallback && !silent) && this.onPopupCloseCallback();
     }
 
     /**

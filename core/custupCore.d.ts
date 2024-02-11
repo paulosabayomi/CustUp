@@ -43,10 +43,14 @@ export default class CustUpCore {
      *               headers: {};
      *               configs: {};
      *          };
+     *          chunk_size: number;
+     *          should_chunk: boolean;
      *      };
      *      allowed_sources: Array<'record_video' | 'capture_image' | 'record_audio' | 'record_screen' | 'link_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source'>;
+     *      display_file_sources: boolean;
      *      upload_automatically?: boolean;
      *      show_upload_error_overlay?: boolean;
+     *      show_upload_progress_bar?: boolean;
      *      file_source_config: {
      *        video_recording: {
      *             video_only: boolean;
@@ -119,6 +123,9 @@ export default class CustUpCore {
      *      persist_files: boolean;
      *      persist_type: 'soft' | 'hard';
      *      alert_timeout_time: number;
+     *      messages: {
+     *          timeout: number;
+     *      };
      * }}
      *
      * @param autoInitialize - Whether to automatically initialize the library
@@ -195,7 +202,7 @@ export default class CustUpCore {
      * @param alert_timeout_time - the timeout for Custup alerts default is 300ms
      *
     */
-    constructor({ autoInitialize, disable_scrollbar, persist_default_ui, use_default_file_display_ui, _custupDefaultUploadSentence, show_preview_file_btn, show_file_remove_btn, show_file_details_container, file_preview_animation_types, default_styles_override, persist_styles_override_across_instances, css_font_link, css_font_name, external_source_style_override, media_capture_source_style_override, allowed_file_types, targetRootElement, maxNumberOfFiles, minNumberOfFiles, minimumAllowedFileSize, maximumAllowedFileSize, ui_type, position_container, allowMultipleUpload, file_upload, upload_automatically, show_upload_error_overlay, file_source_icons, allowed_sources, display_ui_tools, show_ui_tools_on_mobile_devices, disable_drag_n_drop, disable_select_files_from_device, allowed_tools, default_icons_override, file_source_config, default_files, count_default_files, instance_attach, single_upload, persist_files, persist_type, alert_timeout_time }: {
+    constructor({ autoInitialize, disable_scrollbar, persist_default_ui, use_default_file_display_ui, _custupDefaultUploadSentence, show_preview_file_btn, show_file_remove_btn, show_file_details_container, file_preview_animation_types, default_styles_override, persist_styles_override_across_instances, css_font_link, css_font_name, external_source_style_override, media_capture_source_style_override, allowed_file_types, targetRootElement, maxNumberOfFiles, minNumberOfFiles, minimumAllowedFileSize, maximumAllowedFileSize, ui_type, position_container, allowMultipleUpload, file_upload, upload_automatically, show_upload_error_overlay, show_upload_progress_bar, file_source_icons, allowed_sources, display_file_sources, display_ui_tools, show_ui_tools_on_mobile_devices, disable_drag_n_drop, disable_select_files_from_device, allowed_tools, default_icons_override, file_source_config, default_files, count_default_files, instance_attach, single_upload, persist_files, persist_type, alert_timeout_time, messages }: {
         _custupDefaultUploadSentence?: string | undefined;
         disable_scrollbar?: boolean | undefined;
         persist_default_ui?: boolean | undefined;
@@ -256,10 +263,6 @@ export default class CustUpCore {
             defaultUIUploadSentenceContainer: string;
             defaultUIUploadIconsContainer: string;
             UITool: string;
-            /**
-             * An array that holds successfully uploaded files
-             * @protected @property {File[]} successfullyUploadedFiles
-             */
             fileDisplayUI: string;
             fileUIOuterContainer: string;
             fileDetailsContainer: string;
@@ -267,10 +270,7 @@ export default class CustUpCore {
             custup_fileSize: string;
             fileBottomDetails: string;
             fileUIBottomToolsContainer: string;
-            file_wrapper_el: string; /**
-             * Custup UI styles
-             * @protected @property {FormData} ui_styles
-             */
+            file_wrapper_el: string;
             fileUI: string;
             remove_file_btn: string;
             file_upload_overlay_ui: string;
@@ -280,6 +280,9 @@ export default class CustUpCore {
             file_upload_progress_inner: string;
             retry_upload_overlay_ui: string;
             retry_upload_button: string;
+            /**
+             * @private @property {Object} file_progress
+             */
             message_container: string;
             filePreviewer: string;
             filePreviewerInnerContainer: string;
@@ -288,6 +291,7 @@ export default class CustUpCore {
         default_icons_override?: {
             add_file: string;
             add_file_2: string;
+            add_file_filled: string;
             delete_filled: string;
             delete: string;
             edit: string;
@@ -329,9 +333,6 @@ export default class CustUpCore {
             check: string;
             dot: string;
             stop: string;
-            /**
-             * @protected handleCustomScroll
-             */
             refresh: string;
             audio: string;
             screen_recording: string;
@@ -344,6 +345,11 @@ export default class CustUpCore {
             openai_logo: string;
             red_circle_cancel: string;
             upload_circle: string;
+            loading_partial: string;
+            desktop_device: string;
+            mobile_device: string;
+            search_icon: string;
+            bars: string;
         } | undefined;
         allowed_file_types: (keyof {
             '123': string;
@@ -363,7 +369,7 @@ export default class CustUpCore {
             acu: string;
             /**
              * Array that holds default loaded files
-             * @public @property {File[]} defaultFiles
+             * @protected @property {File[]} defaultFiles
              */
             acutc: string;
             adp: string;
@@ -372,18 +378,10 @@ export default class CustUpCore {
             afp: string;
             ahead: string;
             ai: string;
-            /**
-             * Array that holds that could not be sent because of an error
-             * @protected @property {File[]} filesNotSent
-             */
             aif: string;
             aifc: string;
             aiff: string;
             air: string;
-            /**
-             * An array that holds successfully uploaded files
-             * @protected @property {File[]} successfullyUploadedFiles
-             */
             ait: string;
             ami: string;
             apk: string;
@@ -391,10 +389,7 @@ export default class CustUpCore {
             application: string;
             apr: string;
             arc: string;
-            asc: string; /**
-             * Custup FormData for uploading files
-             * @private @property {FormData} file_upload_form_data
-             */
+            asc: string;
             asf: string;
             asm: string;
             aso: string;
@@ -405,17 +400,10 @@ export default class CustUpCore {
             atomsvc: string;
             atx: string;
             au: string;
-            avi: string; /**
-             * Custup Axios instance for file upload
-             * @private @property {axios} __axios_instance
-             */
+            avi: string;
             aw: string;
             azf: string;
             azs: string;
-            /**
-             * Events
-             * @private @property {any} eventMethods
-             */
             azw: string;
             bat: string;
             bcpio: string;
@@ -429,10 +417,7 @@ export default class CustUpCore {
             bmi: string;
             bmp: string;
             book: string;
-            box: string; /**
-             * Events
-             * @private @property {any} eventMethods
-             */
+            box: string;
             boz: string;
             bpk: string;
             btif: string;
@@ -455,7 +440,10 @@ export default class CustUpCore {
             cba: string;
             cbr: string;
             cbt: string;
-            cbz: string;
+            cbz: string; /**
+             * Events
+             * @private @property {any} eventMethods
+             */
             cc: string;
             cct: string;
             ccxml: string;
@@ -515,10 +503,7 @@ export default class CustUpCore {
             cxx: string;
             dae: string;
             daf: string;
-            dart: string; /** Custup Options
-             * @protected @param {{}} options
-             *
-            */
+            dart: string;
             dataless: string;
             davmount: string;
             dbk: string;
@@ -544,7 +529,9 @@ export default class CustUpCore {
             dmp: string;
             dms: string;
             dna: string;
-            doc: string;
+            doc: string; /**
+             * @private @property {number} lastToolOffsetBottom
+             */
             docm: string;
             docx: string;
             dot: string;
@@ -1155,11 +1142,7 @@ export default class CustUpCore {
             tar: string;
             tcap: string;
             tcl: string;
-            teacher: string; /**
-             * @private getRandChars
-             * @param {string} identifyer
-             * @returns {string}
-             */
+            teacher: string;
             tei: string;
             teicorpus: string;
             tex: string;
@@ -1252,6 +1235,9 @@ export default class CustUpCore {
             vxml: string;
             w3d: string;
             wad: string;
+            /**
+             * @protected loadFont
+             */
             wav: string;
             wax: string;
             wbmp: string;
@@ -1274,9 +1260,6 @@ export default class CustUpCore {
             wml: string;
             wmlc: string;
             wmls: string;
-            /**
-             * @protected @method read_files_from_storage - reads and loads files from browser Storage
-             */
             wmlsc: string;
             wmv: string;
             wmx: string;
@@ -1311,7 +1294,9 @@ export default class CustUpCore {
             xdp: string;
             xdssc: string;
             xdw: string;
-            xenc: string;
+            xenc: string; /**
+             * @protected @method load_default_files - Loads default files
+             */
             xer: string;
             xfdf: string;
             xfdl: string;
@@ -1394,10 +1379,14 @@ export default class CustUpCore {
                 headers: {};
                 configs: {};
             };
+            chunk_size: number;
+            should_chunk: boolean;
         };
         allowed_sources: Array<'record_video' | 'capture_image' | 'record_audio' | 'record_screen' | 'link_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source'>;
+        display_file_sources: boolean;
         upload_automatically?: boolean | undefined;
         show_upload_error_overlay?: boolean | undefined;
+        show_upload_progress_bar?: boolean | undefined;
         file_source_config: {
             video_recording: {
                 video_only: boolean;
@@ -1470,6 +1459,9 @@ export default class CustUpCore {
         persist_files: boolean;
         persist_type: 'soft' | 'hard';
         alert_timeout_time: number;
+        messages: {
+            timeout: number;
+        };
     });
     /**
      * Custup library name - !!! Please do not change !!!
@@ -1478,14 +1470,14 @@ export default class CustUpCore {
     private libraryName;
     /**
      * Array that holds default loaded files
-     * @public @property {File[]} defaultFiles
+     * @protected @property {File[]} defaultFiles
      */
-    public defaultFiles: any[];
+    protected defaultFiles: any[];
     /**
      * Array that holds all selected files
-     * @public @property {File[]} selectedFiles
+     * @protected @property {File[]} selectedFiles
      */
-    public selectedFiles: any[];
+    protected selectedFiles: any[];
     /**
      * Array that holds that could not be sent because of an error
      * @protected @property {File[]} filesNotSent
@@ -1496,6 +1488,11 @@ export default class CustUpCore {
      * @protected @property {File[]} successfullyUploadedFiles
      */
     protected successfullyUploadedFiles: any[];
+    /**
+     * An array that holds successfully uploaded files
+     * @protected @property {File[]} currentlyUploadingFiles
+     */
+    protected currentlyUploadingFiles: any[];
     /**
      * UI messages items offset counter
      * @private @property {number} last_message_el_offset_bottom
@@ -1525,10 +1522,6 @@ export default class CustUpCore {
         defaultUIUploadSentenceContainer: string;
         defaultUIUploadIconsContainer: string;
         UITool: string;
-        /**
-         * An array that holds successfully uploaded files
-         * @protected @property {File[]} successfullyUploadedFiles
-         */
         fileDisplayUI: string;
         fileUIOuterContainer: string;
         fileDetailsContainer: string;
@@ -1536,10 +1529,7 @@ export default class CustUpCore {
         custup_fileSize: string;
         fileBottomDetails: string;
         fileUIBottomToolsContainer: string;
-        file_wrapper_el: string; /**
-         * Custup UI styles
-         * @protected @property {FormData} ui_styles
-         */
+        file_wrapper_el: string;
         fileUI: string;
         remove_file_btn: string;
         file_upload_overlay_ui: string;
@@ -1549,6 +1539,9 @@ export default class CustUpCore {
         file_upload_progress_inner: string;
         retry_upload_overlay_ui: string;
         retry_upload_button: string;
+        /**
+         * @private @property {Object} file_progress
+         */
         message_container: string;
         filePreviewer: string;
         filePreviewerInnerContainer: string;
@@ -1560,6 +1553,7 @@ export default class CustUpCore {
     protected ui_icons: {
         add_file: string;
         add_file_2: string;
+        add_file_filled: string;
         delete_filled: string;
         delete: string;
         edit: string;
@@ -1601,9 +1595,6 @@ export default class CustUpCore {
         check: string;
         dot: string;
         stop: string;
-        /**
-         * @protected handleCustomScroll
-         */
         refresh: string;
         audio: string;
         screen_recording: string;
@@ -1616,12 +1607,37 @@ export default class CustUpCore {
         openai_logo: string;
         red_circle_cancel: string;
         upload_circle: string;
+        loading_partial: string;
+        desktop_device: string;
+        mobile_device: string;
+        search_icon: string;
+        bars: string;
     };
     /**
      * Custup Axios instance for file upload
      * @private @property {axios} __axios_instance
      */
     private __axios_instance;
+    /**
+     * @private @property {Object} file_chunks
+     */
+    private file_chunks;
+    /**
+     * @private @property {Object} file_progress
+     */
+    private file_progress;
+    /**
+     * @private @property {any} _custup_media_source_instance
+     */
+    private _custup_media_source_instance;
+    /**
+     * @private @property {any} _custup_external_source_instance
+     */
+    private _custup_external_source_instance;
+    /**
+     * @private @property {any} _is_secured_context
+     */
+    private _is_secured_context;
     /**
      * Events
      * @private @property {any} eventMethods
@@ -1648,37 +1664,41 @@ export default class CustUpCore {
     addFilesUITool: undefined;
     uploadFilesToServerTool: undefined;
     close_popup_btn: undefined;
-    file_preview_animation_arr: any[];
-    previewerAnimations: {
-        slideInLeft: {
-            left: string;
-        }[];
-        slideInBottom: {
-            bottom: string;
-        }[];
-        slideInRight: {
-            right: string;
-        }[];
-        slideInTop: {
-            top: string;
-        }[];
-        zoomIn: {
-            transform: string;
-        }[];
-        fadeIn: {
-            opacity: number;
-        }[];
-    };
+    /**
+     * @private @property {Array} file_preview_animation_arr
+     */
+    private file_preview_animation_arr;
+    /**
+     * @private @property {Object} previewerAnimations
+     */
+    private previewerAnimations;
     toolDragger: undefined;
-    currentToolElOffsetLeft: number;
-    currentToolElOffsetBottom: number;
-    lastToolOffsetBottom: number;
-    lastToolOffsetLeft: number;
-    fileDisplayUIElCurrentScrollHeight: number;
-    scrollBarEl: undefined;
+    /**
+     * @private @property {number} currentToolElOffsetLeft
+     */
+    private currentToolElOffsetLeft;
+    /**
+     * @private @property {number} currentToolElOffsetBottom
+     */
+    private currentToolElOffsetBottom;
+    /**
+     * @private @property {number} lastToolOffsetBottom
+     */
+    private lastToolOffsetBottom;
+    /**
+     * @private @property {number} lastToolOffsetLeft
+     */
+    private lastToolOffsetLeft;
+    /**
+     * @private @property {number} fileDisplayUIElCurrentScrollHeight
+     */
+    private fileDisplayUIElCurrentScrollHeight;
+    /**
+     * @public @property {number} scrollBarEl
+     */
+    public scrollBarEl: undefined;
     /** Custup Options
      * @protected @param {{}} options
-     *
     */
     protected options: {
         autoInitialize: boolean;
@@ -1714,6 +1734,7 @@ export default class CustUpCore {
             openai_dalle_source: string;
         };
         allowed_sources: never[];
+        display_file_sources: boolean;
         file_source_config: {
             video_recording: {
                 video_only: boolean;
@@ -1795,9 +1816,12 @@ export default class CustUpCore {
                 headers: {};
                 configs: {};
             };
+            chunk_size: number;
+            should_chunk: boolean;
         };
         upload_automatically: boolean;
         show_upload_error_overlay: boolean;
+        show_upload_progress_bar: boolean;
         default_files: never[];
         count_default_files: boolean;
         instance_attach: never[];
@@ -1805,6 +1829,9 @@ export default class CustUpCore {
         persist_files: boolean;
         persist_type: string;
         alert_timeout_time: number;
+        messages: {
+            timeout: number;
+        };
     };
     /**
      * @private getRandChars
@@ -1816,9 +1843,19 @@ export default class CustUpCore {
      * @protected loadFont
      */
     protected loadFont(): void;
-    map_override_styles_to_default_styles(o_style: any): void;
-    map_override_icons_to_default_icons(): void;
-    load_default_files(): void;
+    /**
+     * @protected @method map_override_styles_to_default_styles - maps the provided styles to the default styles
+     * @param {Object} o_style - The style to map to the default styles
+     */
+    protected map_override_styles_to_default_styles(o_style: Object): void;
+    /**
+     * @protected @method map_override_icons_to_default_icons - Maps the provided icons to the current icons
+     */
+    protected map_override_icons_to_default_icons(): void;
+    /**
+     * @protected @method load_default_files - Loads default files
+     */
+    protected load_default_files(): void;
     /**
      * @protected @method update_file_storage - updates the added files to the browser Storage
      */
@@ -1839,7 +1876,7 @@ export default class CustUpCore {
     /**
      * @public initializeUI
      */
-    public initializeUI(): false | undefined;
+    public initializeUI(): this | undefined;
     /**
      * @protected showDefaultUI
      * @param {boolean} after_container_init - a boolean to specify if the calcel icon should be added to the
@@ -1850,19 +1887,22 @@ export default class CustUpCore {
      * @protected removeDefaultUI
      */
     protected removeDefaultUI(): void;
-    set_file_preview_animations(): void;
     /**
-     * @public @method handleRecordVideo
+     * @protected @method set_file_preview_animations
+     */
+    protected set_file_preview_animations(): void;
+    /**
+     * @protected @method handleRecordVideo
      * @param {'video' | 'image' | 'audio' | 'screen'} type
      */
-    public handleMediaSource(type: 'video' | 'image' | 'audio' | 'screen'): void;
+    protected handleMediaSource(type: 'video' | 'image' | 'audio' | 'screen'): void;
     /**
-     * @public @method handleOpenaiDALLESource
+     * @protected @method handleOpenaiDALLESource
      * @param {'url' | 'onedrive' | 'google_drive' | 'clipboard' | 'box' | 'dalle' | 'dropbox'} type - source type
      */
-    public handleExternalSource(type: 'url' | 'onedrive' | 'google_drive' | 'clipboard' | 'box' | 'dalle' | 'dropbox'): void;
+    protected handleExternalSource(type: 'url' | 'onedrive' | 'google_drive' | 'clipboard' | 'box' | 'dalle' | 'dropbox'): void;
     /**
-     * @protected makeFileDisplayUI
+     * @protected @method makeFileDisplayUI
      */
     protected makeFileDisplayUI(): void;
     /**
@@ -1872,13 +1912,13 @@ export default class CustUpCore {
     protected set_scroll_pointer_event(el: HTMLElement, targetEl?: undefined, targetScrollBarEl?: undefined): void;
     layerMoved: any;
     /**
-     * @protected make_ui_tools
+     * @protected @method make_ui_tools
      */
     protected make_ui_tools(): void;
     /**
-     * @protected handleAddNewFileButton
+     * @protected @method handleAddNewFileButton
      */
-    protected handleAddNewFileButton(): void;
+    protected handleAddNewFileButton(): (() => void) | undefined;
     /**
      * @protected @method attempt_clear_mobile_tools - This methods clears the ui tools if on mobile devices, if no tools were displayed it does nothing
      */
@@ -1893,58 +1933,83 @@ export default class CustUpCore {
      * @param {boolean} file_removed
      */
     protected setNumberOfFiles(file_removed?: boolean): void;
-    createScrollBar(targetEl?: undefined): HTMLDivElement;
-    updateScrollbarHeight(targetEl?: undefined): void;
     /**
-     * @protected handleCustomScroll
+     * @protected @method createScrollBar
+     * @param {HTMLElement | undefined} targetEl - The scrollbar parent container
+     * @returns {HTMLElement}
      */
-    protected handleCustomScroll(e: any, targetEl?: undefined, targetScrollBarEl?: undefined): void;
+    protected createScrollBar(targetEl?: HTMLElement | undefined): HTMLElement;
     /**
-     * @protected handleInnerElementContainerMouseDown
+     * @protected @method updateScrollbarHeight
+     * @param {HTMLElement} targetEl - The scrollbar parent container
      */
-    protected handleInnerElementContainerMouseDown(e: any): void;
+    protected updateScrollbarHeight(targetEl?: HTMLElement): void;
     /**
-     * @protected handleInnerElementContainerMouseUp
+     * @protected @method handleCustomScroll
+     * @param {Event} e - Mouse wheel event or touch event for touch devices
+     * @param {HTMLElement | undefined} targetEl - The scrolling container parent container
+     * @param {HTMLElement | undefined} targetScrollBarEl - The main scroll bar element
+     */
+    protected handleCustomScroll(e: Event, targetEl?: HTMLElement | undefined, targetScrollBarEl?: HTMLElement | undefined): void;
+    /**
+     * removed because tool dragging has been removed for touch devices,
+     * the upload tool on bigger screens has been changed to a static tool which is displayed inside the header on mobile devices
+     * @deprecated @protected @method handleInnerElementContainerPointerDown
+     */
+    protected handleInnerElementContainerPointerDown(e: any): void;
+    /**
+     * @protected @method handleInnerElementContainerMouseUp
      */
     protected handleInnerElementContainerMouseUp(e: any): void;
     /**
-     * @protected handleToolDraggerMouseMove
+     * @protected @method handleToolDraggerMouseMove
      */
     protected handleToolDraggerMouseMove(e: any): void;
     /**
-     * @protected addFileToUI
+     * @protected @method addFileToUI
      * @param {File} file
      * @param {boolean} isUploadable
+     * @param {number | null} index
      */
-    protected addFileToUI(file: File, isUploadable?: boolean): void;
-    file_display_width_setter(el: any): void;
+    protected addFileToUI(file: File, isUploadable?: boolean, index?: number | null): void;
     /**
-     * @protected makeFileDisplayElement
+     * @public @method is_file_previewable
+     * @param {File} file - The file to check whether CustUp can preview it
+     * @returns {boolean}
+     */
+    public is_file_previewable(file: File): boolean;
+    /**
+     * @protected @method file_display_width_setter
+     * @param {HTMLElement} el - The file display width setter only for default UI type
+     */
+    protected file_display_width_setter(el: HTMLElement): void;
+    /**
+     * @protected @method makeFileDisplayElement
      * @param {File} file - file data of the file to display
      * @param {HTMLDivElement} fileContainer
      * @param {ArrayBuffer} fileBase64 - optional to be provided only for image files
      */
     protected makeFileDisplayElement(file: File, fileContainer: HTMLDivElement, fileBase64: ArrayBuffer): void;
     /**
-     * @protected makeFilePreviewer
+     * @protected @method makeFilePreviewer
      * @param {File} file - File object of the element to be previewed
      */
     protected makeFilePreviewer(file: File): void;
     /**
-     * @protected getFileIcon
+     * @protected @method getFileIcon
      * @param {string} file_type - the full file type of the file to return its icons
      * @returns {SVGElement}
      */
     protected getFileIcon(file_type: string): SVGElement;
     /**
-     * @protected handleRemoveFile
+     * @protected @method handleRemoveFile
      * @param {File} fileData
      * @param {Function} callback_fn
      */
     protected handleRemoveFile(fileData: File, callback_fn?: Function): void;
     /**
      * Removes unwanted characters from file name
-     * @protected cleanFileName
+     * @protected @method cleanFileName
      * @param {string} file_name - the file name to remove unwanted characters from
      * @returns {string}
      */
@@ -1955,27 +2020,30 @@ export default class CustUpCore {
      */
     protected get_unique_uuid(): string;
     /**
-     * @protected clipFileNameIfShouldClip
+     * @protected @method clipFileNameIfShouldClip
      * @param {string} file_name
      * @returns {string}
      */
     protected clipFileNameIfShouldClip(file_name: string): string;
     /**
-     /// Postponed
-     * @protected changeFileElementPosition
+     * /// Postponed
+     * @protected @method changeFileElementPosition
+     * @param {Event} e
      */
-    protected changeFileElementPosition(e: any): void;
+    protected changeFileElementPosition(e: Event): void;
     /**
-     * @protected handleFileUIDragOver
+     * @protected @method handleFileUIDragOver
+     * @param {Event} e
      */
-    protected handleFileUIDragOver(e: any): void;
+    protected handleFileUIDragOver(e: Event): void;
     /**
-     * @protected handleFileUIDragOver
+     * @protected @method handleFileUIDragOver
+     * @param {Event} e
      */
-    protected handleFileUIDropped(e: any): void;
+    protected handleFileUIDropped(e: Event): void;
     /**
      *
-     * @private set_class_name
+     * @private @method set_class_name
      *
      * @param style_key_name string the name of the style
      * @param element_to_style HTMLElement
@@ -1984,51 +2052,52 @@ export default class CustUpCore {
      */
     private set_class_name;
     /**
-     * @private get_element_class_name
+     * @private @method get_element_class_name
      * @param {string} style_key_name
      * @returns {string}
      */
     private get_element_class_name;
     /**
-     * @protected select_file_from_device
-     * @param {MouseEvent} e
+     * @protected @method _select_file_from_device
+     * @param {MouseEvent | TouchEvent} e
      */
-    protected select_file_from_device(e: MouseEvent): void;
+    protected _select_file_from_device(e: MouseEvent | TouchEvent): void;
     /**
-     * @protected handle_drag_over
-     * @param {Event} e
+     * @protected @method handle_drag_over
+     * @param {DragEvent} e
      */
-    protected handle_drag_over(e: Event): void;
+    protected handle_drag_over(e: DragEvent): void;
     /**
-     * @protected handle_drag_leave
-     * @param {EventListener} e
+     * @protected @method handle_drag_leave
+     * @param {DragEvent} e
      */
-    protected handle_drag_leave(e: EventListener): void;
+    protected handle_drag_leave(e: DragEvent): void;
     /**
-     * @protected show_message
+     * @protected @method show_message
      * @param {string} msg
      * @param {"error" | "success" | "info"} type
+     * @param {boolean} async - for async messages that doesn't hide until the request is done
+     * @param {number} timeout - timeout for hiding the message
      */
-    protected show_message(msg: string, type: "error" | "success" | "info"): void;
+    protected show_message(msg: string, type: "error" | "success" | "info", async?: boolean, timeout?: number): (() => void) | undefined;
     /**
-     * @protected message_element_exit_call
+     * @protected @method message_element_exit_call
      * This method is executed when a message element is exiting
      * @param {HTMLElement} message_container
-     * @param {boolean} no_wait - specifies if the exit call should be ran inside a setTimeout or not
      */
-    protected message_element_exit_call(message_container: HTMLElement, no_wait?: boolean): void;
+    protected message_element_exit_call(message_container: HTMLElement): void;
     /**
-     * @protected handle_file_drop
+     * @protected @method handle_file_drop
      * @param {Event} e
      */
     protected handle_file_drop(e: Event): void;
     /**
-     * @property isfileAreadyAdded
+     * @property @method isfileAreadyAdded
      * @param {File} file
      */
     isfileAreadyAdded(file: File): boolean;
     /**
-     * @protected parseFileSize
+     * @protected @method parseFileSize
      * @param {number} size
      */
     protected parseFileSize: (size: number) => string;
@@ -2038,59 +2107,71 @@ export default class CustUpCore {
      */
     private isFileTypeInAcceptedTypes;
     /**
-     * @protected handle_selected_files
+     * @protected @method handle_selected_files
      * @param {Array<File>} files
+     * @param {Function | null} before_add_callback_fn
+     * @param {boolean} isUploadable
+     * @param {number | null} index
      */
-    protected handle_selected_files(files: Array<File>, before_add_callback_fn?: null, isUploadable?: boolean): void;
+    protected handle_selected_files(files: Array<File>, before_add_callback_fn?: Function | null, isUploadable?: boolean, index?: number | null): void;
     /**
-     * @protected createFileUploadOverlay
+     * @protected @method createFileUploadOverlay
      * @param {string} file_id - id of the file to add file upload overlay to
      * @returns {HTMLDivElement}
      */
     protected createFileUploadOverlay(file_id: string): HTMLDivElement;
     /**
-     * @protected createRetryUploadOverlay
+     * @protected @method createRetryUploadOverlay
      * @param {File} file
      * @param {string} file_id - id of the file element to append the retry upload overlay to
      */
     protected createRetryUploadOverlay(file: File, file_id: string): void;
-    isUploadConditionsSatisfied(): boolean;
     /**
-     * @protected handleUploadFile
+     * @protected @method isUploadConditionsSatisfied
+     * @returns {boolean}
+     */
+    protected isUploadConditionsSatisfied(): boolean;
+    /**
+     * @protected @method handleUploadFile
      * @param {File} file - the file to be uploaded
      */
     protected handleUploadFile(file?: File): void;
-    handleUploadAllFiles(): Promise<void>;
     /**
-     * @protected fileUploadHandler
+     * @private @method handleUploadAllFiles
+     * @returns {Promise<void>}
+     */
+    private handleUploadAllFiles;
+    /**
+     * @protected @method fileUploadHandler
      * @param {File} file - the file to be uploaded
      */
     protected fileUploadHandler(file?: File): void;
     /**
-     * @protected handleRetryFileUpload
+     * @protected @method handleRetryFileUpload
      * @param {File} file - Blob of the file to retry
      * @param {HTMLDivElement} retry_upload_overlay_ui - html element of the retry upload overlay
      */
     protected handleRetryFileUpload(file: File, retry_upload_overlay_ui: HTMLDivElement): void;
     /**
-     * @protected configure_axios
+     * @protected @method configure_axios
      */
     protected configure_axios(): void;
     /**
-     * @private handleUploadFileToEndpoint
+     * @private @method handleUploadFileToEndpoint
      * @param {File} file - file to upload to the server
      * @param {HTMLDivElement} upload_element - html element containing elements to display upload data and status
+     * @param {boolean} chunking
      */
     private handleUploadFileToEndpoint;
     /**
-     * @private removeFileUploadOverlay
+     * @private @method removeFileUploadOverlay
      * @param {HTMLDivElement} upload_element - html element of the overlay element
      * @param {HTMLDivElement} fileContainer - html element of the of the file container
      * @param {boolean} isSuccessful - boolean to specify if the request was successful or not
      */
     private removeFileUploadOverlay;
     /**
-     * @protected handleUploadProgressEvent
+     * @protected @method handleUploadProgressEvent
      * @param {ProgressEvent} event - upload progress event
      * @param {HTMLDivElement} upload_element - HTML element to display the file upload status
      */
@@ -2124,11 +2205,15 @@ export default class CustUpCore {
      *  'upload.progress' |
      *  'upload.success' |
      *  'upload.error' |
-     *  'upload.retry'
+     *  'upload.retry' |
+     *  'upload.all_finished' |
+     *  'file_source.closed' |
+     *  'default_ui.shown' |
+     *  'default_ui.closed'
      * } event - event name
-     * @param {*} callbackFn - the callback function
+     * @param {Function} callbackFn - the callback function
      */
-    on(event: 'file.beforeAdded' | 'library.init' | 'file.afterAdded' | 'file.beforePassedChecks' | 'file.removed' | 'file.defaultFileRemoved' | 'file.all_removed' | 'video.recordingStarted' | 'video.recording' | 'video.recordStop' | 'video.recordSaved' | 'video.recordCancel' | 'image.captured' | 'audio.recordingStarted' | 'audio.recording' | 'audio.recordStop' | 'audio.recordSaved' | 'audio.recordCancel' | 'screen.recordingStarted' | 'screen.recording' | 'screen.recordStop' | 'screen.recordSaved' | 'screen.recordCancel' | 'upload.beforeStart' | 'upload.progress' | 'upload.success' | 'upload.error' | 'upload.retry', callbackFn: any): void;
+    on(event: 'file.beforeAdded' | 'library.init' | 'file.afterAdded' | 'file.beforePassedChecks' | 'file.removed' | 'file.defaultFileRemoved' | 'file.all_removed' | 'video.recordingStarted' | 'video.recording' | 'video.recordStop' | 'video.recordSaved' | 'video.recordCancel' | 'image.captured' | 'audio.recordingStarted' | 'audio.recording' | 'audio.recordStop' | 'audio.recordSaved' | 'audio.recordCancel' | 'screen.recordingStarted' | 'screen.recording' | 'screen.recordStop' | 'screen.recordSaved' | 'screen.recordCancel' | 'upload.beforeStart' | 'upload.progress' | 'upload.success' | 'upload.error' | 'upload.retry' | 'upload.all_finished' | 'file_source.closed' | 'default_ui.shown' | 'default_ui.closed', callbackFn: Function): void;
     /**
      * @method upload - the method to upload file to the endpoint
      * @param {string | undefined} file_id - the id of the file to upload in the case of a single file, all the files will be uploaded serially if not provided
@@ -2152,6 +2237,10 @@ export default class CustUpCore {
      * @method get_selected_files - return all the selected files
      */
     get_selected_files(): any[];
+    /**
+     * @method get_default_files - return all the default files
+     */
+    get_default_files(): any[];
     /**
      * @method get_all_files - return all the selected files
      */
@@ -2198,8 +2287,11 @@ export default class CustUpCore {
     remove_file(file_id: string, callback_fn: Function): void;
     /**
      * @method add_file - add a file to the UI
+     * @param {File} file
+     * @param {boolean} [skip_file_check=false]
+     * @param {number | null} [index=null]
      */
-    add_file(file: any, skip_file_check?: boolean): void;
+    add_file(file: File, skip_file_check?: boolean | undefined, index?: number | null | undefined): void;
     /**
      * @method record_video - launch the video recording UI
      */
@@ -2232,6 +2324,35 @@ export default class CustUpCore {
      * @method launch_dalle_source - launch the OpenAI Dall.E file source UI
      */
     launch_dalle_source(): void;
+    /**
+     * @method clear_persisted_files
+     */
+    clear_persisted_files(): void;
+    /**
+     * @method select_file_from_device
+     */
+    select_file_from_device(): void;
+    /**
+     * @method close_file_source_popup
+     */
+    close_file_source_popup(): void;
+    /**
+     * @method get_file_sources - Returns all the allowed file sources icons wrapped in HTML element
+     * @param {HTMLElement | null} iconsContainer - An HTML element to automatically append the icons to
+     * @param {Function | null} allElOnClick - A callback function to be attached to the onClick event of every icons
+     * @param {Object<Function> | {}} additionalElOnClickEv - An object containing the function to be attached to the onClick event of the specified icons
+     * @returns {Array<HTMLElement>}
+     */
+    get_file_sources(iconsContainer?: HTMLElement | null, allElOnClick?: Function | null, additionalElOnClickEv?: Object<Function> | {}): Array<HTMLElement>;
+    /**
+     * @public @method display_message - display pop up message
+     * @param {string} msg - The message to be displayed
+     * @param {"error" | "success" | "info"} type - The message type
+     * @param {boolean} async - for async messages that doesn't hide until the request is done
+     * @param {number} timeout - timeout for hiding the message
+     * @returns {Function | void}
+     */
+    public display_message(msg: string, type: "error" | "success" | "info", async?: boolean, timeout?: number): Function | void;
 }
 import { external_sources_ui_styles } from "../utils/_styles.js";
 import { media_capture_ui_styles } from "../utils/_styles.js";

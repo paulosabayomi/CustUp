@@ -6,7 +6,7 @@ import file_types from "../utils/filetypes.js";
 export default class ExternalSource {
     _custupInnerContainer
     callbackFn
-    standalone_mode
+    standalone_mode // not implemented yet
 
     /**
      * @private @param {HTMLDivElement} container_ui_container
@@ -57,7 +57,6 @@ export default class ExternalSource {
     googleDrivePickerInited = false;
     gisInited = false;
     
-    dropboxInitialized = false
     dropboxUIContainer
 
     /**
@@ -105,10 +104,15 @@ export default class ExternalSource {
 
     /**
      * @private @param {HTMLDivElement} dalleOuterContainer 
-     * @public @param {HTMLDivElement} dalleInitialPageContainer 
      */
     dalleOuterContainer
+    /**
+     * @public @param {HTMLDivElement} dalleInitialPageContainer 
+     */
     dalleInitialPageContainer
+    /**
+     * @public @param {HTMLDivElement} dallePreviewPageContainer 
+     */
     dallePreviewPageContainer
     
     dalleResponseData = []
@@ -293,7 +297,11 @@ export default class ExternalSource {
             }
         }
 
-        this.setElementMediaQuery = setElementMediaQuery
+        this.setElementMediaQuery = setElementMediaQuery;
+
+        if (document.querySelector('._custup_external_sources_container') != null) {
+            document.querySelector('._custup_external_sources_container').remove()
+        }
 
 
         this.initialize();
@@ -434,7 +442,7 @@ export default class ExternalSource {
         this._custupInnerContainer.append(this.container_ui_container)
     }
 
-    destroyContainerUI () {
+    destroyContainerUI (silent=false) {
         if (this.source_type == 'dalle') {
             this.resetDalleData()            
         }
@@ -443,7 +451,7 @@ export default class ExternalSource {
             this.custup_close_btn.onclick = () => null;
             this.custup_close_btn.style.display = 'none';
         }
-        this.onclose?.();
+        !silent && this.onclose?.();
     }
 
     makeURLSourceUi () {
@@ -501,16 +509,19 @@ export default class ExternalSource {
         _class.URL_source_button.disabled = false
     }
 
-
+    dropboxIsInitialized () {
+        return document.querySelector('[src*="https://www.dropbox.com/static/api/"]') != null
+    }
 
     handleAddFileFromDropbox () {
-        if (this.dropboxInitialized == false) {
+        if (this.dropboxIsInitialized() == false) {
             this.loadDropboxPickerScript()            
+        }else{
+            this.addDropboxToUI()
         }
     }
 
     addDropboxToUI () {
-        this.dropboxInitialized = true;
         this.createContainerUI();
         this.setupCustupCloseBtn();
         this.allowed_mime_types.map(type => this.config_override.dropbox.options.extensions.push("."+type))
@@ -631,27 +642,35 @@ export default class ExternalSource {
     async googleDrivePickerCallback(data) {
         try {
             if (data.action === google.picker.Action.PICKED) {
-                this.custup_show_message_fn("Adding selected files to the UI, please wait it can take few minutes", "info")
+                const request_notif_msg = this.custup_show_message_fn("Adding selected files from Google Drive, please wait it may take up to few minutes", "info", true)
                 const doc = data[google.picker.Response.DOCUMENTS];
-                // const fileId = doc[google.picker.Document.ID];
-                doc.map(async file => {
-                    const res = await gapi.client.drive.files.get({
-                        'fileId': file[google.picker.Document.ID],
-                        'fields': '*',
-                        alt: 'media'
-                    });
-                    // Convert binary string to ArrayBuffer
-                    const arrayBuffer = new Uint8Array([...res.body].map((char) => char.charCodeAt(0))).buffer;
-    
-                    // Create a Blob from the ArrayBuffer
-                    const blob = new Blob([arrayBuffer], { type: file.mimeType });
-    
-                    // Use the resulting Blob as needed
-                    
-                    blob.name = file.name
-                    this.callbackFn(blob)
-                })
                 this.destroyContainerUI()
+                
+                for await (const file of doc) {
+                    try {
+                        const res = await gapi.client.drive.files.get({
+                            'fileId': file[google.picker.Document.ID],
+                            'fields': '*',
+                            alt: 'media'
+                        });
+                        // Convert binary string to ArrayBuffer
+                        const arrayBuffer = new Uint8Array([...res.body].map((char) => char.charCodeAt(0))).buffer;
+        
+                        // Create a Blob from the ArrayBuffer
+                        const blob = new Blob([arrayBuffer], { type: file.mimeType });
+        
+                        // Use the resulting Blob as needed
+                        
+                        blob.name = file.name
+                        this.callbackFn(blob)                        
+                    } catch (error) {
+                        this.custup_show_message_fn("An error occured, could not load file " + file.name + " from Google Drive", "error")
+                    }
+                }
+
+                request_notif_msg();
+                this.custup_show_message_fn("All files has been loaded from Google Drive", "success")
+                
             }
             
         } catch (error) {
@@ -660,10 +679,18 @@ export default class ExternalSource {
         
     }
 
+    isBoxScriptLoaded () {
+        return document.querySelector(`[src*="${this.config_override.box.authConfig.jsLink}"]`) != null
+    }
+
     handleAddFileFromBox () {
         this.createContainerUI();
         this.setupCustupCloseBtn();
-        this.loadBoxPickerScript()
+        if (!this.isBoxScriptLoaded()) {
+            this.loadBoxPickerScript();            
+        }else{
+            this.addBoxPickerToUI()
+        }
     }
 
     addBoxPickerToUI () {
@@ -924,7 +951,7 @@ export default class ExternalSource {
         const dalleIntialPageButtonContainer = document.createElement('div')
 
         const dalleIntialPageTitleText = document.createElement('div')
-        dalleIntialPageTitleText.innerText = "Generate Image with OpenAI DALL.E"
+        dalleIntialPageTitleText.innerText = "Generate images with OpenAI DALL.E"
 
         const dalleIntialPageSearchInput = document.createElement('input')
         dalleIntialPageSearchInput.placeholder = "Type a prompt for DALL.E"

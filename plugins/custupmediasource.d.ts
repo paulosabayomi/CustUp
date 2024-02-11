@@ -14,7 +14,7 @@ export default class CustUpMediaSource {
      *      ui_styles: typeof media_capture_ui_styles;
      * }}
      */
-    constructor({ inner_container, media_type, standalone, callbackFn, config, eventMethods, ui_styles }: {
+    constructor({ inner_container, media_type, standalone, callbackFn, config, eventMethods, ui_styles, onclose }: {
         inner_container: HTMLDivElement;
         media_type: 'audio' | 'video' | 'image';
         standalone?: boolean;
@@ -27,9 +27,9 @@ export default class CustUpMediaSource {
         ui_styles: typeof media_capture_ui_styles;
     });
     /**
-     * @protected @property {HTMLDivElement} _funkupInnerContainer
+     * @protected @property {HTMLDivElement} _custupInnerContainer
      */
-    protected _funkupInnerContainer: HTMLDivElement;
+    protected _custupInnerContainer: HTMLDivElement;
     /**
      * @protected @property {'audio' | 'video' | 'image' | 'screen'} media_type
      */
@@ -97,6 +97,10 @@ export default class CustUpMediaSource {
      */
     protected callbackFn: Function;
     /**
+     * @protected @property {Function} onPopupCloseCallback
+     */
+    protected onPopupCloseCallback: any;
+    /**
      * @protected @property {Function} media_config
      */
     protected media_config: {
@@ -138,7 +142,7 @@ export default class CustUpMediaSource {
      * @param {'video' | 'both' | 'image' | 'audio' | 'screen'} constraint_type - type of media
      * @returns MediaStream
      */
-    protected initializeMediaDevices(constraint_type: 'video' | 'both' | 'image' | 'audio' | 'screen'): Promise<MediaStream>;
+    protected initializeMediaDevices(constraint_type: 'video' | 'both' | 'image' | 'audio' | 'screen'): Promise<any>;
     /**
      * @protected initializeMediaDevices
      * @param {string} constraint_type - type of media
@@ -168,7 +172,8 @@ export default class CustUpMediaSource {
      */
     protected createMediaCaptureUI(media_type: 'audio' | 'video' | 'image'): HTMLVideoElement;
     removeMediaCaptureUI(): void;
-    closeMediaPopup(): void;
+    stopTracks(): void;
+    closeMediaPopup(silent?: boolean): void;
     /**
      * @protected animateStartActionButton
      * @param {boolean} stop - whether to start or stop the action button animation

@@ -1,11 +1,13 @@
 {
   "name": "custup",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "Highly customisable file upload library with zero dependencies",
   "main": "src/custup.min.js",
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
-    "type-test": "npx tsd ."
+    "type-test": "npx tsd .",
+    "typed": "find . -type f ! -path './node_modules/*' -name '*.d.ts*' -delete; npx tsc",
+    "grunt": "grunt uglify cssmin"
   },
   "repository": {
     "type": "git",

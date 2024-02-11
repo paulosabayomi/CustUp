@@ -8,7 +8,7 @@
 <!-- Please keep comment here to allow auto update -->
 <!-- [END BADGES] -->
   
-![CustUp Init](https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png)  
+![CustUp Default UI type](https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png)  
   
 CustUp is a highly customizable library with zero dependency, and can be easily adapted to a wide range of applications.  
   
@@ -18,9 +18,10 @@ CustUp which is the short for Customizable Uploader was made to be >95% customiz
 
 ### Things you might want to know about CustUp
 
-- Easily change the UI design or create your own UI just by overriding or adding to the CSS classes of the Elements
-- With the instance attachment feature, you can create multiple CustUp instances and upload all files at once together with form fields and/or additional data
-- You can get all the selected files and upload them manually
+- Choose the UI type that fits your project.
+- Easily change the UI design or create your own UI just by overriding or adding to the CSS classes of the Elements.
+- With the instance attachment feature, you can create multiple CustUp instances and upload all files at once together with form fields and/or additional data.
+- You can get all the selected files and upload them manually.
 - You don't need to worry about installing HTTP client to manage your upload requests because axios was bundled into CustUp which you can easily configure.
 
 ## Documentation Homepage
@@ -268,8 +269,10 @@ const instance4 = new CustUp({
 instance4.upload();
 ```
 
-`single_upload` when set to true and used with `instance_attach` it is useful if all files should be uploaded at once, if `false` then upload event will be triggered for each of the files in all of the attached instances
-
+`single_upload` when set to true and used with `instance_attach` it is useful if all files should be uploaded at once, if `false` then upload event will be triggered for each of the files in all of the attached instances.  
+  
+See more guides on the [documentation page](https://custup.pryxy.com/docs/category/guides).  
+  
 ## Options
 
 | Option | type | default | Required | Description |
@@ -303,7 +306,7 @@ persist_files | `boolean` | `false` | Not required | To persist files in the bro
 persist_type | `soft` or `hard` | `soft` | Not required | To set the `persist_files` storage method, if `soft` CustUp will use `sessionStorage` to temporarily store files and if `hard` CustUp will use `localStorage` to store files.
 alert_timeout_time | `number` | `300` milliseconds | Not required | The timeout for CustUp alerts  
   
-There are many more other options, read the documentation for more options  
+There are many more other options, read the [documentation for more options](https://custup.pryxy.com/docs/category/options)  
   
 ## All Options
 
@@ -470,6 +473,8 @@ options = {
 }
 ```
 
+See all available options [here](https://custup.pryxy.com/docs/category/options)
+
 ## Events
 
 CustUp has events that can be subscribed to  
@@ -535,6 +540,8 @@ And many more events, read the documentation for more events
 */
 ```
 
+Check out more events [here](https://custup.pryxy.com/docs/events)
+
 ## Methods
 
 There are several methods that can be used to customize the library to your taste, example, to dynamically call the `upload` method
@@ -560,7 +567,7 @@ retry_upload | To trigger upload retry for all files that were not uploaded due 
 | clear_files | To clear all the added files from the memory, browser storage and UI | `None` |
 | get_total_file_count | Returns all total number of added files, it will only return total number of selected files if `count_default_files` is set to false | `None`   |
   
-And many more, read more about CustUp methods in the documentation
+And many more, read more about [CustUp methods in the documentation](https://custup.pryxy.com/docs/methods)
 
 ## Inspiration
 
@@ -568,10 +575,10 @@ When I was working on a freelance project that has a custom file upload UI desig
   
 ## Upcoming Features
 
-- [ ] Upload resumable
-- [ ] Chunk upload
-- [ ] React js version
 - [x] Typescript version/support
+- [x] React js version
+- [x] Chunk upload
+- [ ] Upload resumable
 - [ ] Onedrive implementation
 
 ## Contributing
