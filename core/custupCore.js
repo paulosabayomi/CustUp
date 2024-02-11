@@ -173,6 +173,11 @@ export default class CustUpCore {
     file_preview_animation_arr = []; // Custup close popup btn
 
     /**
+     * @private @property {boolean} is_default_ui_shown
+     */
+    is_default_ui_shown = undefined; // Custup close popup btn
+
+    /**
      * @private @property {Object} previewerAnimations
      */
     // file preview animations 
@@ -437,7 +442,7 @@ export default class CustUpCore {
      *      minNumberOfFiles?: number; 
      *      minimumAllowedFileSize?: number; 
      *      maximumAllowedFileSize?: number; 
-     *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture'; 
+     *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture' | 'elegant'; 
      *      display_ui_tools?: boolean;
      *      show_ui_tools_on_mobile_devices?: boolean;
      *      disable_drag_n_drop?: boolean;
@@ -1086,6 +1091,7 @@ export default class CustUpCore {
         this._custupInnerEl.append(this._custupDefaultUIEl);
         !this.options.disable_select_files_from_device && (this._custupDefaultUIEl.onclick = (e) => this._select_file_from_device(e));
         this.eventMethods.default_ui_shown && this.eventMethods.default_ui_shown();
+        this.is_default_ui_shown = true;
     }
 
 
@@ -1097,6 +1103,7 @@ export default class CustUpCore {
             this._custupDefaultUIEl.remove();
             this._custupDefaultUIEl = undefined;    
             this.eventMethods.default_ui_closed && this.eventMethods.default_ui_closed();
+            this.is_default_ui_shown = false;
         }
     }
 
@@ -1229,6 +1236,7 @@ export default class CustUpCore {
      * @param {HTMLElement} el
      */
     set_scroll_pointer_event (el, targetEl=undefined, targetScrollBarEl=undefined) {
+        if (el == undefined) return;
         el.ontouchstart = (e) => {
             e.stopPropagation();
             this.layerMoved = e.layerY
@@ -2831,6 +2839,21 @@ export default class CustUpCore {
     close_file_source_popup () {
         this._custup_external_source_instance?.destroyContainerUI(true);
         this._custup_media_source_instance?.closeMediaPopup(true); // destroy CustUpMediaSource instance if already exists
+    }
+
+    /**
+     * @method hide_add_file_ui
+     */
+    hide_add_file_ui () {
+        this.removeDefaultUI();
+    }
+
+    /**
+     * @method is_add_file_ui_shown
+     * @returns {boolean}
+     */
+    is_add_file_ui_shown () {
+        return this.is_default_ui_shown;
     }
 
     /**

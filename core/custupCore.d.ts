@@ -25,7 +25,7 @@ export default class CustUpCore {
      *      minNumberOfFiles?: number;
      *      minimumAllowedFileSize?: number;
      *      maximumAllowedFileSize?: number;
-     *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture';
+     *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture' | 'elegant';
      *      display_ui_tools?: boolean;
      *      show_ui_tools_on_mobile_devices?: boolean;
      *      disable_drag_n_drop?: boolean;
@@ -357,7 +357,7 @@ export default class CustUpCore {
         minNumberOfFiles?: number | undefined;
         minimumAllowedFileSize?: number | undefined;
         maximumAllowedFileSize?: number | undefined;
-        ui_type?: "default" | "resumeUploaderUI" | "bare" | "detached" | "profilePicture" | undefined;
+        ui_type?: "default" | "resumeUploaderUI" | "bare" | "detached" | "profilePicture" | "elegant" | undefined;
         display_ui_tools?: boolean | undefined;
         show_ui_tools_on_mobile_devices?: boolean | undefined;
         disable_drag_n_drop?: boolean | undefined;
@@ -666,6 +666,10 @@ export default class CustUpCore {
      * @private @property {Array} file_preview_animation_arr
      */
     private file_preview_animation_arr;
+    /**
+     * @private @property {boolean} is_default_ui_shown
+     */
+    private is_default_ui_shown;
     /**
      * @private @property {Object} previewerAnimations
      */
@@ -1334,6 +1338,15 @@ export default class CustUpCore {
      * @method close_file_source_popup
      */
     close_file_source_popup(): void;
+    /**
+     * @method hide_add_file_ui
+     */
+    hide_add_file_ui(): void;
+    /**
+     * @method is_add_file_ui_shown
+     * @returns {boolean}
+     */
+    is_add_file_ui_shown(): boolean;
     /**
      * @method get_file_sources - Returns all the allowed file sources icons wrapped in HTML element
      * @param {HTMLElement | null} iconsContainer - An HTML element to automatically append the icons to

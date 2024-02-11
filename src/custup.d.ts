@@ -25,7 +25,7 @@ export default class CustUp extends CustUpCore {
     *      minNumberOfFiles?: number;
     *      minimumAllowedFileSize?: number;
     *      maximumAllowedFileSize?: number;
-    *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture';
+    *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture' | 'elegant';
     *      display_ui_tools?: boolean;
     *      show_ui_tools_on_mobile_devices?: boolean;
     *      disable_drag_n_drop?: boolean;
@@ -162,7 +162,7 @@ export default class CustUp extends CustUpCore {
         minNumberOfFiles?: number | undefined;
         minimumAllowedFileSize?: number | undefined;
         maximumAllowedFileSize?: number | undefined;
-        ui_type?: "default" | "resumeUploaderUI" | "bare" | "detached" | "profilePicture" | undefined;
+        ui_type?: "default" | "resumeUploaderUI" | "bare" | "detached" | "profilePicture" | "elegant" | undefined;
         display_ui_tools?: boolean | undefined;
         show_ui_tools_on_mobile_devices?: boolean | undefined;
         disable_drag_n_drop?: boolean | undefined;

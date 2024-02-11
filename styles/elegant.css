@@ -12,6 +12,7 @@
     border-radius: 1px !important;
     width: 750px !important;
     height: 500px !important;
+    position: relative;
 }
 
 .EUIOuterContainer * {
@@ -52,7 +53,7 @@
     outline: none;
     border: 0px;
     margin: 6px 0px;
-    color: white;
+    color: white !important;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color .2s linear, color .2s linear;
@@ -218,7 +219,7 @@
 }
 
 .EUIFileTipText2 {
-    color: gray;
+    color: gray !important;
     font-size: 90%;
 }
 
@@ -257,13 +258,13 @@
     outline: none;
     padding-left: 25px;
     text-align: center;
-    color: gray;
+    color: gray !important;
     border-radius: 2px;
 }
 
 
 .EUIFilterBox::placeholder {
-    color: rgb(158, 158, 158);
+    color: rgb(158, 158, 158) !important;
 }
 
 .EUIFileStateInfoContainer {
@@ -277,7 +278,7 @@
 
 .EUIFileStateInfoContainer div {
  text-transform: uppercase;
- color: #555;
+ color: #555 !important;
  font-size: 75%;
  font-weight: 400 !important;
 }
@@ -316,13 +317,13 @@
 }
 
 .EUIFilenameSizeContainer div:first-child {
-    color: gray;
+    color: gray !important;
     font-size: 85%;
     margin-bottom: 6px;
 }
 
 .EUIFilenameSizeContainer div:last-child {
-    color: darkgray;
+    color: darkgray !important;
     font-size: 75%;
 }
 
@@ -343,11 +344,11 @@
 
 .EUIFileDisplayToolsContainer div svg path {
     transition: fill .4s linear;
-    fill: rgb(114, 114, 114)
+    fill: rgb(114, 114, 114) !important;
 }
 
 .EUIFileDisplayToolsContainer div:hover svg path {
-    fill: darkgray
+    fill: darkgray !important;
 }
 
 .EUIProgressIndicatorContainer {
@@ -363,6 +364,21 @@
     height: 100%;
 }
 
+.EUISelectFileToggleBtn {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    z-index: +6 !important;
+    display: flex;
+    cursor: pointer;
+}
+
+.EUISelectFileToggleBtn svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* For mobile devices and when user's device is on landscape */
 @media only screen and (max-width: 768px), (orientation: landscape) and (max-width: 768px) {
     :root {
         --header-container-height: var(--height, 30px) !important;
@@ -410,7 +426,7 @@
     }
 
     .EUIDefaultUIInnerContentEl div.file-source:hover div, div.file-source:active div {
-        color: var(--eui-blue);
+        color: var(--eui-blue) !important;
     }
 
     .EUIDefaultUIInnerContentEl div svg {

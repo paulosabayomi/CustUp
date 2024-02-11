@@ -29,7 +29,7 @@ export default class CustUp extends CustUpCore {
     *      minNumberOfFiles?: number; 
     *      minimumAllowedFileSize?: number; 
     *      maximumAllowedFileSize?: number; 
-    *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture'; 
+    *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture' | 'elegant'; 
     *      display_ui_tools?: boolean;
     *      show_ui_tools_on_mobile_devices?: boolean;
     *      disable_drag_n_drop?: boolean;
@@ -551,6 +551,30 @@ export default class CustUp extends CustUpCore {
             // scope variable declaration
             let footerContainerFilled = false;
             let submitBtnEl_clone = null;
+            let selectFromDeviceSourceIcon_clone = null;
+
+            const showAddFileUI = (e) => {
+                this.show_add_file_ui();
+                this._custupEl.querySelectorAll('[data-custup-icon-active="true"]').forEach(el => el.removeAttribute("data-custup-icon-active"));
+                selectFromDeviceSourceIcon_clone && (selectFromDeviceSourceIcon_clone.dataset.custupIconActive = "true");
+                headerTitleBar.innerHTML = e?.currentTarget.innerHTML == undefined ? 'Select from' : e.currentTarget.innerHTML;
+                hideHeaderUtils();
+                clearUtilsButtonsFromFooter()
+                this.close_file_source_popup();
+            }
+            const selectFileToggleBtn = document.createElement('div');
+            selectFileToggleBtn.className = "EUISelectFileToggleBtn";
+            selectFileToggleBtn.innerHTML = this.ui_icons.bars;
+            selectFileToggleBtn.onclick = (e) => {
+                if (this.is_add_file_ui_shown() && this.get_total_file_count() > 0) {
+                    this.hide_add_file_ui();
+                }else{
+                    showAddFileUI();
+                    list_file_sources();
+                }
+
+            }
+            this._custupEl.append(selectFileToggleBtn);
 
             // function that creates the utils buttons in the footer container
             const createUtilsButtonsInFooter = () => {
@@ -582,11 +606,7 @@ export default class CustUp extends CustUpCore {
                 footerContainerFilled = false;
             }
 
-            // create the select from user's device icon
-            const selectFromDeviceSourceIcon = document.createElement('div');
-            selectFromDeviceSourceIcon.innerHTML = this.ui_icons.desktop_device;
-            this._custupSidebarLeftEl.append(selectFromDeviceSourceIcon);
-            selectFromDeviceSourceIcon.dataset.custupIconActive = "true"
+            
 
 
             // create the header title
@@ -653,15 +673,7 @@ export default class CustUp extends CustUpCore {
                 this._custupEl.style.setProperty('--header-container-height', this._custupHeaderEl.offsetHeight + 'px');
             }
 
-            selectFromDeviceSourceIcon.onclick = (e) => {
-                this.show_add_file_ui();
-                this._custupEl.querySelectorAll('[data-custup-icon-active="true"]').forEach(el => el.removeAttribute("data-custup-icon-active"));
-                selectFromDeviceSourceIcon.dataset.custupIconActive = "true";
-                headerTitleBar.innerHTML = e.currentTarget.innerHTML;
-                hideHeaderUtils();
-                clearUtilsButtonsFromFooter()
-                this.close_file_source_popup();
-            }
+            
 
             const setIconActiveCallbackFn = (e) => {
                 this._custupEl.querySelectorAll('[data-custup-icon-active="true"]').forEach(el => el.removeAttribute("data-custup-icon-active"))
@@ -674,13 +686,17 @@ export default class CustUp extends CustUpCore {
             // create the other file source icons
             const list_file_sources = () => {
                 this._custupSidebarLeftEl.innerHTML = "";
-                !is_mobile() && this.get_file_sources(this._custupSidebarLeftEl, setIconActiveCallbackFn);
+
+                // create the select from user's device icon
+                const selectFromDeviceSourceIcon = document.createElement('div');
+                selectFromDeviceSourceIcon_clone = selectFromDeviceSourceIcon
+                
+
                 if (is_mobile()) {
                     this._custupDefaultUIInnerContentEl.innerHTML = "";
                     const file_source_icons = this.get_file_sources();
 
-                    const selectFromDeviceSourceIcon = document.createElement('div');
-                    selectFromDeviceSourceIcon.innerHTML = this.ui_icons.desktop_device;
+                    selectFromDeviceSourceIcon.innerHTML = this.ui_icons.mobile_device;
                     selectFromDeviceSourceIcon.classList.add('file-source');
                     const device_icon_title = document.createElement('div');
                     device_icon_title.innerHTML = "Select from Device";
@@ -697,10 +713,18 @@ export default class CustUp extends CustUpCore {
                         this._custupDefaultUIInnerContentEl.append(source_el)
                     })
                     this.set_scroll_pointer_event(this._custupDefaultUIEl, this._custupDefaultUIInnerContentEl);
+                    selectFileToggleBtn.style.display = 'flex'
                 }else{
+                    selectFileToggleBtn.style.display = 'none'
                     this._custupDefaultUIInnerContentEl.innerHTML = this.options._custupDefaultUploadSentence;
-
+                    
+                    selectFromDeviceSourceIcon.innerHTML = this.ui_icons.desktop_device;
+                    this._custupSidebarLeftEl.append(selectFromDeviceSourceIcon);
+                    selectFromDeviceSourceIcon.dataset.custupIconActive = "true";
+                    selectFromDeviceSourceIcon.onclick = (e) => showAddFileUI(e)
                 }
+
+                !is_mobile() && this.get_file_sources(this._custupSidebarLeftEl, setIconActiveCallbackFn);
             }
             list_file_sources();
             window.onresize = (e) => {
@@ -821,12 +845,6 @@ export default class CustUp extends CustUpCore {
                 createUtilsButtonsInFooter();
             });
         });
-
-
-        
-
-
-
 
     }
 }
