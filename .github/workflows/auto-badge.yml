@@ -50,6 +50,6 @@ jobs:
               {
                 "badge": "https://github.com/paulosabayomi/CustUp/actions/workflows/test-ts.js.yml/badge.svg",
                 "alt": "TypeScript Test",
-                "link": "https://www.typescriptlang.org/"
+                "link": "${{ env.repo_url }}/actions/workflows/test-ts.js.yml"
               }
             ]

@@ -8,13 +8,12 @@
 <!-- Please keep comment here to allow auto update -->
 <!-- [END BADGES] -->
   
-<div style="display: flex;">
+<div>
     <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-default.png" alt="Custup logo" width="45%" style="object-fit: contain; justify-self:center;"/>
     <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-2.png" alt="Custup logo" width="45%" style="object-fit: contain; justify-self:center;"/>
     <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-3.png" alt="Custup logo" width="45%" style="object-fit: contain; justify-self:center;"/>
     <img src="https://github.com/paulosabayomi/CustUp/blob/master/_assets/custup-4.png" alt="Custup logo" width="45%" style="object-fit: contain; justify-self:center;"/>
 </div>
-  
   
 CustUp is a highly customizable JavaScript file upload library with zero dependency that can be easily adapted to a wide range of applications.  
   
