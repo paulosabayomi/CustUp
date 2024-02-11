@@ -6,6 +6,15 @@
 
 <!-- [START BADGES] -->
 <!-- Please keep comment here to allow auto update -->
+<p align="center">
+  <a href="https://github.com/paulosabayomi/CustUp/blob/master/LICENSE"><img src="https://img.shields.io/github/license/paulosabayomi/CustUp?style=flat-square" alt="MIT License" /></a>
+  <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/What_is_JavaScript"><img src="https://img.shields.io/badge/logo-javascript-blue?logo=javascript" alt="Language" /></a>
+  <a href="https://github.com/paulosabayomi/CustUp/pulls"><img src="https://img.shields.io/badge/PRs-Welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome" /></a>
+  <a href="https://github.com/paulosabayomi/CustUp/actions/workflows/node.js.yml"><img src="https://github.com/paulosabayomi/CustUp/actions/workflows/node.js.yml/badge.svg" alt="Tests" /></a>
+  <a href="https://github.com/paulosabayomi/CustUp/actions/workflows/setup-node.yml"><img src="https://github.com/paulosabayomi/CustUp/actions/workflows/setup-node.yml/badge.svg" alt="Publish to NPM" /></a>
+  <a href="https://github.com/paulosabayomi/CustUp/actions/workflows/test-ts.js.yml"><img src="https://img.shields.io/badge/logo-typescript-blue?logo=typescript" alt="TypeScript" /></a>
+  <a href="https://github.com/paulosabayomi/CustUp/actions/workflows/test-ts.js.yml"><img src="https://github.com/paulosabayomi/CustUp/actions/workflows/test-ts.js.yml/badge.svg" alt="TypeScript Test" /></a>
+</p>
 <!-- [END BADGES] -->
   
 <div>
