@@ -15,7 +15,7 @@ export default class CustUp extends CustUpCore {
     *      autoInitialize?: boolean;
     *      show_file_remove_btn?: boolean;
     *      show_file_details_container?: boolean;
-    *      file_source_icons: {[key in 'video_camera' | 'capture_image' | 'record_audio' | 'record_screen' | 'url_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source']: any};
+    *      file_source_icons?: {[key in 'video_camera' | 'capture_image' | 'record_audio' | 'record_screen' | 'url_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source']: any};
     *      css_font_link?: string;
     *      css_font_name?: string;
     *      external_source_style_override?: typeof external_sources_ui_styles;
@@ -23,22 +23,22 @@ export default class CustUp extends CustUpCore {
     *      default_styles_override?: typeof ui_styles;
     *      persist_styles_override_across_instances?: boolean;
     *      default_icons_override?: typeof icons;
-    *      allowed_file_types: (keyof file_types)[];
+    *      allowed_file_types?: (keyof file_types)[];
     *      targetRootElement: string; 
-    *      maxNumberOfFiles: number; 
-    *      minNumberOfFiles: number; 
-    *      minimumAllowedFileSize: number; 
-    *      maximumAllowedFileSize: number; 
-    *      ui_type: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture'; 
-    *      display_ui_tools: boolean;
-    *      show_ui_tools_on_mobile_devices: boolean;
-    *      disable_drag_n_drop: boolean;
-    *      disable_select_files_from_device: boolean;
-    *      allowed_tools: Array<'tools_dragger' | 'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
-    *      position_container: "before" | "after" | "overwrite" | {"beforeEl": string};
-    *      file_preview_animation_types: Array<'slideInRight' | 'slideInTop' | 'slideInLeft' | 'slideInBottom' | 'zoomIn' | 'fadeIn'>;
-    *      allowMultipleUpload: boolean;
-    *      file_upload: {
+    *      maxNumberOfFiles?: number; 
+    *      minNumberOfFiles?: number; 
+    *      minimumAllowedFileSize?: number; 
+    *      maximumAllowedFileSize?: number; 
+    *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture'; 
+    *      display_ui_tools?: boolean;
+    *      show_ui_tools_on_mobile_devices?: boolean;
+    *      disable_drag_n_drop?: boolean;
+    *      disable_select_files_from_device?: boolean;
+    *      allowed_tools?: Array<'tools_dragger' | 'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
+    *      position_container?: "before" | "after" | "overwrite" | {"beforeEl": string};
+    *      file_preview_animation_types?: Array<'slideInRight' | 'slideInTop' | 'slideInLeft' | 'slideInBottom' | 'zoomIn' | 'fadeIn'>;
+    *      allowMultipleUpload?: boolean;
+    *      file_upload?: {
     *          endpoint_url: string;
     *          files_field_name: string;
     *          form_field?: HTMLFormElement | string;
@@ -50,12 +50,12 @@ export default class CustUp extends CustUpCore {
     *          chunk_size: number;
     *          should_chunk: boolean;
     *      };
-    *      allowed_sources: Array<'record_video' | 'capture_image' | 'record_audio' | 'record_screen' | 'link_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source'>;
-    *      display_file_sources: boolean;
+    *      allowed_sources?: Array<'record_video' | 'capture_image' | 'record_audio' | 'record_screen' | 'link_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source'>;
+    *      display_file_sources?: boolean;
     *      upload_automatically?: boolean;
     *      show_upload_error_overlay?: boolean;
     *      show_upload_progress_bar?: boolean;
-    *      file_source_config: {
+    *      file_source_config?: {
     *        video_recording: {
     *             video_only: boolean;
     *             show_image_capture_btn: boolean;
@@ -120,15 +120,15 @@ export default class CustUp extends CustUpCore {
     *              quality: "standard" | "hd";
     *         };
     * };
-    *      default_files: Array<{file: string | File | Blob; isUploadable: boolean; headers: any}>;
-    *      count_default_files: boolean;
-    *      instance_attach: Array<object>;
-    *      single_upload: boolean;
-    *      persist_files: boolean;
-    *      persist_type: 'soft' | 'hard';
-    *      alert_timeout_time: number;
-    *      messages: {
-    *          timeout: number;
+    *      default_files?: Array<{file: string | File | Blob; isUploadable: boolean; headers: any}>;
+    *      count_default_files?: boolean;
+    *      instance_attach?: Array<object>;
+    *      single_upload?: boolean;
+    *      persist_files?: boolean;
+    *      persist_type?: 'soft' | 'hard';
+    *      alert_timeout_time?: number;
+    *      messages?: {
+    *          timeout?: number;
     *      };
     * }}  options
     * 
