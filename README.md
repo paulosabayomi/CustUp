@@ -154,7 +154,7 @@ const uploader = new CustUp(options)
 
 To overide the default class names the provided class name should be a string or an array with false as the second item like `fileUIOuterContainer: ['custup_file_display_outer', false],` and to append/add new css class name to the element the second item in the array should be `true` like `fileUIOuterContainer: ['custup_file_display_outer', true]`  
   
-Read more on [properties here](https://custup.pryxy.com/docs/properties)
+Read more on how to customize CustUp elements with [properties here](https://custup.pryxy.com/docs/properties)
 
 File upload settings, you can also add additional data that should be sent along the files, and/or a form field data to be sent along with the upload and you can also set the axios settings
 
