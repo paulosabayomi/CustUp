@@ -3,6 +3,7 @@
 ## 1.0.0
 
 - Added chunk upload
+- Added new UI type: elegant
 - Fix: file persistent storage method, files are now stored as ObjectURL on https and base64 on http
 - New: Added auto upload for files added to the UI when files are still uploading
 - New: Added option display_file_sources: if set to false the file sources will not be listed on the default UI.
