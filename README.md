@@ -86,6 +86,8 @@ Then include the CSS file
 <!-- OR individual CSS files -->
 <!-- Bare UI CSS file -->
 <link rel="stylesheet" href="path/to/custup/src/bare.min.css">
+<!-- Elegant UI CSS file -->
+<link rel="stylesheet" href="path/to/custup/src/elegant.min.css">
 <!-- CustUp default UI CSS file -->
 <link rel="stylesheet" href="path/to/custup/src/custup.min.css">
 <!-- Detached UI CSS file -->
