@@ -10,11 +10,11 @@ export default class CustUpMediaSource {
      *          video_only: boolean;
      *          show_image_capture_btn: boolean;
      *      };
-     *      eventMethods: typeof eventMethods;
+     *      triggerEvent: any;
      *      ui_styles: typeof media_capture_ui_styles;
      * }}
      */
-    constructor({ inner_container, media_type, standalone, callbackFn, config, eventMethods, ui_styles, onclose }: {
+    constructor({ inner_container, media_type, standalone, callbackFn, config, triggerEvent, ui_styles, onclose }: {
         inner_container: HTMLDivElement;
         media_type: 'audio' | 'video' | 'image';
         standalone?: boolean;
@@ -23,7 +23,7 @@ export default class CustUpMediaSource {
             video_only: boolean;
             show_image_capture_btn: boolean;
         };
-        eventMethods: typeof eventMethods;
+        triggerEvent: any;
         ui_styles: typeof media_capture_ui_styles;
     });
     /**
@@ -112,30 +112,16 @@ export default class CustUpMediaSource {
      */
     protected ui_styles: {
         container: string;
+        /**
+         * @protected @property {Function} ui_styles
+         */
         media_capture_main_container: string;
         media_capture_bottom_tools_container: string;
     };
     /**
-     * @protected @property {any} eventMethods
+     * @private @param {any} triggerEvent
      */
-    protected eventMethods: {
-        video_recordingStarted: undefined;
-        video_recording: undefined;
-        video_recordStop: undefined;
-        video_recordSaved: undefined;
-        video_recordCancel: undefined;
-        image_captured: undefined;
-        audio_recordingStarted: undefined;
-        audio_recording: undefined;
-        audio_recordStop: undefined;
-        audio_recordSaved: undefined;
-        audio_recordCancel: undefined;
-        screen_recordingStarted: undefined;
-        screen_recording: undefined;
-        screen_recordStop: undefined;
-        screen_recordSaved: undefined;
-        screen_recordCancel: undefined;
-    };
+    private triggerEvent;
     initialize(): Promise<void>;
     /**
      * @protected initializeMediaDevices
@@ -183,7 +169,6 @@ export default class CustUpMediaSource {
     captureImage(): void;
     recordAudio(): void;
     recordScreen(): void;
-    listenToDeviceChange(): void;
     startRecording(): void;
     _snapImage(): Promise<void>;
     handleRecorderError(): void;

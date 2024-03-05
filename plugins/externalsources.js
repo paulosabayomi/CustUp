@@ -431,7 +431,7 @@ export default class ExternalSource {
 
     setupCustupCloseBtn () {
         this.custup_close_btn.style.display = "flex"
-        this.custup_close_btn.onclick = (e) => this.destroyContainerUI()
+        this.custup_close_btn.addEventListener('click', () => this.destroyContainerUI())
     }
 
     createContainerUI () {
@@ -446,9 +446,9 @@ export default class ExternalSource {
         if (this.source_type == 'dalle') {
             this.resetDalleData()            
         }
-        this.container_ui_container.remove();
+        this.container_ui_container?.remove();
         if (this.custup_close_btn != undefined) {
-            this.custup_close_btn.onclick = () => null;
+            this.custup_close_btn.removeEventListener('click', () => this.destroyContainerUI());
             this.custup_close_btn.style.display = 'none';
         }
         !silent && this.onclose?.();

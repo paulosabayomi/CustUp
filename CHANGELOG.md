@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0 (2024-03-05)
+
+- New: CustUp now extends `EventTarget` and it can now trigger events, and events triggered by CustUp can be listened for by calling the `addEventListener` or the `on` method
+- New: Options are now set with the setOptions method
+- New: Added setOptions method
+- New: Added `on` method as a shortcut for listening for CustUp events
+- Fix: Default UI tool dragger removed and replaced with tools in the header
+- Fix: Bug caused by former event emitter
+- Fix: Bugs in the documentation bugs
+- Remove: Tool dragger has been removed
+
 ## 1.0.5
 
 - Fix: Unhandled fetch exception when loading default files.

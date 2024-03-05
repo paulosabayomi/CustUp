@@ -13,7 +13,6 @@ declare namespace _default {
         defaultUIInnerContentEl: string;
         defaultUIUploadSentenceContainer: string;
         defaultUIUploadIconsContainer: string;
-        UITool: string;
         fileDisplayUI: string;
         fileUIOuterContainer: string;
         fileDetailsContainer: string;
@@ -49,7 +48,6 @@ declare namespace _default {
         defaultUIInnerContentEl: string;
         defaultUIUploadSentenceContainer: string;
         defaultUIUploadIconsContainer: string;
-        UITool: string;
         fileDisplayUI: string;
         fileUIOuterContainer: string;
         fileDetailsContainer: string;

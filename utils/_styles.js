@@ -20,9 +20,6 @@ export const ui_styles = {
     defaultUIInnerContentEl: "_custup_default_ui_inner_container",
     defaultUIUploadSentenceContainer: "_custup_default_ui_upload_sentence_container",
     defaultUIUploadIconsContainer: "_custup_default_ui_upload_icons_container",
-
-    // tools
-    UITool: "_custup_ui_tools",
     
     // file display
     fileDisplayUI: "_custup_file_display_ui_container",

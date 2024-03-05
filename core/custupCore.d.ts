@@ -1,4 +1,4 @@
-export default class CustUpCore {
+export default class CustUpCore extends EventTarget {
     /**
      * Pass parameters
      *
@@ -27,14 +27,13 @@ export default class CustUpCore {
      *      maximumAllowedFileSize?: number;
      *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture' | 'elegant';
      *      display_ui_tools?: boolean;
-     *      show_ui_tools_on_mobile_devices?: boolean;
      *      disable_drag_n_drop?: boolean;
      *      disable_select_files_from_device?: boolean;
-     *      allowed_tools?: Array<'tools_dragger' | 'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
+     *      allowed_tools?: Array<'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
      *      position_container?: "before" | "after" | "overwrite" | {"beforeEl": string};
      *      file_preview_animation_types?: Array<'slideInRight' | 'slideInTop' | 'slideInLeft' | 'slideInBottom' | 'zoomIn' | 'fadeIn'>;
      *      allowMultipleUpload?: boolean;
-     *      file_upload?: {
+     *      file_upload_settings?: {
      *          endpoint_url: string;
      *          files_field_name: string;
      *          form_field?: HTMLFormElement | string;
@@ -126,7 +125,7 @@ export default class CustUpCore {
      *      messages?: {
      *          timeout?: number;
      *      };
-     * }}
+     * }}  passedOptions
      *
      * @param autoInitialize - Whether to automatically initialize the library
      *
@@ -135,6 +134,8 @@ export default class CustUpCore {
      * @param persist_default_ui - Whether to show or not remove the default UI should be closable
      *
      * @param use_default_file_display_ui - Whether to use default file display UI
+     *
+     * @param _custupDefaultUploadSentence - The HTML Element that holds default text that displays on the default UI
      *
      * @param allowed_file_types - Allowed file types, any file can be uploaded if the `allowed_file_types` parameter is not provided
      *
@@ -155,6 +156,10 @@ export default class CustUpCore {
      * @param  default_styles_override - style override of default styles - class names to be provided in place of the current class names - {keyof ui_styles: value like string | [string, append_style: boolean]}
      *
      * @param persist_styles_override_across_instances - whether to make style overrides to persists over multiple CustUp instances, Note: only instances declared after the instance that this option is set will persist the styles, so it is best to do this in the first CustUp initialization: default is false
+     *
+     * @param css_font_link - To set the CSS font link to be used by CustUp
+     *
+     * @param css_font_name - To set the CSS font name to be used by CustUp
      *
      * @param  default_icons_override - default icons override
      *
@@ -184,14 +189,21 @@ export default class CustUpCore {
      * @param allowMultipleUpload
      * Set whether to allow multiple upload or not, it is true by default
      *
-     * @param file_upload - options to handle file upload
+     * @param file_upload_settings - options to handle file upload
      * @param upload_automatically - whether to upload file to the server automatically
      * @param show_upload_error_overlay - whether to show upload error overlay: defaults to true
+     * @param show_upload_progress_bar - whether to show progress bar overlay over file display container
      * @param file_source_icons - customize any file source icon of your choice
      * @param display_ui_tools - whether to display UI tool or not
      * @param allowed_tools - tools to display, an empty array displays all tools
+     * @param allowed_sources - For setting the file sources that should be listed on the UI
+     * @param display_file_sources - Whether to display file source icons on the default UI
+     * @param disable_drag_n_drop - Whether to allow drag and drop feature or not
+     * @param disable_select_files_from_device - Whether to disable select files from device feature that get called when the default UI is being clicked
      *
      * @param default_files - array of files to be added by default after initialization
+     *
+     * @param file_source_config - To configure/setup the file sources, like to provide API keys and other stuffs
      *
      * @param count_default_files - whether default added files should be counted as part of the added files - defaults to true
      *
@@ -200,9 +212,10 @@ export default class CustUpCore {
      * @param persist_files - whether to persist files and restore files when user refreshes the page or after the library finished initialization if the persist type is hard
      * @param persist_type - set the persist type to either soft or hard, if hard it will use localstorage else it will use session storage
      * @param alert_timeout_time - the timeout for Custup alerts default is 300ms
+     * @param messages - For configuring the CustUp messages or notifications
      *
     */
-    constructor({ autoInitialize, disable_scrollbar, persist_default_ui, use_default_file_display_ui, _custupDefaultUploadSentence, show_preview_file_btn, show_file_remove_btn, show_file_details_container, file_preview_animation_types, default_styles_override, persist_styles_override_across_instances, css_font_link, css_font_name, external_source_style_override, media_capture_source_style_override, allowed_file_types, targetRootElement, maxNumberOfFiles, minNumberOfFiles, minimumAllowedFileSize, maximumAllowedFileSize, ui_type, position_container, allowMultipleUpload, file_upload, upload_automatically, show_upload_error_overlay, show_upload_progress_bar, file_source_icons, allowed_sources, display_file_sources, display_ui_tools, show_ui_tools_on_mobile_devices, disable_drag_n_drop, disable_select_files_from_device, allowed_tools, default_icons_override, file_source_config, default_files, count_default_files, instance_attach, single_upload, persist_files, persist_type, alert_timeout_time, messages }: {
+    constructor(passedOptions: {
         _custupDefaultUploadSentence?: string | undefined;
         disable_scrollbar?: boolean | undefined;
         persist_default_ui?: boolean | undefined;
@@ -262,7 +275,6 @@ export default class CustUpCore {
             defaultUIInnerContentEl: string;
             defaultUIUploadSentenceContainer: string;
             defaultUIUploadIconsContainer: string;
-            UITool: string;
             fileDisplayUI: string;
             fileUIOuterContainer: string;
             fileDetailsContainer: string;
@@ -280,9 +292,6 @@ export default class CustUpCore {
             file_upload_progress_inner: string;
             retry_upload_overlay_ui: string;
             retry_upload_button: string;
-            /**
-             * @private @property {Object} file_progress
-             */
             message_container: string;
             filePreviewer: string;
             filePreviewerInnerContainer: string;
@@ -359,16 +368,15 @@ export default class CustUpCore {
         maximumAllowedFileSize?: number | undefined;
         ui_type?: "default" | "resumeUploaderUI" | "bare" | "detached" | "profilePicture" | "elegant" | undefined;
         display_ui_tools?: boolean | undefined;
-        show_ui_tools_on_mobile_devices?: boolean | undefined;
         disable_drag_n_drop?: boolean | undefined;
         disable_select_files_from_device?: boolean | undefined;
-        allowed_tools?: ("upload" | "tools_dragger" | "add_file" | "added_files_count" | "clear_files")[] | undefined;
+        allowed_tools?: ("upload" | "add_file" | "added_files_count" | "clear_files")[] | undefined;
         position_container?: {
             beforeEl: string;
         } | "before" | "after" | "overwrite" | undefined;
         file_preview_animation_types?: ("slideInRight" | "slideInTop" | "slideInLeft" | "slideInBottom" | "zoomIn" | "fadeIn")[] | undefined;
         allowMultipleUpload?: boolean | undefined;
-        file_upload?: {
+        file_upload_settings?: {
             endpoint_url: string;
             files_field_name: string;
             form_field?: string | HTMLFormElement | undefined;
@@ -519,7 +527,6 @@ export default class CustUpCore {
         defaultUIInnerContentEl: string;
         defaultUIUploadSentenceContainer: string;
         defaultUIUploadIconsContainer: string;
-        UITool: string;
         fileDisplayUI: string;
         fileUIOuterContainer: string;
         fileDetailsContainer: string;
@@ -537,9 +544,6 @@ export default class CustUpCore {
         file_upload_progress_inner: string;
         retry_upload_overlay_ui: string;
         retry_upload_button: string;
-        /**
-         * @private @property {Object} file_progress
-         */
         message_container: string;
         filePreviewer: string;
         filePreviewerInnerContainer: string;
@@ -637,15 +641,48 @@ export default class CustUpCore {
      */
     private _is_secured_context;
     /**
-     * Events
-     * @private @property {any} eventMethods
+     * @protected @property {typeof eventNames} event_names
      */
-    private eventMethods;
-    /**
-     * Events
-     * @private @property {any} eventMethods
-     */
-    private deviceFileSourceEventMethods;
+    protected event_names: {
+        library_init: string;
+        library_beforeInit: string;
+        file_beforeAdded: string;
+        file_afterAdded: string;
+        file_beforePassedChecks: string;
+        file_removed: string;
+        file_defaultFileRemoved: string;
+        file_all_removed: string;
+        upload_beforeStart: string;
+        upload_progress: string;
+        upload_success: string;
+        upload_error: string;
+        upload_retry: string;
+        upload_all_finished: string; /**
+         * Custup FormData for uploading files
+         * @private @property {FormData} file_upload_form_data
+         */
+        file_source_closed: string;
+        default_ui_shown: string;
+        default_ui_closed: string;
+        video_recordingStarted: string;
+        video_recording: string;
+        video_recordStop: string;
+        video_recordSaved: string;
+        video_recordCancel: string;
+        image_captured: string;
+        audio_recordingStarted: string;
+        audio_recording: string;
+        audio_recordStop: string;
+        audio_recordSaved: string;
+        audio_recordCancel: string;
+        screen_recordingStarted: string; /**
+         * @private @property {any} _custup_media_source_instance
+         */
+        screen_recording: string;
+        screen_recordStop: string;
+        screen_recordSaved: string;
+        screen_recordCancel: string;
+    };
     _custupEl: undefined;
     _custupHeaderEl: undefined;
     _custupFooterEl: undefined;
@@ -656,7 +693,6 @@ export default class CustUpCore {
     _custupDefaultUIEl: undefined;
     _custupDefaultUIInnerContentEl: undefined;
     fileDisplayUIEl: undefined;
-    UIToolEl: undefined;
     numberOfFilesDisplayTool: undefined;
     clearAllFilesBtnTool: undefined;
     addFilesUITool: undefined;
@@ -674,23 +710,6 @@ export default class CustUpCore {
      * @private @property {Object} previewerAnimations
      */
     private previewerAnimations;
-    toolDragger: undefined;
-    /**
-     * @private @property {number} currentToolElOffsetLeft
-     */
-    private currentToolElOffsetLeft;
-    /**
-     * @private @property {number} currentToolElOffsetBottom
-     */
-    private currentToolElOffsetBottom;
-    /**
-     * @private @property {number} lastToolOffsetBottom
-     */
-    private lastToolOffsetBottom;
-    /**
-     * @private @property {number} lastToolOffsetLeft
-     */
-    private lastToolOffsetLeft;
     /**
      * @private @property {number} fileDisplayUIElCurrentScrollHeight
      */
@@ -846,6 +865,20 @@ export default class CustUpCore {
      */
     protected loadFont(): void;
     /**
+     * @public @method setOptions
+     * @param {Object} option - The option(s) to update
+     * @param {boolean} [no_update=false] - To set whether the function that needs to be called for some options to be updated should be called, the functions are called by default
+     * @returns {void}
+     */
+    public setOptions(option: Object, no_update?: boolean | undefined): void;
+    /**
+     * @private @method setObjectValue
+     * @param {Object} objectParent - The Object to update
+     * @param {Object} value - The object holding the values to update to target object
+     * @returns {Object}
+     */
+    private setObjectValue;
+    /**
      * @protected @method map_override_styles_to_default_styles - maps the provided styles to the default styles
      * @param {Object} o_style - The style to map to the default styles
      */
@@ -892,7 +925,7 @@ export default class CustUpCore {
     /**
      * @protected @method set_file_preview_animations
      */
-    protected set_file_preview_animations(): void;
+    protected set_file_preview_animations(override?: boolean): void;
     /**
      * @protected @method handleRecordVideo
      * @param {'video' | 'image' | 'audio' | 'screen'} type
@@ -954,19 +987,9 @@ export default class CustUpCore {
      */
     protected handleCustomScroll(e: Event, targetEl?: HTMLElement | undefined, targetScrollBarEl?: HTMLElement | undefined): void;
     /**
-     * removed because tool dragging has been removed for touch devices,
-     * the upload tool on bigger screens has been changed to a static tool which is displayed inside the header on mobile devices
-     * @deprecated @protected @method handleInnerElementContainerPointerDown
-     */
-    protected handleInnerElementContainerPointerDown(e: any): void;
-    /**
      * @protected @method handleInnerElementContainerMouseUp
      */
     protected handleInnerElementContainerMouseUp(e: any): void;
-    /**
-     * @protected @method handleToolDraggerMouseMove
-     */
-    protected handleToolDraggerMouseMove(e: any): void;
     /**
      * @protected @method addFileToUI
      * @param {File} file
@@ -1179,43 +1202,51 @@ export default class CustUpCore {
      */
     protected handleUploadProgressEvent(event: ProgressEvent, upload_element: HTMLDivElement): void;
     /**
-     * on - listen for an event
-     * @param { 'file.beforeAdded' |
-     *  'library.init' |
-     *  'file.afterAdded' |
-     *  'file.beforePassedChecks' |
-     *  'file.removed' |
-     *  'file.defaultFileRemoved' |
-     *  'file.all_removed' |
-     *  'video.recordingStarted' |
-     *  'video.recording' |
-     *  'video.recordStop' |
-     *  'video.recordSaved' |
-     *  'video.recordCancel' |
-     *  'image.captured' |
-     *  'audio.recordingStarted' |
-     *  'audio.recording' |
-     *  'audio.recordStop' |
-     *  'audio.recordSaved' |
-     *  'audio.recordCancel' |
-     *  'screen.recordingStarted' |
-     *  'screen.recording' |
-     *  'screen.recordStop' |
-     *  'screen.recordSaved' |
-     *  'screen.recordCancel' |
-     *  'upload.beforeStart' |
-     *  'upload.progress' |
-     *  'upload.success' |
-     *  'upload.error' |
-     *  'upload.retry' |
-     *  'upload.all_finished' |
-     *  'file_source.closed' |
-     *  'default_ui.shown' |
-     *  'default_ui.closed'
-     * } event - event name
-     * @param {Function} callbackFn - the callback function
+     * @public @method triggerEvent - triggers an event
+     * @param {keyof eventNames} eventName - event name
+     * @param {any} data - the callback function
+     * @param {boolean} cancelable - whether the event should be cancelable with preventDefault
      */
-    on(event: 'file.beforeAdded' | 'library.init' | 'file.afterAdded' | 'file.beforePassedChecks' | 'file.removed' | 'file.defaultFileRemoved' | 'file.all_removed' | 'video.recordingStarted' | 'video.recording' | 'video.recordStop' | 'video.recordSaved' | 'video.recordCancel' | 'image.captured' | 'audio.recordingStarted' | 'audio.recording' | 'audio.recordStop' | 'audio.recordSaved' | 'audio.recordCancel' | 'screen.recordingStarted' | 'screen.recording' | 'screen.recordStop' | 'screen.recordSaved' | 'screen.recordCancel' | 'upload.beforeStart' | 'upload.progress' | 'upload.success' | 'upload.error' | 'upload.retry' | 'upload.all_finished' | 'file_source.closed' | 'default_ui.shown' | 'default_ui.closed', callbackFn: Function): void;
+    public triggerEvent(eventName: keyof {
+        library_init: string;
+        library_beforeInit: string;
+        file_beforeAdded: string;
+        file_afterAdded: string;
+        file_beforePassedChecks: string;
+        file_removed: string;
+        file_defaultFileRemoved: string;
+        file_all_removed: string;
+        upload_beforeStart: string;
+        upload_progress: string;
+        upload_success: string;
+        upload_error: string;
+        upload_retry: string;
+        upload_all_finished: string; /**
+         * Custup FormData for uploading files
+         * @private @property {FormData} file_upload_form_data
+         */
+        file_source_closed: string;
+        default_ui_shown: string;
+        default_ui_closed: string;
+        video_recordingStarted: string;
+        video_recording: string;
+        video_recordStop: string;
+        video_recordSaved: string;
+        video_recordCancel: string;
+        image_captured: string;
+        audio_recordingStarted: string;
+        audio_recording: string;
+        audio_recordStop: string;
+        audio_recordSaved: string;
+        audio_recordCancel: string;
+        screen_recordingStarted: string; /**
+         * @private @property {any} _custup_media_source_instance
+         */
+        screen_recording: string;
+        screen_recordStop: string;
+        screen_recordSaved: string;
+        screen_recordCancel: string;
+    }, data?: any, cancelable?: boolean): boolean;
     /**
      * @method upload - the method to upload file to the endpoint
      * @param {string | undefined} file_id - the id of the file to upload in the case of a single file, all the files will be uploaded serially if not provided
@@ -1347,6 +1378,13 @@ export default class CustUpCore {
      * @returns {boolean}
      */
     is_add_file_ui_shown(): boolean;
+    /**
+     * @public @method on - Custom and shothand event listener
+     * @typedef {import('../utils/eventNames.js').TEventNames} TEventNames
+     * @param {TEventNames} eventName
+     * @param {Function} callback
+     */
+    public on(eventName: import("../utils/eventNames.js").TEventNames, callback: Function): void;
     /**
      * @method get_file_sources - Returns all the allowed file sources icons wrapped in HTML element
      * @param {HTMLElement | null} iconsContainer - An HTML element to automatically append the icons to

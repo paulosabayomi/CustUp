@@ -95,30 +95,9 @@ export default class CustUpMediaSource {
     ui_styles = {...media_capture_ui_styles}
 
     /**
-     * @protected @property {any} eventMethods
+     * @private @param {any} triggerEvent
      */
-    eventMethods = {
-        video_recordingStarted: undefined,
-        video_recording: undefined,
-        video_recordStop: undefined,
-        video_recordSaved: undefined,
-        video_recordCancel: undefined,
-        
-        image_captured: undefined,
-        
-        audio_recordingStarted: undefined,
-        audio_recording: undefined,
-        audio_recordStop: undefined,
-        audio_recordSaved: undefined,
-        audio_recordCancel: undefined,
-        
-        screen_recordingStarted: undefined,
-        screen_recording: undefined,
-        screen_recordStop: undefined,
-        screen_recordSaved: undefined,
-        screen_recordCancel: undefined,
-
-    }
+    triggerEvent = undefined
     
     /**
      * 
@@ -131,7 +110,7 @@ export default class CustUpMediaSource {
      *          video_only: boolean;
      *          show_image_capture_btn: boolean;
      *      };
-     *      eventMethods: typeof eventMethods;
+     *      triggerEvent: any;
      *      ui_styles: typeof media_capture_ui_styles;
      * }}
      */
@@ -142,7 +121,7 @@ export default class CustUpMediaSource {
         standalone,
         callbackFn,
         config,
-        eventMethods,
+        triggerEvent,
         ui_styles,
         onclose
     }) {
@@ -158,12 +137,7 @@ export default class CustUpMediaSource {
 
         this.media_config = config;
 
-        for (const key in eventMethods) {
-            if (Object.hasOwnProperty.call(eventMethods, key)) {
-                const value = eventMethods[key];
-                this.eventMethods[key] = value
-            }
-        }
+        this.triggerEvent = triggerEvent;
 
         if (ui_styles !== undefined) {
             for (const key in ui_styles) {
@@ -204,9 +178,6 @@ export default class CustUpMediaSource {
         }else{
             throw new Error(`CustUp: ${this.media_type} is not implemented yet, you are welcome to implement it :)`);
         }
-
-        // this will stop media and destroy class instance if user changes device
-        this.listenToDeviceChange() 
     }
 
     /**
@@ -285,9 +256,10 @@ export default class CustUpMediaSource {
         this.add_media_button.style.display = 'none'
 
         this.add_media_button.onclick = () => {
-            (this.media_type == 'video' && this.eventMethods.video_recordSaved !== undefined) && this.eventMethods.video_recordSaved({data: this.media_data});
-            (this.media_type == 'audio' && this.eventMethods.audio_recordSaved !== undefined) && this.eventMethods.audio_recordSaved({data: this.media_data});
-            (this.media_type == 'screen' && this.eventMethods.screen_recordSaved !== undefined) && this.eventMethods.screen_recordSaved({data: this.media_data});
+            const ev_data = {data: this.media_data}
+            this.media_type == 'video' && this.triggerEvent('video_recordSaved', ev_data);
+            this.media_type == 'audio' && this.triggerEvent('audio_recordSaved', ev_data);
+            this.media_type == 'screen' && this.triggerEvent('screen_recordSaved', ev_data);
             this.callbackFn(this.media_data[0]);
             this.closeMediaPopup();
         }
@@ -387,14 +359,14 @@ export default class CustUpMediaSource {
     
 
     closeMediaPopup (silent=false) {
-        this.stopTracks()
+        this.stopTracks();
         this.media_capture_ui_container?.remove();
         this.media_capture_bottom_tools_container?.remove();
         this.media_capture_main_container?.remove();
         this.removeMediaCaptureUI();
-        (this.media_type == 'video' && this.eventMethods.video_recordCancel !== undefined) && this.eventMethods.video_recordCancel();
-        (this.media_type == 'audio' && this.eventMethods.audio_recordCancel !== undefined) && this.eventMethods.audio_recordCancel();
-        (this.media_type == 'screen' && this.eventMethods.screen_recordCancel !== undefined) && this.eventMethods.screen_recordCancel();
+        this.media_type == 'video' && this.triggerEvent('video_recordCancel');
+        this.media_type == 'audio' && this.triggerEvent('audio_recordCancel');
+        this.media_type == 'screen' && this.triggerEvent('screen_recordCancel');
         (this.onPopupCloseCallback && !silent) && this.onPopupCloseCallback();
     }
 
@@ -433,14 +405,9 @@ export default class CustUpMediaSource {
         this.media_display_el.srcObject = this.media_devices_instance 
     }
 
-    listenToDeviceChange () {
-        navigator.mediaDevices.addEventListener('devicechange', event => this.removeMediaCaptureUI());
-    }
-
     startRecording () {
         this.media_data = []
         this.media_recorder_instance = new MediaRecorder(this.media_devices_instance);
-        // this.media_recorder_instance = new MediaCapture(this.media_devices_instance)
         this.media_recorder_instance.start()
         if (this.audio_rec_info_container != undefined) {
             this.audio_rec_info_container.innerHTML  = "recording..."         
@@ -460,9 +427,9 @@ export default class CustUpMediaSource {
         this.media_display_el.muted = true
 
         const intervalListener = setInterval(() => {
-            (this.media_type == 'video' && this.eventMethods.video_recording!== undefined) && this.eventMethods.video_recording(this.media_recorder_instance);
-            (this.media_type == 'audio' && this.eventMethods.audio_recording !== undefined) && this.eventMethods.audio_recording(this.media_recorder_instance);
-            (this.media_type == 'screen' && this.eventMethods.screen_recording !== undefined) && this.eventMethods.screen_recording(this.media_recorder_instance);
+            this.media_type == 'video' && this.triggerEvent('video_recording', this.media_recorder_instance);
+            this.media_type == 'audio' && this.triggerEvent('audio_recording', this.media_recorder_instance);
+            this.media_type == 'screen' && this.triggerEvent('screen_recording', this.media_recorder_instance);
         }, 1000);
 
         this.media_recorder_instance.ondataavailable = (e) => {
@@ -472,9 +439,10 @@ export default class CustUpMediaSource {
 
         this.handleRecorderError();
         this.listenToMediaRecorderStop();
-        (this.media_type == 'video' && this.eventMethods.video_recordingStarted !== undefined) && this.eventMethods.video_recordingStarted({media_recorder: this.media_recorder_instance, media_devices: this.media_devices_instance, display_el: this.media_display_el});
-        (this.media_type == 'screen' && this.eventMethods.screen_recordingStarted !== undefined) && this.eventMethods.screen_recordingStarted({media_recorder: this.media_recorder_instance, media_devices: this.media_devices_instance, display_el: this.media_display_el});
-        (this.media_type == 'audio' && this.eventMethods.audio_recordingStarted !== undefined) && this.eventMethods.audio_recordingStarted({media_recorder: this.media_recorder_instance, media_devices: this.media_devices_instance, display_el: this.audio_rec_info_container});
+        const ev_data = {media_recorder: this.media_recorder_instance, media_devices: this.media_devices_instance,}
+        this.media_type == 'screen' && this.triggerEvent('video_recordingStarted', {...ev_data, display_el: this.media_display_el});
+        this.media_type == 'screen' && this.triggerEvent('screen_recordingStarted', {...ev_data, display_el: this.media_display_el});
+        this.media_type == 'audio' && this.triggerEvent('audio_recordingStarted', {...ev_data, display_el: this.audio_rec_info_container});
     }
 
     async _snapImage () {
@@ -510,7 +478,7 @@ export default class CustUpMediaSource {
         this.add_media_button.style.display = 'flex'
         this.media_data[0].name = this.getRandChars()
         this.callbackFn(this.media_data[0]);
-        (this.media_type == 'image' && this.eventMethods.image_captured !== undefined) && this.eventMethods.image_captured({data: this.media_data});
+        this.media_type == 'image' && this.triggerEvent('image_captured', {data: this.media_data});
         this.closeMediaPopup();
     }
 
@@ -532,9 +500,10 @@ export default class CustUpMediaSource {
             _class.is_recording = false;
             this.add_media_button.style.display = 'flex';
             this.media_data[0].name = _class.getRandChars();
-            (this.media_type == 'video' && this.eventMethods.video_recordStop !== undefined) && this.eventMethods.video_recordStop({data: this.media_data, display_el: this.media_display_el});
-            (this.media_type == 'audio' && this.eventMethods.audio_recordStop !== undefined) && this.eventMethods.audio_recordStop({data: this.media_data, display_el: this.media_display_el});
-            (this.media_type == 'screen' && this.eventMethods.screen_recordStop !== undefined) && this.eventMethods.screen_recordStop({data: this.media_data, display_el: this.media_display_el});
+            const res_data = {data: this.media_data, display_el: this.media_display_el}
+            this.media_type == 'video' && this.triggerEvent('video_recordStop', res_data);
+            this.media_type == 'audio' && this.triggerEvent('audio_recordStop', res_data);
+            this.media_type == 'screen' && this.triggerEvent('screen_recordStop', res_data);
         }
     }
 }

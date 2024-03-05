@@ -31,10 +31,9 @@ export default class CustUp extends CustUpCore {
     *      maximumAllowedFileSize?: number; 
     *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture' | 'elegant'; 
     *      display_ui_tools?: boolean;
-    *      show_ui_tools_on_mobile_devices?: boolean;
     *      disable_drag_n_drop?: boolean;
     *      disable_select_files_from_device?: boolean;
-    *      allowed_tools?: Array<'tools_dragger' | 'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
+    *      allowed_tools?: Array<'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
     *      position_container?: "before" | "after" | "overwrite" | {"beforeEl": string};
     *      file_preview_animation_types?: Array<'slideInRight' | 'slideInTop' | 'slideInLeft' | 'slideInBottom' | 'zoomIn' | 'fadeIn'>;
     *      allowMultipleUpload?: boolean;
@@ -161,8 +160,8 @@ export default class CustUp extends CustUpCore {
             default:
                 break;
         }
-        this.map_override_styles_to_default_styles(this.options.default_styles_override)
-        this.options.autoInitialize && this.initializeUI()
+        this.map_override_styles_to_default_styles(this.options.default_styles_override);
+        this.options.autoInitialize && this.initializeUI();
     }
 
     /**
@@ -294,11 +293,11 @@ export default class CustUp extends CustUpCore {
             const item = document.createElement('div')
             item.style.width = '100%'
             item.className = "DUIFileContainer"
-            item.id = e.file.id
+            item.id = e.detail.file.id
             
             const file_preview_el = document.createElement('div')
             file_preview_el.className = "DHIFilePreviewEl"
-            this.makeFileDisplayElement(e.file, file_preview_el, e.base64) 
+            this.makeFileDisplayElement(e.detail.file, file_preview_el, e.detail.base64) 
 
             const file_details = document.createElement('div')
             file_details.className = "DHIFileDetails"
@@ -307,10 +306,10 @@ export default class CustUp extends CustUpCore {
             const file_name = document.createElement('div')
             const file_size = document.createElement('div')
             file_size.className = "DHIFilesizeContainer"
-            file_size.innerHTML = this.parseFileSize(e.file.size);
+            file_size.innerHTML = this.parseFileSize(e.detail.file.size);
             const progress_text = document.createElement('div')
             progress_text.className = "DHIProgressText"
-            file_name.innerHTML = this.clipFileNameIfShouldClip(e.file.name)
+            file_name.innerHTML = this.clipFileNameIfShouldClip(e.detail.file.name)
             textContainer.appendChild(file_name)
             textContainer.appendChild(progress_text)
 
@@ -331,7 +330,7 @@ export default class CustUp extends CustUpCore {
             const close_btn_container = document.createElement('div');
             close_btn_container.className = "DHICloseBtnContainer";
             close_btn_container.innerHTML = this.ui_icons.red_circle_cancel;
-            close_btn_container.onclick = () => this.remove_file(e.file.id, () => item.remove())
+            close_btn_container.onclick = () => this.remove_file(e.detail.file.id, () => item.remove())
             
             item.appendChild(file_preview_el)
             item.appendChild(file_details)
@@ -347,7 +346,7 @@ export default class CustUp extends CustUpCore {
         });
         
         this.on('file.removed', (e) => {
-            e.files_count == 0 && (button_container.style.display = 'none');
+            e.detail.files_count == 0 && (button_container.style.display = 'none');
         });
 
         this.on("upload.beforeStart", () => {
@@ -367,7 +366,7 @@ export default class CustUp extends CustUpCore {
             clear_all_btn.disabled = false
             upload_btn.innerHTML = "Upload"
 
-            const item_container = this._custupFooterEl.querySelector('.inner').querySelector(`div.DUIFileContainer#${e.file.id}`)
+            const item_container = this._custupFooterEl.querySelector('.inner').querySelector(`div.DUIFileContainer#${e.detail.file.id}`)
             const progress_container = item_container.querySelector(`.DHIUploadProgressContainer`)
             const progressInner = progress_container.querySelector('.DHIProgressInner')
             progressInner.style.backgroundColor = 'red'
@@ -376,7 +375,7 @@ export default class CustUp extends CustUpCore {
             const retryButton = document.createElement('div')
             retryButton.className = "DHIRetryButton";
             retryButton.innerHTML = 'Retry'
-            retryButton.onclick = () => this.retry_upload(e.file.id)
+            retryButton.onclick = () => this.retry_upload(e.detail.file.id)
             !this.options.single_upload && (progressText.innerHTML = '');
             !this.options.single_upload && progressText.append(retryButton);
 
@@ -384,17 +383,17 @@ export default class CustUp extends CustUpCore {
 
         this.on('upload.progress', (e) => {
             if (this.options.single_upload) return;
-            const item_container = this._custupFooterEl.querySelector('.inner').querySelector(`div.DUIFileContainer#${e.file.id}`)
+            const item_container = this._custupFooterEl.querySelector('.inner').querySelector(`div.DUIFileContainer#${e.detail.file.id}`)
             const progress_container = item_container.querySelector('.DHIUploadProgressContainer')
             progress_container.style.display = "flex"
             const progressText = item_container.querySelector('.DHIProgressText')
             const progressInner = progress_container.querySelector('.DHIProgressInner')
             progressInner.style.backgroundColor = 'rgb(39, 39, 148)'
 
-            const progress_calc = ((e.progressEvent.loaded / e.progressEvent.total) * 100)
+            const progress_calc = ((e.detail.progressEvent.loaded / e.detail.progressEvent.total) * 100)
             progressInner.style.width = progress_calc + "%"
             progressText.innerHTML = progress_calc == 100 ? '100%' : progress_calc.toFixed(1) + "%";
-            if (e.progressEvent.loaded >= e.progressEvent.total) {
+            if (e.detail.progressEvent.loaded >= e.detail.progressEvent.total) {
                 progressInner.style.backgroundColor = 'green'
             }
         });
@@ -559,9 +558,10 @@ export default class CustUp extends CustUpCore {
                 selectFromDeviceSourceIcon_clone && (selectFromDeviceSourceIcon_clone.dataset.custupIconActive = "true");
                 headerTitleBar.innerHTML = e?.currentTarget.innerHTML == undefined ? 'Select from' : e.currentTarget.innerHTML;
                 hideHeaderUtils();
-                clearUtilsButtonsFromFooter()
+                clearUtilsButtonsFromFooter();
                 this.close_file_source_popup();
             }
+
             const selectFileToggleBtn = document.createElement('div');
             selectFileToggleBtn.className = "EUISelectFileToggleBtn";
             selectFileToggleBtn.innerHTML = this.ui_icons.bars;
@@ -733,13 +733,16 @@ export default class CustUp extends CustUpCore {
 
             
             this.on('file_source.closed', () => {
+                this.hide_add_file_ui();
+                clearUtilsButtonsFromFooter(); 
+                createUtilsButtonsInFooter()
                 this._custupEl.querySelectorAll('[data-custup-icon-active="true"]').forEach(el => el.removeAttribute("data-custup-icon-active"))
                 headerTitleBar.innerHTML = is_mobile() ? "Select from" : this.ui_icons.desktop_device;
                 this.get_total_file_count() > 0 && showHeaderUtils();
             });
 
     
-            this.on('file.afterAdded', ({file, element, count}) => {
+            this.on('file.afterAdded', (e) => {
                 !footerContainerFilled && createUtilsButtonsInFooter();
 
                 const fileDetailsContainer = document.createElement('div');
@@ -748,9 +751,9 @@ export default class CustUp extends CustUpCore {
                 const filenameSizeContainer = document.createElement('div')
                 filenameSizeContainer.className = "EUIFilenameSizeContainer"
                 const fileName = document.createElement('div')
-                fileName.innerHTML = file.name
+                fileName.innerHTML = e.detail.file.name
                 const fileSize = document.createElement('div')
-                fileSize.innerHTML = this.parseFileSize(file.size)
+                fileSize.innerHTML = this.parseFileSize(e.detail.file.size)
                 filenameSizeContainer.appendChild(fileName)
                 filenameSizeContainer.appendChild(fileSize)
 
@@ -758,24 +761,24 @@ export default class CustUp extends CustUpCore {
                 fileDisplayToolsContainer.className = 'EUIFileDisplayToolsContainer'
                 const removeFileBtn = document.createElement('div')
                 removeFileBtn.innerHTML = this.ui_icons.cancel
-                removeFileBtn.onclick = (e) => {
-                    this.remove_file(file.id)
+                removeFileBtn.onclick = (ev) => {
+                    this.remove_file(e.detail.file.id)
                 }
                 const previewFileBtn = document.createElement('div')
                 previewFileBtn.innerHTML = this.ui_icons.eye;
-                previewFileBtn.onclick = (e) => {
-                    this.preview_file(file.id)
+                previewFileBtn.onclick = (ev) => {
+                    this.preview_file(e.detail.file.id)
                 }
                 const retryUploadBtn = document.createElement('div')
                 retryUploadBtn.innerHTML = this.ui_icons.retry;
-                retryUploadBtn.id = "retry_" + file.id
+                retryUploadBtn.id = "retry_" + e.detail.file.id
                 retryUploadBtn.style.display = "none"
-                retryUploadBtn.onclick = (e) => {
-                    this.retry_upload(file.id)
+                retryUploadBtn.onclick = (ev) => {
+                    this.retry_upload(e.detail.file.id)
                 }
 
                 fileDisplayToolsContainer.appendChild(retryUploadBtn)
-                this.is_file_previewable(file) && fileDisplayToolsContainer.appendChild(previewFileBtn);
+                this.is_file_previewable(e.detail.file) && fileDisplayToolsContainer.appendChild(previewFileBtn);
                 
                 fileDisplayToolsContainer.appendChild(removeFileBtn)
 
@@ -786,10 +789,10 @@ export default class CustUp extends CustUpCore {
 
                 fileDetailsContainer.appendChild(filenameSizeContainer)
                 fileDetailsContainer.appendChild(fileDisplayToolsContainer)
-                element.appendChild(fileDetailsContainer)
-                element.appendChild(progressIndicatorContainer)
+                e.detail.element.appendChild(fileDetailsContainer)
+                e.detail.element.appendChild(progressIndicatorContainer)
 
-                headerTitleBar.innerHTML = "Selected Files " + count;
+                headerTitleBar.innerHTML = "Selected Files " + e.detail.count;
 
                 showHeaderUtils();
             });
@@ -804,28 +807,28 @@ export default class CustUp extends CustUpCore {
             });
 
             this.on("file.removed", (e) => {
-                headerTitleBar.innerHTML = "Selected Files " + e.files_count
+                headerTitleBar.innerHTML = "Selected Files " + e.detail.files_count
             });
 
             this.on("upload.error", (e) => {
-                const file_error_el = this._custupEl.querySelector('#'+e.file.id).querySelector('[id*="retry_"]');
+                const file_error_el = this._custupEl.querySelector('#'+e.detail.file.id).querySelector('[id*="retry_"]');
                 file_error_el.style.display = "flex";
                 submitBtnEl_clone.innerHTML = "Upload";
                 submitBtnEl_clone.disabled = false;
             });
 
             this.on("upload.retry", (e) => {
-                const file_error_el = this._custupEl.querySelector('#'+e.file.id).querySelector('[id*="retry_"]');
+                const file_error_el = this._custupEl.querySelector('#'+e.detail.file.id).querySelector('[id*="retry_"]');
                 file_error_el.style.display = "none";
             });
 
             this.on("upload.progress", (e) => {
                 if (this.options.single_upload) return;
-                const uploadHTMLEl = this._custupEl.querySelector('#'+e.file.id);
+                const uploadHTMLEl = this._custupEl.querySelector('#'+e.detail.file.id);
                 const progressFileSize = uploadHTMLEl.querySelector('.EUIFilenameSizeContainer div:last-child')
                 const progressIndicator = uploadHTMLEl.querySelector('.EUIProgressIndicatorContainer div')
-                progressIndicator.style.width = (e.progressEvent.progress * 100) + "%";
-                progressFileSize.innerHTML = this.parseFileSize(e.progressEvent.loaded) + " / " + this.parseFileSize(e.progressEvent.total);
+                progressIndicator.style.width = (e.detail.progressEvent.progress * 100) + "%";
+                progressFileSize.innerHTML = this.parseFileSize(e.detail.progressEvent.loaded) + " / " + this.parseFileSize(e.detail.progressEvent.total);
             });
 
             this.on('upload.beforeStart', (e) => {

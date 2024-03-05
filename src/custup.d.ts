@@ -27,10 +27,9 @@ export default class CustUp extends CustUpCore {
     *      maximumAllowedFileSize?: number;
     *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture' | 'elegant';
     *      display_ui_tools?: boolean;
-    *      show_ui_tools_on_mobile_devices?: boolean;
     *      disable_drag_n_drop?: boolean;
     *      disable_select_files_from_device?: boolean;
-    *      allowed_tools?: Array<'tools_dragger' | 'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
+    *      allowed_tools?: Array<'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
     *      position_container?: "before" | "after" | "overwrite" | {"beforeEl": string};
     *      file_preview_animation_types?: Array<'slideInRight' | 'slideInTop' | 'slideInLeft' | 'slideInBottom' | 'zoomIn' | 'fadeIn'>;
     *      allowMultipleUpload?: boolean;
@@ -164,10 +163,9 @@ export default class CustUp extends CustUpCore {
         maximumAllowedFileSize?: number | undefined;
         ui_type?: "default" | "resumeUploaderUI" | "bare" | "detached" | "profilePicture" | "elegant" | undefined;
         display_ui_tools?: boolean | undefined;
-        show_ui_tools_on_mobile_devices?: boolean | undefined;
         disable_drag_n_drop?: boolean | undefined;
         disable_select_files_from_device?: boolean | undefined;
-        allowed_tools?: ("upload" | "tools_dragger" | "add_file" | "added_files_count" | "clear_files")[] | undefined;
+        allowed_tools?: ("upload" | "add_file" | "added_files_count" | "clear_files")[] | undefined;
         position_container?: "before" | "after" | "overwrite" | {
             beforeEl: string;
         } | undefined;

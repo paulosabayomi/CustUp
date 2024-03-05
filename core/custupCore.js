@@ -4,9 +4,10 @@ import ExternalSource from "../plugins/externalsources.js";
 import { ui_styles, external_sources_ui_styles, media_capture_ui_styles } from "../utils/_styles.js";
 import file_types from "../utils/filetypes.js";
 import icons from '../utils/icons.js'
+import eventNames from "../utils/eventNames.js";
 
 
-export default class CustUpCore {
+export default class CustUpCore extends EventTarget {
     /**
      * Custup library name - !!! Please do not change !!!
      * @private @param {string} libraryName - Custup library name
@@ -101,53 +102,9 @@ export default class CustUpCore {
     _is_secured_context = window.location.protocol === 'https:'
 
     /**
-     * Events
-     * @private @property {any} eventMethods
+     * @protected @property {typeof eventNames} event_names
      */
-    eventMethods = {
-        library_init: undefined,
-        file_beforeAdded: undefined,
-        file_afterAdded: undefined,
-        file_removed: undefined,
-        file_defaultFileRemoved: undefined,
-        file_beforePassedChecks: undefined,
-        file_all_removed: undefined,
-        upload_beforeStart: undefined,
-        upload_progress: undefined,
-        upload_success: undefined,
-        upload_error: undefined,
-        upload_retry: undefined,
-        upload_all_finished: undefined,
-        file_source_closed: undefined,
-        default_ui_shown: undefined,
-        default_ui_closed: undefined,
-    };
-
-    /**
-     * Events
-     * @private @property {any} eventMethods
-     */
-    deviceFileSourceEventMethods = {
-        video_recordingStarted: undefined,
-        video_recording: undefined,
-        video_recordStop: undefined,
-        video_recordSaved: undefined,
-        video_recordCancel: undefined,
-        
-        image_captured: undefined,
-        
-        audio_recordingStarted: undefined,
-        audio_recording: undefined,
-        audio_recordStop: undefined,
-        audio_recordSaved: undefined,
-        audio_recordCancel: undefined,
-        
-        screen_recordingStarted: undefined,
-        screen_recording: undefined,
-        screen_recordStop: undefined,
-        screen_recordSaved: undefined,
-        screen_recordCancel: undefined,
-    };
+    event_names = {...eventNames}
 
     // UI Options
     _custupEl = undefined; // CustUp main parent Element
@@ -160,7 +117,6 @@ export default class CustUpCore {
     _custupDefaultUIEl = undefined; // Custup default UI that displays when no files is selected
     _custupDefaultUIInnerContentEl = undefined; // Inner container of the default UI that displays when no files is selected
     fileDisplayUIEl = undefined; // file display UI, the container where selected files are displayed and listed
-    UIToolEl = undefined; // UI tool container
     numberOfFilesDisplayTool = undefined; // the tool that displays number of selected files inside the UI tools
     clearAllFilesBtnTool = undefined; // button that clears all selected files
     addFilesUITool = undefined; // tool that opens the default UI to add more files
@@ -208,29 +164,6 @@ export default class CustUpCore {
             {opacity: 1}
         ]
     }
-
-    // tool dragger
-    toolDragger = undefined; // the tool for dragging the UI tool on the UI
-
-    /**
-     * @private @property {number} currentToolElOffsetLeft
-     */
-    currentToolElOffsetLeft = 0;
-    
-    /**
-     * @private @property {number} currentToolElOffsetBottom
-     */
-    currentToolElOffsetBottom = 0;
-
-    /**
-     * @private @property {number} lastToolOffsetBottom
-     */
-    lastToolOffsetBottom = 0;
-
-    /**
-     * @private @property {number} lastToolOffsetLeft
-     */
-    lastToolOffsetLeft = 0;
 
     // Custom Scrolling
     /**
@@ -444,14 +377,13 @@ export default class CustUpCore {
      *      maximumAllowedFileSize?: number; 
      *      ui_type?: 'default' | 'resumeUploaderUI' | 'bare' | 'detached' | 'profilePicture' | 'elegant'; 
      *      display_ui_tools?: boolean;
-     *      show_ui_tools_on_mobile_devices?: boolean;
      *      disable_drag_n_drop?: boolean;
      *      disable_select_files_from_device?: boolean;
-     *      allowed_tools?: Array<'tools_dragger' | 'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
+     *      allowed_tools?: Array<'upload' | 'add_file' | 'added_files_count' | 'clear_files'>;
      *      position_container?: "before" | "after" | "overwrite" | {"beforeEl": string};
      *      file_preview_animation_types?: Array<'slideInRight' | 'slideInTop' | 'slideInLeft' | 'slideInBottom' | 'zoomIn' | 'fadeIn'>;
      *      allowMultipleUpload?: boolean;
-     *      file_upload?: {
+     *      file_upload_settings?: {
      *          endpoint_url: string;
      *          files_field_name: string;
      *          form_field?: HTMLFormElement | string;
@@ -543,7 +475,7 @@ export default class CustUpCore {
      *      messages?: {
      *          timeout?: number;
      *      };
-     * }}  
+     * }}  passedOptions
      * 
      * @param autoInitialize - Whether to automatically initialize the library
      * 
@@ -552,6 +484,8 @@ export default class CustUpCore {
      * @param persist_default_ui - Whether to show or not remove the default UI should be closable
      * 
      * @param use_default_file_display_ui - Whether to use default file display UI
+     * 
+     * @param _custupDefaultUploadSentence - The HTML Element that holds default text that displays on the default UI
      * 
      * @param allowed_file_types - Allowed file types, any file can be uploaded if the `allowed_file_types` parameter is not provided
      * 
@@ -572,6 +506,10 @@ export default class CustUpCore {
      * @param  default_styles_override - style override of default styles - class names to be provided in place of the current class names - {keyof ui_styles: value like string | [string, append_style: boolean]}
      * 
      * @param persist_styles_override_across_instances - whether to make style overrides to persists over multiple CustUp instances, Note: only instances declared after the instance that this option is set will persist the styles, so it is best to do this in the first CustUp initialization: default is false
+     * 
+     * @param css_font_link - To set the CSS font link to be used by CustUp
+     * 
+     * @param css_font_name - To set the CSS font name to be used by CustUp
      *
      * @param  default_icons_override - default icons override
      * 
@@ -601,14 +539,21 @@ export default class CustUpCore {
      * @param allowMultipleUpload
      * Set whether to allow multiple upload or not, it is true by default
      * 
-     * @param file_upload - options to handle file upload
+     * @param file_upload_settings - options to handle file upload
      * @param upload_automatically - whether to upload file to the server automatically
      * @param show_upload_error_overlay - whether to show upload error overlay: defaults to true
+     * @param show_upload_progress_bar - whether to show progress bar overlay over file display container
      * @param file_source_icons - customize any file source icon of your choice
      * @param display_ui_tools - whether to display UI tool or not
      * @param allowed_tools - tools to display, an empty array displays all tools
+     * @param allowed_sources - For setting the file sources that should be listed on the UI
+     * @param display_file_sources - Whether to display file source icons on the default UI
+     * @param disable_drag_n_drop - Whether to allow drag and drop feature or not
+     * @param disable_select_files_from_device - Whether to disable select files from device feature that get called when the default UI is being clicked
      * 
      * @param default_files - array of files to be added by default after initialization
+     * 
+     * @param file_source_config - To configure/setup the file sources, like to provide API keys and other stuffs
      * 
      * @param count_default_files - whether default added files should be counted as part of the added files - defaults to true
      * 
@@ -617,187 +562,27 @@ export default class CustUpCore {
      * @param persist_files - whether to persist files and restore files when user refreshes the page or after the library finished initialization if the persist type is hard
      * @param persist_type - set the persist type to either soft or hard, if hard it will use localstorage else it will use session storage
      * @param alert_timeout_time - the timeout for Custup alerts default is 300ms
+     * @param messages - For configuring the CustUp messages or notifications
      * 
     */
-    constructor ({
-        autoInitialize,
-        disable_scrollbar,
-        persist_default_ui,
-        use_default_file_display_ui,
-        _custupDefaultUploadSentence,
-        show_preview_file_btn,
-        show_file_remove_btn,
-        show_file_details_container,
-        file_preview_animation_types,
-        default_styles_override,
-        persist_styles_override_across_instances,
-        css_font_link,
-        css_font_name,
-        external_source_style_override,
-        media_capture_source_style_override,
-        allowed_file_types,
-        targetRootElement,
-        maxNumberOfFiles,
-        minNumberOfFiles,
-        minimumAllowedFileSize,
-        maximumAllowedFileSize,
-        ui_type,
-        position_container,
-        allowMultipleUpload,
-        file_upload,
-        upload_automatically,
-        show_upload_error_overlay,
-        show_upload_progress_bar,
-        file_source_icons,
-        allowed_sources,
-        display_file_sources,
-        display_ui_tools,
-        show_ui_tools_on_mobile_devices,
-        disable_drag_n_drop,
-        disable_select_files_from_device,
-        allowed_tools,
-
-        default_icons_override,
-
-        // File sources config
-        file_source_config,
-
-        default_files,
-        count_default_files,
-        instance_attach,
-        single_upload,
-
-        persist_files,
-        persist_type,
-        alert_timeout_time,
-        messages
-    }) { 
-
-        if (targetRootElement == undefined) {
+    constructor (passedOptions) { 
+        super();
+        if (passedOptions.targetRootElement == undefined) {
             throw new Error(`${this.libraryName}: Target Root Element is required`);            
         }
 
-        allowed_file_types !== undefined && (this.options.allowed_file_types = allowed_file_types);
-        this.options.targetRootElement = targetRootElement;
+        this.setOptions(passedOptions, true);
+        this.set_file_preview_animations(); // load animations
         
-        maxNumberOfFiles !== undefined && (this.options.maxNumberOfFiles = maxNumberOfFiles);
-        minNumberOfFiles !== undefined && (this.options.minNumberOfFiles = minNumberOfFiles);
-        minimumAllowedFileSize !== undefined && (this.options.minimumAllowedFileSize = minimumAllowedFileSize);
-        maximumAllowedFileSize !== undefined && (this.options.maximumAllowedFileSize = maximumAllowedFileSize);
-        ui_type != undefined && (this.options.ui_type = ui_type);
-        position_container !== undefined && (this.options.position_container = position_container);
-
-        allowMultipleUpload !== undefined && (this.options.allowMultipleUpload = allowMultipleUpload);
-
-        autoInitialize !== undefined && (this.options.autoInitialize = autoInitialize);
-
-        css_font_link && (this.options.css_font_link = css_font_link);
-        css_font_name && (this.options.css_font_name = css_font_name);
-        
-        upload_automatically !== undefined && (this.options.upload_automatically = upload_automatically);
-        show_upload_error_overlay !== undefined && (this.options.show_upload_error_overlay = show_upload_error_overlay);
-        show_upload_progress_bar !== undefined && (this.options.show_upload_progress_bar = show_upload_progress_bar);
-
-        _custupDefaultUploadSentence !== undefined && (this.options._custupDefaultUploadSentence = _custupDefaultUploadSentence);
-
-        if (file_source_icons != undefined) {
-            for (const key in file_source_icons) {
-                if (Object.hasOwnProperty.call(file_source_icons, key)) {
-                    const value = file_source_icons[key];
-                    this.options.file_source_icons[key] = value
-                }
-            }
-        }
-
-        if (file_source_config !== undefined) {
-            Object.keys(file_source_config).forEach(mkey => {
-                for (const key in file_source_config[mkey]) {
-                    if (Object.hasOwnProperty.call(file_source_config[mkey], key)) {
-                        const value = file_source_config[mkey][key];
-                        if (typeof file_source_config[mkey][key] == 'object' && Object.keys(file_source_config[mkey][key]).length > 0) {
-                            this.options.file_source_config[mkey][key] = {...this.options.file_source_config[mkey][key], ...file_source_config[mkey][key]}
-                        }else{
-                            this.options.file_source_config[mkey][key] = value
-                        }
-                    }
-                }
-            })
-        }
-
-
-        instance_attach !== undefined && (this.options.instance_attach = instance_attach);
-        single_upload !== undefined && (this.options.single_upload = single_upload);
-
-        persist_files !== undefined && (this.options.persist_files = persist_files);
-        persist_type !== undefined && (this.options.persist_type = persist_type);
-
-        alert_timeout_time !== undefined && (this.options.alert_timeout_time = alert_timeout_time);
-        
-        disable_scrollbar !== undefined && (this.options.disable_scrollbar = disable_scrollbar);
-        persist_default_ui !== undefined && (this.options.persist_default_ui = persist_default_ui);
-        use_default_file_display_ui !== undefined && (this.options.use_default_file_display_ui = use_default_file_display_ui);
-
-        allowed_sources !== undefined && (this.options.allowed_sources = allowed_sources);
-        display_file_sources !== undefined && (this.options.display_file_sources = display_file_sources);
-        allowed_tools !== undefined && (this.options.allowed_tools = allowed_tools);
-        file_preview_animation_types !== undefined && (this.options.file_preview_animation_types = file_preview_animation_types);
-        
-        persist_styles_override_across_instances !== undefined && (this.options.persist_styles_override_across_instances = persist_styles_override_across_instances);
-        default_styles_override !== undefined && (this.options.default_styles_override = default_styles_override);
-        external_source_style_override !== undefined && (this.options.external_source_style_override = external_source_style_override);
-        media_capture_source_style_override !== undefined && (this.options.media_capture_source_style_override = media_capture_source_style_override);
-        
-        default_icons_override !== undefined && (this.options.default_icons_override = default_icons_override);
-        count_default_files !== undefined && (this.options.count_default_files = count_default_files);
-
-        this.set_file_preview_animations() // load animations
-
-        show_preview_file_btn != undefined && (this.options.show_preview_file_btn = show_preview_file_btn);
-        show_file_remove_btn != undefined && (this.options.show_file_remove_btn = show_file_remove_btn);
-        show_file_details_container !== undefined && (this.options.show_file_details_container = show_file_details_container);
-
-        default_files != undefined && (this.options.default_files = default_files);
-
-        display_ui_tools != undefined && (this.options.display_ui_tools = display_ui_tools);
-        show_ui_tools_on_mobile_devices !== undefined && (this.options.show_ui_tools_on_mobile_devices = show_ui_tools_on_mobile_devices);
-        disable_drag_n_drop != undefined && (this.options.disable_drag_n_drop = disable_drag_n_drop);
-        disable_select_files_from_device != undefined && (this.options.disable_select_files_from_device = disable_select_files_from_device);
-
-        this.options.file_upload_settings.files_field_name = file_upload?.files_field_name;
-        this.options.file_upload_settings.endpoint_url = file_upload?.endpoint_url;
-        this.options.file_upload_settings.additional_data = file_upload?.additional_data;
-        file_upload?.chunk_size !== undefined && (this.options.file_upload_settings.chunk_size = file_upload?.chunk_size);
-        file_upload?.should_chunk !== undefined && (this.options.file_upload_settings.should_chunk = file_upload?.should_chunk);
-
-        this.options.file_upload_settings.form_field = (typeof file_upload?.form_field == "string" && file_upload?.form_field != '') ? document.querySelector(file_upload?.form_field) : file_upload?.form_field;
-        this.options.file_upload_settings.form_field = this.options.file_upload_settings.form_field == '' ? undefined : this.options.file_upload_settings.form_field;
-
-        this.options.file_upload_settings.files_field_name = file_upload?.files_field_name == undefined ? 'file' : file_upload?.files_field_name;
-        if (file_upload?.axios_settings !== undefined) {
-            for (const key in file_upload?.axios_settings) {
-                if (Object.hasOwnProperty.call(file_upload?.axios_settings, key)) {
-                    const value = file_upload?.axios_settings[key];
-                    this.options.file_upload_settings.axios_settings[key] = {...this.options.file_upload_settings.axios_settings[key], ...value}
-                }
-            }
-        }
-        
-        if (messages !== undefined && Object.keys(messages).length > 0) {
-            for (const key in messages) {
-                if (Object.hasOwnProperty.call(messages, key)) {
-                    const value = messages[key];
-                    this.options.messages[key] = value
-                }
-            }
-        }
-
         // this.map_override_styles_to_default_styles() - removed in the favour of the main child class
-        this.map_override_icons_to_default_icons()
-        this.loadFont()
+        this.map_override_icons_to_default_icons();
+        this.loadFont();
         // this.options.autoInitialize && this.initializeUI() - removed in the favour of the main child class
-        this.configure_axios()
-        console.info(this.libraryName + " ready!")
-
+        this.configure_axios();
+        console.info(this.libraryName + ": ready!");
+        document.addEventListener('DOMContentLoaded', () => {
+            this.triggerEvent('library_beforeInit');
+        })
     }
 
     /**
@@ -834,6 +619,65 @@ export default class CustUpCore {
         document.head.append(load2)
         document.head.append(font_link)
     }
+
+    /**
+     * @public @method setOptions
+     * @param {Object} option - The option(s) to update
+     * @param {boolean} [no_update=false] - To set whether the function that needs to be called for some options to be updated should be called, the functions are called by default
+     * @returns {void}
+     */
+    setOptions (option, no_update=false) {
+        if (option === undefined) return;
+        for (const key in this.options) {
+            if (!Object.keys(option).includes(key)) continue;
+            if (Object.hasOwnProperty.call(this.options, key)) {
+                const element = option[key];
+                if (typeof this.options[key] == 'object' && !Array.isArray(this.options[key]) && element != undefined) {
+                    this.options[key] = this.setObjectValue(this.options[key], option[key], key);
+                }else{
+                    this.options[key] = element;
+                }
+            }
+
+            if (no_update) continue;
+            
+            // update items that needs to be updated
+            if (key === 'file_preview_animation_types') {
+                this.set_file_preview_animations(true); // load animations
+            }else if (key === 'default_files') {
+                this.load_default_files();                
+            }else if (key === 'default_icons_override') {
+                this.map_override_icons_to_default_icons();
+            }else if (key === "default_styles_override" || key === "persist_styles_override_across_instances") {
+                this.map_override_styles_to_default_styles();
+            }
+        }
+    }
+
+    /**
+     * @private @method setObjectValue
+     * @param {Object} objectParent - The Object to update
+     * @param {Object} value - The object holding the values to update to target object
+     * @returns {Object}
+     */
+    setObjectValue (objectParent, value, key) {
+        const setObj = objectParent;
+        if (Object.keys(setObj) == 0) return value;
+        for (const keyx in setObj) {
+            if (!Object.keys(value).includes(keyx)) continue;
+            if (Object.hasOwnProperty.call(setObj, keyx)) {
+                if (typeof setObj[keyx] == 'object' && !Array.isArray(setObj[keyx])) {
+                    const xc = this.setObjectValue(setObj[keyx], value[keyx])
+                    setObj[keyx] = {...setObj[keyx], ...xc}
+                }else{
+                    setObj[keyx] = value[keyx]
+                }
+            }
+        }
+        return setObj;
+    }
+
+    
 
     /**
      * @protected @method map_override_styles_to_default_styles - maps the provided styles to the default styles
@@ -873,7 +717,7 @@ export default class CustUpCore {
      * @protected @method load_default_files - Loads default files
      */
     load_default_files () {
-        const URLFilesArr = []
+        const URLFilesArr = [];
         this.options.default_files.map(file_obj => {
             if (typeof file_obj.file == 'string') {
                 URLFilesArr.push(file_obj)
@@ -985,7 +829,7 @@ export default class CustUpCore {
             return this;
         }
 
-        targetEl.setAttribute('data-custup-init', '_custup')
+        targetEl.setAttribute('data-custup-init', '_custup');
 
         this._custupEl = document.createElement('div');
         this._custupInnerEl = document.createElement('div');
@@ -1041,10 +885,12 @@ export default class CustUpCore {
         }
 
         this.showDefaultUI();
-        this.eventMethods.library_init && this.eventMethods.library_init();
+        
+        setTimeout(() => this.triggerEvent('library_init'), 0);
+
         console.info(this.libraryName + " initialized!");
-        this.load_default_files()
-        this.read_files_from_storage()
+        this.load_default_files();
+        this.read_files_from_storage();
     }
 
     /**
@@ -1090,7 +936,7 @@ export default class CustUpCore {
         this.set_class_name('defaultUIUploadIconsContainer', iconsContainer);
         this._custupInnerEl.append(this._custupDefaultUIEl);
         !this.options.disable_select_files_from_device && (this._custupDefaultUIEl.onclick = (e) => this._select_file_from_device(e));
-        this.eventMethods.default_ui_shown && this.eventMethods.default_ui_shown();
+        this.triggerEvent('default_ui_shown');
         this.is_default_ui_shown = true;
     }
 
@@ -1102,7 +948,7 @@ export default class CustUpCore {
         if (this._custupDefaultUIEl != undefined && !this.options.persist_default_ui) {
             this._custupDefaultUIEl.remove();
             this._custupDefaultUIEl = undefined;    
-            this.eventMethods.default_ui_closed && this.eventMethods.default_ui_closed();
+            this.triggerEvent('default_ui_closed');
             this.is_default_ui_shown = false;
         }
     }
@@ -1110,7 +956,8 @@ export default class CustUpCore {
     /**
      * @protected @method set_file_preview_animations
      */
-    set_file_preview_animations () {
+    set_file_preview_animations (override=false) {
+        if (override) this.file_preview_animation_arr = [];
         if (this.options.file_preview_animation_types !== null && this.options.file_preview_animation_types.length == 0) {
             Object.keys(this.previewerAnimations).forEach(key => this.file_preview_animation_arr.push(this.previewerAnimations[key]));
         }else{
@@ -1137,7 +984,11 @@ export default class CustUpCore {
         }
 
         const handleClose = () => {
-            _class.eventMethods.file_source_closed && this.eventMethods.file_source_closed();
+            this.triggerEvent('file_source_closed')
+        }
+
+        const eventTrigger = (eventName, data=undefined, cancelable=true) => {
+            return this.triggerEvent(eventName, data, cancelable);
         }
 
         this._custup_external_source_instance?.destroyContainerUI(true);
@@ -1149,7 +1000,7 @@ export default class CustUpCore {
             callbackFn: media_callback,
             onclose: handleClose,
             config: config[type],
-            eventMethods: this.deviceFileSourceEventMethods,
+            triggerEvent: eventTrigger,
             ui_styles: this.options.media_capture_source_style_override
         });
     }
@@ -1183,7 +1034,7 @@ export default class CustUpCore {
         const handleOnClose = () => {
             _class._custupInnerEl.onwheel = (e) => _class.handleCustomScroll(e)
             _class.set_scroll_pointer_event(this._custupInnerEl);
-            _class.eventMethods.file_source_closed && this.eventMethods.file_source_closed();
+            this.triggerEvent('file_source_closed');
         }
         const handleSetPointerEV = (el, targetEl) => {
             const targetElScrollBarEl = targetEl.parentElement.querySelector(`div[class*='scroll_bar']`)
@@ -1226,8 +1077,6 @@ export default class CustUpCore {
         !this.options.disable_scrollbar && this.createScrollBar();
         this._custupInnerContainerWrapperEl.append(this.fileDisplayUIEl);
         this._custupInnerEl.onwheel = (e) => this.handleCustomScroll(e);
-        // removed because tool dragging is no more available on touch devices, the tool on
-        // this._custupInnerEl.onpointerdown = (e) => this.handleInnerElementContainerPointerDown(e);
         this.set_scroll_pointer_event(this._custupInnerEl);
     }
 
@@ -1255,15 +1104,12 @@ export default class CustUpCore {
      * @protected @method make_ui_tools
      */
     make_ui_tools () {
-        this.UIToolEl = document.createElement('div')
-        this.set_class_name("UITool", this.UIToolEl)
         // tools making
         this.numberOfFilesDisplayTool = document.createElement('div')
+        this.numberOfFilesDisplayTool.className = "custup-num-files"
         this.clearAllFilesBtnTool = document.createElement('div')
         this.addFilesUITool = document.createElement('div')
-        this.uploadFilesToServerTool = document.createElement('div')
-        this.toolDragger = document.createElement('div')
-        this.toolDragger.className = "_custup_dragger_tool"
+        this.uploadFilesToServerTool = document.createElement('div');
         this.setNumberOfFiles()
         this.uploadFilesToServerTool.title = "Upload Files"
         this.uploadFilesToServerTool.innerHTML = this.ui_icons.send
@@ -1277,24 +1123,17 @@ export default class CustUpCore {
 
         const tools_arr = {
             added_files_count: () => {
-                this.UIToolEl.append(this.numberOfFilesDisplayTool);
-                (this.options.display_ui_tools && screen.width <= 768 && this.options.show_ui_tools_on_mobile_devices) && this._custupHeaderEl.querySelector('.inner').append(this.numberOfFilesDisplayTool);
+                this.options.display_ui_tools && this._custupHeaderEl.querySelector('.inner').append(this.numberOfFilesDisplayTool);
             },
             add_file: () => {
-                this.UIToolEl.append(this.addFilesUITool);
-                (this.options.display_ui_tools && screen.width <= 768 && this.options.show_ui_tools_on_mobile_devices) && this._custupHeaderEl.querySelector('.inner').append(this.addFilesUITool);
+                this.options.display_ui_tools && this._custupHeaderEl.querySelector('.inner').append(this.addFilesUITool);
             },
             clear_files: () => {
-                this.UIToolEl.append(this.clearAllFilesBtnTool);
-                (this.options.display_ui_tools && screen.width <= 768 && this.options.show_ui_tools_on_mobile_devices) && this._custupHeaderEl.querySelector('.inner').append(this.clearAllFilesBtnTool);
+                this.options.display_ui_tools && this._custupHeaderEl.querySelector('.inner').append(this.clearAllFilesBtnTool);
             },
             upload: () => {
-                this.UIToolEl.append(this.uploadFilesToServerTool);
-                (this.options.display_ui_tools && screen.width <= 768 && this.options.show_ui_tools_on_mobile_devices) && this._custupHeaderEl.querySelector('.inner').append(this.uploadFilesToServerTool);
+                this.options.display_ui_tools && this._custupHeaderEl.querySelector('.inner').append(this.uploadFilesToServerTool);
             },
-            tools_dragger: () => {
-                this.UIToolEl.append(this.toolDragger);
-            }
         }
         
         if (this.options.allowed_tools !== null && this.options.allowed_tools.length == 0) {
@@ -1304,14 +1143,10 @@ export default class CustUpCore {
                 this.options.allowed_tools.forEach(tool => tools_arr[tool]())
             }
         }
-        
-        if (screen.width > 768) {
-            this.options.display_ui_tools && this._custupInnerEl.append(this.UIToolEl)            
-        }else{
-            if (this.options.display_ui_tools && this.options.allowed_tools !== null) {
-                this._custupHeaderEl.classList.add('_custup_mobile_768_screen_tools_container');
-                this._custupInnerContainerWrapperEl.classList.add('_custup_inner_container_wrapper_container_768');
-            }
+
+        if (this.options.allowed_tools !== null && this.options.display_ui_tools) {
+            this._custupHeaderEl.classList.add('_custup_tools_container');
+            this._custupInnerContainerWrapperEl.classList.add('_custup_inner_container_wrapper_container_with_tools');
         }
     }
     
@@ -1327,9 +1162,9 @@ export default class CustUpCore {
      * @protected @method attempt_clear_mobile_tools - This methods clears the ui tools if on mobile devices, if no tools were displayed it does nothing
      */
     attempt_clear_mobile_tools () {
-        this._custupHeaderEl.classList.contains('_custup_mobile_768_screen_tools_container') && (this._custupHeaderEl.querySelector('.inner').innerHTML = '');
-        this._custupHeaderEl.classList.remove('_custup_mobile_768_screen_tools_container');
-        this._custupInnerContainerWrapperEl.classList.remove('_custup_inner_container_wrapper_container_768');
+        this._custupHeaderEl.classList.contains('_custup_tools_container') && (this._custupHeaderEl.querySelector('.inner').innerHTML = '');
+        this._custupHeaderEl.classList.remove('_custup_tools_container');
+        this._custupInnerContainerWrapperEl.classList.remove('_custup_inner_container_wrapper_container_with_tools');
     }
     
     /**
@@ -1339,10 +1174,8 @@ export default class CustUpCore {
     handleClearAllFiles () {
         this.fileDisplayUIEl?.remove()
         this.fileDisplayUIEl = undefined;
-        this.UIToolEl?.remove();
         this.attempt_clear_mobile_tools();
-        this.UIToolEl = undefined;
-        this.eventMethods.file_all_removed && this.eventMethods.file_all_removed([...this.defaultFiles, ...this.selectedFiles]);
+        this.triggerEvent('file_all_removed', [...this.defaultFiles, ...this.selectedFiles])
         this.selectedFiles = []
         this.defaultFiles = []
         this.successfullyUploadedFiles = [];
@@ -1427,62 +1260,11 @@ export default class CustUpCore {
     }
 
     /**
-     * removed because tool dragging has been removed for touch devices, 
-     * the upload tool on bigger screens has been changed to a static tool which is displayed inside the header on mobile devices
-     * @deprecated @protected @method handleInnerElementContainerPointerDown
-     */
-    handleInnerElementContainerPointerDown (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.lastToolOffsetBottom = e.clientY
-        this.lastToolOffsetLeft = e.clientX
-        if (e.target.classList.contains("_custup_dragger_tool")) {
-            this._custupInnerEl.onmousemove = (e) => this.handleToolDraggerMouseMove(e)           
-            this._custupInnerEl.onpointermove = (e) => this.handleToolDraggerMouseMove(e)           
-            this._custupInnerEl.onmouseup = (e) => this.handleInnerElementContainerMouseUp(e)
-            this._custupInnerEl.onpointerup = (e) => {e.stopPropagation();this.handleInnerElementContainerMouseUp(e)} 
-        }else if (e.target.classList.contains("_custup_file_ui") || e.target.parentElement.classList.contains("_custup_file_ui")) {
-            /**
-             * TODO: implement changing of file position on the UI
-             */
-        }
-    }
-
-    /**
      * @protected @method handleInnerElementContainerMouseUp
      */
     handleInnerElementContainerMouseUp (e) {
         this._custupInnerEl.onmousemove = null
         this._custupInnerEl.onpointermove = null
-    }
-
-    /**
-     * @protected @method handleToolDraggerMouseMove
-     */
-    handleToolDraggerMouseMove (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const addToolElStyleLeft = this.currentToolElOffsetLeft == 0 ? this.UIToolEl.offsetLeft : 0;
-        
-        if (e.clientX > this.lastToolOffsetLeft) {
-            this.currentToolElOffsetLeft += Math.abs(this.lastToolOffsetLeft - e.clientX) + addToolElStyleLeft;
-        }else if (e.clientX < this.lastToolOffsetLeft) {
-            if (this.currentToolElOffsetLeft <= 0) {
-                this.currentToolElOffsetLeft = this.currentToolElOffsetLeft;
-            }else{
-                this.currentToolElOffsetLeft -= Math.abs(this.lastToolOffsetLeft - e.clientX) + addToolElStyleLeft;
-            }
-        }else{
-            if (addToolElStyleLeft != 0) {
-                this.currentToolElOffsetLeft = addToolElStyleLeft                
-            }else{
-                this.currentToolElOffsetLeft = this.currentToolElOffsetLeft
-            }
-        }
-        
-        
-        this.UIToolEl.style.left = this.currentToolElOffsetLeft + "px"
-        this.lastToolOffsetLeft = e.clientX
     }
 
     /**
@@ -1498,18 +1280,16 @@ export default class CustUpCore {
             this.makeFileDisplayUI()
             this.removeDefaultUI()
         }
-        this.eventMethods.file_beforeAdded && (() => 
-            {
-                if (file.type.split('/')[0].toLowerCase() == 'image') {
-                    const fr = new FileReader()
-                    fr.onload = (e) => {
-                        this.eventMethods.file_beforeAdded({file, base64: e.target.result});
-                    }
-                    fr.readAsDataURL(file)            
-                }else{
-                    this.eventMethods.file_beforeAdded({file});
-                }
-            })();
+        
+        if (file.type.split('/')[0].toLowerCase() == 'image') {
+            const fr = new FileReader()
+            fr.onload = (e) => {
+                this.triggerEvent('file_beforeAdded', {file, base64: e.target.result})
+            }
+            fr.readAsDataURL(file)            
+        }else{
+            this.triggerEvent('file_beforeAdded', {file})
+        }
 
         isUploadable && (index !== null ? this.selectedFiles.splice(index, 0, file) : this.selectedFiles.push(file));
         file.isDefaultFile && this.defaultFiles.push(file);
@@ -1585,7 +1365,7 @@ export default class CustUpCore {
 
         this.options.use_default_file_display_ui  && this.fileDisplayUIEl.append(fileUIContainer);
 
-        this.eventMethods.file_afterAdded && this.eventMethods.file_afterAdded({file, element: fileUIContainer, count: this._get_total_file_count()});
+        this.triggerEvent('file_afterAdded', {file, element: fileUIContainer, count: this._get_total_file_count()});
         
         (!this.options.disable_scrollbar && this.options.use_default_file_display_ui) && this.updateScrollbarHeight();
 
@@ -1689,16 +1469,18 @@ export default class CustUpCore {
             previewElement.innerHTML = `<source src="${URL.createObjectURL(file)}" type="${file.type}">`;
         }
 
-        this.close_popup_btn.onclick = () => {
+        const closePreviewer = () => {
             if (animation == undefined) return filePreviewer.remove();
             const animation_clone = animation && [...animation]
             animation_clone && filePreviewer.animate(animation_clone.reverse(), {duration: 200});
             setTimeout(() => {
                 filePreviewer.remove()
             }, 200);
-            this.close_popup_btn.onclick = () => null
+            this.close_popup_btn.removeEventListener('click', closePreviewer)
             this.close_popup_btn.style.display = 'none'
         }
+
+        this.close_popup_btn.addEventListener('click', closePreviewer)
         
         filePreviewerInnerContainer.append(previewElement)
         filePreviewer.append(filePreviewerInnerContainer)
@@ -1790,14 +1572,14 @@ export default class CustUpCore {
         }
 
         const default_file = this.defaultFiles.findIndex(file => file.id == fileData.id);
-        (default_file > -1 && this.eventMethods.file_defaultFileRemoved) && this.eventMethods.file_defaultFileRemoved(this.defaultFiles[default_file]);
+        default_file > -1 && this.triggerEvent('file_defaultFileRemoved', this.defaultFiles[default_file]);
         (default_file > -1) && this.defaultFiles.splice(default_file, 1);
 
 
         this.setNumberOfFiles(true);
         !this.options.disable_scrollbar && this.updateScrollbarHeight();
         callback_fn && callback_fn();
-        this.eventMethods.file_removed && this.eventMethods.file_removed({file: fileData, files_count: this._get_total_file_count()});
+        this.triggerEvent('file_removed', {file: fileData, files_count: this._get_total_file_count()})
         this.remove_file_from_storage(fileData.id)
     }
 
@@ -2092,11 +1874,14 @@ export default class CustUpCore {
                 this.show_message(`Maximum number of files that can be uploaded is ${this.options.maxNumberOfFiles}`, "error")
                 break;
             }
-            const customCheck = this.eventMethods.file_beforePassedChecks !== undefined ? this.eventMethods.file_beforePassedChecks(file) : undefined
-            if (customCheck !== undefined && (customCheck[0] === false || customCheck === false)) {
-                customCheck[1] && this.show_message(customCheck?.[1], "error");
+
+            const passedCheck = this.triggerEvent('file_beforePassedChecks', file);
+
+            if (!passedCheck) {
+                this.show_message("An error occured could not add file " + file.name + ", please make sure to read the requirements for file upload", "error");
                 continue;
             }
+
             before_add_callback_fn && before_add_callback_fn()
             this.addFileToUI(file, isUploadable, index)
         }
@@ -2187,8 +1972,9 @@ export default class CustUpCore {
      */
     handleUploadFile (file=undefined) {
         if (!this.isUploadConditionsSatisfied()) return;
-        const _class = this
-        _class.file_upload_form_data = new FormData(_class.options.file_upload_settings.form_field)
+        const _class = this;
+        const form_field = _class.options.file_upload_settings.form_field
+        _class.file_upload_form_data = new FormData(form_field == '' ? undefined : form_field)
 
         if (!file) {
             const files_to_upload = _class.selectedFiles.filter(file => _class.successfullyUploadedFiles.findIndex(f => f.name == file.name && f.size == file.size) == -1)
@@ -2211,7 +1997,8 @@ export default class CustUpCore {
     async handleUploadAllFiles () {
         if (!this.isUploadConditionsSatisfied()) return;
         const _class = this
-        _class.file_upload_form_data = new FormData(_class.options.file_upload_settings.form_field)
+        const form_field = _class.options.file_upload_settings.form_field
+        _class.file_upload_form_data = new FormData(form_field == '' ? undefined : form_field)
 
         if (_class.options.file_upload_settings.additional_data != undefined) { 
             for (const key in _class.options.file_upload_settings.additional_data) {
@@ -2239,26 +2026,26 @@ export default class CustUpCore {
         attached_files.map(file => _class.file_upload_form_data.append(_class.options.file_upload_settings.files_field_name, file))
         
         const all_files = [...this.selectedFiles, ...attached_files];
-        const beforeUploadStartCheck = this.eventMethods.upload_beforeStart && (await this.eventMethods.upload_beforeStart({files: all_files, formData: _class.file_upload_form_data, form: this.options.file_upload_settings.form_field}));
-        if (beforeUploadStartCheck !== undefined && (beforeUploadStartCheck[0] === false || beforeUploadStartCheck === false)) {
-            beforeUploadStartCheck?.[1] && this.show_message(beforeUploadStartCheck?.[1], "error");
+        const beforeUploadStartCheck = this.triggerEvent('upload_beforeStart', {files: all_files, formData: _class.file_upload_form_data, form: this.options.file_upload_settings.form_field})
+        if (!beforeUploadStartCheck) {
+            this.show_message("Please check that all requirements have been satisfied", "error");
             return;
         }
 
         await _class.__axios_instance.post('', _class.file_upload_form_data, {
             onUploadProgress: progressEvent => {
-                this.eventMethods.upload_progress && this.eventMethods.upload_progress({progressEvent, all_files});
+                this.triggerEvent('upload_progress', {progressEvent, all_files});
             }
         })
         .then((data) => {
-            this.eventMethods.upload_success && this.eventMethods.upload_success({data, files: all_files, formData: _class.file_upload_form_data});
+            this.triggerEvent('upload_success', {data, files: all_files, formData: _class.file_upload_form_data});
         })
         .catch(err => {
             this.show_message(err.message, 'error');
-            this.eventMethods.upload_error && this.eventMethods.upload_error({err, files: all_files, formData: _class.file_upload_form_data});
+            this.triggerEvent('upload_error', {err, files: all_files, formData: _class.file_upload_form_data})
         });
 
-        this.eventMethods.upload_all_finished({not_uploaded_files: this.filesNotSent, uploaded_files: this.successfullyUploadedFiles});
+        this.triggerEvent('upload_all_finished', {not_uploaded_files: this.filesNotSent, uploaded_files: this.successfullyUploadedFiles})
 
     }
 
@@ -2287,7 +2074,7 @@ export default class CustUpCore {
 
         const upload_element = this.createFileUploadOverlay(file.id);
         this.handleUploadFileToEndpoint(file, upload_element);
-        this.eventMethods.upload_retry && this.eventMethods.upload_retry({file, file_container: this.fileDisplayUIEl.querySelector(`#${file.id}`)});
+        this.triggerEvent('upload_retry', {file, file_container: this.fileDisplayUIEl.querySelector(`#${file.id}`)})
     }
 
     /**
@@ -2316,8 +2103,8 @@ export default class CustUpCore {
     handleUploadFileToEndpoint (file, upload_element, chunking = false) {
         const _class = this;
         const chunk_size = _class.options.file_upload_settings.chunk_size;
-
-        const uniq_formdata = new FormData(_class.options.file_upload_settings.form_field)
+        const form_field = _class.options.file_upload_settings.form_field;
+        const uniq_formdata = new FormData(form_field == '' ? undefined : form_field)
 
         if (_class.options.file_upload_settings.should_chunk) {
             if (Object.keys(this.file_chunks).includes(file.id)) {
@@ -2361,7 +2148,11 @@ export default class CustUpCore {
             }
         }
 
-        this.eventMethods.upload_beforeStart && this.eventMethods.upload_beforeStart({file, upload_element});
+        const beforeUploadStartCheck = this.triggerEvent('upload_beforeStart', {file, upload_element})
+        if (!beforeUploadStartCheck) {
+            this.show_message("File " + file.name + " could not be uploaded because it didn't passed the upload requirement", "error");
+            return;
+        }
 
         const fileContainer = _class.fileDisplayUIEl?.querySelector(`#${file.id}`);
 
@@ -2383,7 +2174,7 @@ export default class CustUpCore {
                 progressEvent.loaded = should_use_chunking ? this.file_progress[file.id].loaded : progressEvent.loaded;
                 progressEvent.total = should_use_chunking ? this.file_progress[file.id].total : progressEvent.total;
                 progressEvent.progress = should_use_chunking ? this.file_progress[file.id].progress : progressEvent.progress;
-                this.eventMethods.upload_progress && this.eventMethods.upload_progress({progressEvent, file, upload_element});
+                this.triggerEvent('upload_progress', {progressEvent, file, upload_element});
                 _class.handleUploadProgressEvent(progressEvent, upload_element);
             }
         })
@@ -2397,10 +2188,10 @@ export default class CustUpCore {
             }else{
                 _class.successfullyUploadedFiles.push(file);
                 _class.removeFileUploadOverlay(upload_element, fileContainer, true);
-                this.eventMethods.upload_success && this.eventMethods.upload_success({data, file, upload_element, file_container: fileContainer});
+                this.triggerEvent('upload_success', {data, file, upload_element, file_container: fileContainer});
                 delete this.file_chunks[file.id];
                 delete this.file_progress[file.id];
-                (this.currentlyUploadingFiles.length == 0 && this.eventMethods.upload_all_finished !== undefined) && this.eventMethods.upload_all_finished({not_uploaded_files: this.filesNotSent, uploaded_files: this.successfullyUploadedFiles});
+                this.triggerEvent('upload_all_finished', {not_uploaded_files: this.filesNotSent, uploaded_files: this.successfullyUploadedFiles})
             }
 
 
@@ -2410,7 +2201,7 @@ export default class CustUpCore {
             _class.removeFileUploadOverlay(upload_element, fileContainer, false);
             _class.filesNotSent.push(file);
             this.show_message(err.message, 'error');
-            this.eventMethods.upload_error && this.eventMethods.upload_error({err, file, upload_element, file_container: fileContainer});
+            this.triggerEvent('upload_error', {err, file, upload_element, file_container: fileContainer})
             this.currentlyUploadingFiles.splice(this.currentlyUploadingFiles.indexOf(file), 1);
         });
     }
@@ -2449,176 +2240,15 @@ export default class CustUpCore {
     ////////////////////////////////////////// Event Handlers //////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
-     * on - listen for an event
-     * @param { 'file.beforeAdded' | 
-     *  'library.init' | 
-     *  'file.afterAdded' | 
-     *  'file.beforePassedChecks' | 
-     *  'file.removed' | 
-     *  'file.defaultFileRemoved' | 
-     *  'file.all_removed' | 
-     *  'video.recordingStarted' |
-     *  'video.recording' | 
-     *  'video.recordStop' | 
-     *  'video.recordSaved' |
-     *  'video.recordCancel' | 
-     *  'image.captured' | 
-     *  'audio.recordingStarted' | 
-     *  'audio.recording' | 
-     *  'audio.recordStop' | 
-     *  'audio.recordSaved' | 
-     *  'audio.recordCancel' | 
-     *  'screen.recordingStarted' | 
-     *  'screen.recording' | 
-     *  'screen.recordStop' | 
-     *  'screen.recordSaved' | 
-     *  'screen.recordCancel' | 
-     *  'upload.beforeStart' | 
-     *  'upload.progress' | 
-     *  'upload.success' | 
-     *  'upload.error' |
-     *  'upload.retry' |
-     *  'upload.all_finished' |
-     *  'file_source.closed' |
-     *  'default_ui.shown' |
-     *  'default_ui.closed'
-     * } event - event name
-     * @param {Function} callbackFn - the callback function
+     * @public @method triggerEvent - triggers an event
+     * @param {keyof eventNames} eventName - event name
+     * @param {any} data - the callback function
+     * @param {boolean} cancelable - whether the event should be cancelable with preventDefault
      */    
 
-    on (event, callbackFn) {
-        switch (event) {
-            case 'library.init':
-                this.eventMethods.library_init = callbackFn
-                break;
-
-            case 'file.beforeAdded':
-                this.eventMethods.file_beforeAdded = callbackFn
-                break;
-
-            case 'file.afterAdded':
-                this.eventMethods.file_afterAdded = callbackFn
-                break;
-
-            case 'file.beforePassedChecks':
-                this.eventMethods.file_beforePassedChecks = callbackFn
-                break;
-
-            case 'file.removed':
-                this.eventMethods.file_removed = callbackFn
-                break;
-
-            case 'file.defaultFileRemoved':
-                this.eventMethods.file_defaultFileRemoved = callbackFn
-                break;
-
-            case 'file.all_removed':
-                this.eventMethods.file_all_removed = callbackFn
-                break;
-
-            case 'video.recordingStarted':
-                this.deviceFileSourceEventMethods.video_recordingStarted = callbackFn
-                break;
-
-            case 'video.recording':
-                this.deviceFileSourceEventMethods.video_recording = callbackFn
-                break;
-
-            case 'video.recordStop':
-                this.deviceFileSourceEventMethods.video_recordStop = callbackFn
-                break;
-
-            case 'video.recordSaved':
-                this.deviceFileSourceEventMethods.video_recordSaved = callbackFn
-                break;
-
-            case 'video.recordCancel':
-                this.deviceFileSourceEventMethods.video_recordCancel = callbackFn
-                break;
-
-            case 'image.captured':
-                this.deviceFileSourceEventMethods.image_captured = callbackFn
-                break;
-
-            case 'audio.recordingStarted':
-                this.deviceFileSourceEventMethods.audio_recordingStarted = callbackFn
-                break;
-
-            case 'audio.recording':
-                this.deviceFileSourceEventMethods.audio_recording = callbackFn
-                break;
-
-            case 'audio.recordStop':
-                this.deviceFileSourceEventMethods.audio_recordStop = callbackFn
-                break;
-
-            case 'audio.recordSaved':
-                this.deviceFileSourceEventMethods.audio_recordSaved = callbackFn
-                break;
-
-            case 'audio.recordCancel':
-                this.deviceFileSourceEventMethods.audio_recordCancel = callbackFn
-                break;
-
-            case 'screen.recordingStarted':
-                this.deviceFileSourceEventMethods.screen_recordingStarted = callbackFn
-                break;
-
-            case 'screen.recording':
-                this.deviceFileSourceEventMethods.screen_recording = callbackFn
-                break;
-
-            case 'screen.recordStop':
-                this.deviceFileSourceEventMethods.screen_recordStop = callbackFn
-                break;
-
-            case 'screen.recordSaved':
-                this.deviceFileSourceEventMethods.screen_recordSaved = callbackFn
-                break;
-
-            case 'screen.recordCancel':
-                this.deviceFileSourceEventMethods.screen_recordCancel = callbackFn
-                break;
-
-            case 'upload.beforeStart':
-                this.eventMethods.upload_beforeStart = callbackFn
-                break;
-
-            case 'upload.progress':
-                this.eventMethods.upload_progress = callbackFn
-                break;
-
-            case 'upload.success':
-                this.eventMethods.upload_success = callbackFn
-                break;
-
-            case 'upload.error':
-                this.eventMethods.upload_error = callbackFn
-                break;
-
-            case 'upload.retry':
-                this.eventMethods.upload_retry = callbackFn
-                break;
-
-            case 'upload.all_finished':
-                this.eventMethods.upload_all_finished = callbackFn
-                break;
-
-            case 'file_source.closed':
-                this.eventMethods.file_source_closed = callbackFn
-                break;
-
-            case 'default_ui.shown':
-                this.eventMethods.default_ui_shown = callbackFn
-                break;
-
-            case 'default_ui.closed':
-                this.eventMethods.default_ui_closed = callbackFn
-                break;
-        
-            default:
-                break;
-        }
+    triggerEvent (eventName, data=undefined, cancelable=true) {
+        const customEv = new CustomEvent(this.event_names[eventName], {detail: data, bubbles: true, cancelable});
+        return this.dispatchEvent(customEv);
     }
 
     /////////////////////////////////////////////////////////////////////////////////
@@ -2631,7 +2261,7 @@ export default class CustUpCore {
      */
     upload (file_id) {
         const file = this.selectedFiles.find(fl => fl.id == file_id)
-        this.fileUploadHandler(file)
+        this.fileUploadHandler(file);
     }
 
     /**
@@ -2857,6 +2487,16 @@ export default class CustUpCore {
     }
 
     /**
+     * @public @method on - Custom and shothand event listener
+     * @typedef {import('../utils/eventNames.js').TEventNames} TEventNames
+     * @param {TEventNames} eventName
+     * @param {Function} callback 
+     */
+    on (eventName, callback) {
+        this.addEventListener(eventName, callback);
+    }
+
+    /**
      * @method get_file_sources - Returns all the allowed file sources icons wrapped in HTML element
      * @param {HTMLElement | null} iconsContainer - An HTML element to automatically append the icons to
      * @param {Function | null} allElOnClick - A callback function to be attached to the onClick event of every icons
@@ -2864,8 +2504,8 @@ export default class CustUpCore {
      * @returns {Array<HTMLElement>}
      */
     get_file_sources (iconsContainer=null, allElOnClick=null, additionalElOnClickEv = {}) {
-        const file_sources = []
-        
+        const file_sources = [];
+
         const file_sources_arr = {
             record_video: () => {
                 const recordVideoIcon = document.createElement('div')

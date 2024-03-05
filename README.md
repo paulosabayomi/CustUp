@@ -32,6 +32,10 @@ CustUp which is the short for Customizable Uploader was made to be >95% customiz
 ## Documentation Homepage
 
 [CustUp documentation website](https://custup.pryxy.com)
+
+### Demo
+
+Check out the [demo here](https://custup.pryxy.com/examples), or check the CustUp [documentation homepage]((https://custup.pryxy.com)) to see different CustUp UIs
   
 ## Quick Start
 
@@ -142,7 +146,6 @@ To change the styles of some elements, you can override their styles by either o
             fileUI: ['custup_file_ui_outer', true],
             file_wrapper_el: ['file_wrapper', true],
             fileDetailsContainer: ['file_details', true],
-            UITool: ['tool_container', true],
             custupInnerContainerWrapperEl: ['inner_container_wrapper', true],
             headerContainer: 'header_cont',
             footerContainer: 'footer_container'
@@ -489,8 +492,8 @@ CustUp has events that can be subscribed to
 ### For example
 
 ```js
-uploader.on('file.beforeAdded', (ev) => {
-    console.log('CustUp:', ev)
+uploader.addEventListener('file.beforeAdded', (ev) => {
+    console.log('CustUp:', ev, ev.detail)
 })
 ```
 
@@ -509,7 +512,7 @@ uploader.on('file.beforeAdded', (ev) => {
 | `'upload.error'` | Called when a file or collective upload was not successfully due to an error | `{err: Error, file: File, upload_element: HTMLELement | null, file_container: HTMLElement | null}` |
 | `'upload.retry'` | Called when an upload is about to be retried | `{file: File, file_container: HTMLElement | null}`  |
   
-And many more events, read the documentation for more events  
+And many more events, check the [documentation](https://custup.pryxy.com) for more events  
   
 ### All Events
 

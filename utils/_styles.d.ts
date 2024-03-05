@@ -12,7 +12,6 @@ export namespace ui_styles {
     let defaultUIInnerContentEl: string;
     let defaultUIUploadSentenceContainer: string;
     let defaultUIUploadIconsContainer: string;
-    let UITool: string;
     let fileDisplayUI: string;
     let fileUIOuterContainer: string;
     let fileDetailsContainer: string;
