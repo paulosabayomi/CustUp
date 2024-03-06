@@ -528,8 +528,6 @@ export default class CustUpCore extends EventTarget {
                 this.load_default_files();                
             }else if (key === 'default_icons_override') {
                 this.map_override_icons_to_default_icons();
-            }else if (key === '_custupDefaultUploadSentence') {
-                this.uploadSentenceEl.innerHTML = this.options._custupDefaultUploadSentence;
             }else if (key === "default_styles_override" || key === "persist_styles_override_across_instances") {
                 this.map_override_styles_to_default_styles();
             }

@@ -229,6 +229,13 @@ export default class CustUpCore extends EventTarget {
         link: string;
         clipboard: string;
         google_drive: string;
+        /**
+         * @protected @method show_message
+         * @param {string} msg
+         * @param {"error" | "success" | "info"} type
+         * @param {boolean} async - for async messages that doesn't hide until the request is done
+         * @param {number} timeout - timeout for hiding the message
+         */
         dropbox: string;
         box_icon: string;
         onedrive: string;

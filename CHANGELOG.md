@@ -1,8 +1,12 @@
 # Changelog
 
+## 1.1.4 (2024-03-05)
+
+- Fix: A bug caused by trying to update `_custupDefaultUploadSentence` option in `setOptions` method.
+
 ## 1.1.3 (2024-03-05)
 
-Fix: Corrected the type mistake made in version 1.1.2 by removing `targetRootElement`, it is now optional in type but still required by CustUp.
+- Fix: Corrected the type mistake made in version 1.1.2 by removing `targetRootElement`, it is now optional in type but still required by CustUp.
 
 ## 1.1.2 (2024-03-05)
 
