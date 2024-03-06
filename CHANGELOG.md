@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2 (2024-03-05)
+
+- Fix: Fixed setOptions type bug by removing `targetRootElement` which is required by CustUp but cannot be set with `setOptions`.
+
 ## 1.1.1 (2024-03-05)
 
 - New: Moved the option types to a new file
