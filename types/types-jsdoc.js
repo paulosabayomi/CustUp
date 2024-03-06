@@ -21,6 +21,7 @@ import file_types from "../utils/filetypes"
  *      persist_styles_override_across_instances?: boolean;
  *      default_icons_override?: {[key in (keyof typeof icons)]: string};
  *      allowed_file_types?: (keyof file_types)[];
+ *      targetRootElement?: string; 
  *      maxNumberOfFiles?: number; 
  *      minNumberOfFiles?: number; 
  *      minimumAllowedFileSize?: number; 
