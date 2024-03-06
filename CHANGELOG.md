@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1 (2024-03-05)
+
+- New: Moved the option types to a new file
+- New: Added option types to the `setOptions` method
+
 ## 1.1.0 (2024-03-05)
 
 - New: CustUp now extends `EventTarget` and it can now trigger events, and events triggered by CustUp can be listened for by calling the `addEventListener` or the `on` method
