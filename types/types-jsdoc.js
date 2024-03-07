@@ -12,14 +12,14 @@ import file_types from "../utils/filetypes"
  *      autoInitialize?: boolean;
  *      show_file_remove_btn?: boolean;
  *      show_file_details_container?: boolean;
- *      file_source_icons?: {[key in 'video_camera' | 'capture_image' | 'record_audio' | 'record_screen' | 'url_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source']: any};
+ *      file_source_icons?: {[key in 'video_camera' | 'capture_image' | 'record_audio' | 'record_screen' | 'url_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source']?: any};
  *      css_font_link?: string;
  *      css_font_name?: string;
- *      external_source_style_override?: {[key in (keyof typeof external_sources_ui_styles)]: string};
- *      media_capture_source_style_override?: {[key in (keyof typeof media_capture_ui_styles)]: string};
- *      default_styles_override?: {[key in (keyof typeof ui_styles)]: string};
+ *      external_source_style_override?: {[key in (keyof typeof external_sources_ui_styles)]?: string};
+ *      media_capture_source_style_override?: {[key in (keyof typeof media_capture_ui_styles)]?: string};
+ *      default_styles_override?: {[key in (keyof typeof ui_styles)]?: (string | boolean)[] | string};
  *      persist_styles_override_across_instances?: boolean;
- *      default_icons_override?: {[key in (keyof typeof icons)]: string};
+ *      default_icons_override?: {[key in (keyof typeof icons)]?: string};
  *      allowed_file_types?: (keyof file_types)[];
  *      targetRootElement?: string; 
  *      maxNumberOfFiles?: number; 
@@ -35,16 +35,16 @@ import file_types from "../utils/filetypes"
  *      file_preview_animation_types?: Array<'slideInRight' | 'slideInTop' | 'slideInLeft' | 'slideInBottom' | 'zoomIn' | 'fadeIn'>;
  *      allowMultipleUpload?: boolean;
  *      file_upload_settings?: {
- *          endpoint_url: string;
- *          files_field_name: string;
+ *          endpoint_url?: string;
+ *          files_field_name?: string;
  *          form_field?: HTMLFormElement | string;
  *          additional_data?: object;
- *          axios_settings: {
- *               headers: {};
- *               configs: {};
+ *          axios_settings?: {
+ *               headers?: any;
+ *               configs?: any;
  *          };
- *          chunk_size: number;
- *          should_chunk: boolean;
+ *          chunk_size?: number;
+ *          should_chunk?: boolean;
  *      };
  *      allowed_sources?: Array<'record_video' | 'capture_image' | 'record_audio' | 'record_screen' | 'link_source' | 'google_drive_source' | 'dropbox_source' | 'box_source' | 'openai_dalle_source'>;
  *      display_file_sources?: boolean;
@@ -52,42 +52,38 @@ import file_types from "../utils/filetypes"
  *      show_upload_error_overlay?: boolean;
  *      show_upload_progress_bar?: boolean;
  *      file_source_config?: {
- *        video_recording: {
- *             video_only: boolean;
- *             show_image_capture_btn: boolean;
+ *        video_recording?: {
+ *             video_only?: boolean;
+ *             show_image_capture_btn?: boolean;
  *         };
- *         capture_image: {
- *         };
- *         record_audio: {
- *         };
- *         record_screen: {
- *         };
- *         url_source: {
- *         };
- *         google_drive_source: {
- *             authConfig: {
- *                client_id: string;
- *                api_key: string;
- *                app_id: string;
- *                scopes: string;
+ *         capture_image?: any;
+ *         record_audio?: any;
+ *         record_screen?: any;
+ *         url_source?: any;
+ *         google_drive_source?: {
+ *             authConfig?: {
+ *                client_id?: string;
+ *                api_key?: string;
+ *                app_id?: string;
+ *                scopes?: string;
  *             };
  *         };
- *         dropbox_source: {
- *             authConfig: {
- *                appKey: string;
+ *         dropbox_source?: {
+ *             authConfig?: {
+ *                appKey?: string;
  *             };
- *             options: {
- *                cancel: Function;
+ *             options?: {
+ *                cancel?: Function;
  *             };
  *         };
- *         box_source: {
- *             authConfig: {
- *                 developerToken: string;
- *                 cssLink: string;
- *                 jsLink: string;
- *                 folder_id: string;
+ *         box_source?: {
+ *             authConfig?: {
+ *                 developerToken?: string;
+ *                 cssLink?: string;
+ *                 jsLink?: string;
+ *                 folder_id?: string;
  *             };
- *             pickerConfig: {
+ *             pickerConfig?: {
  *                 chooseButtonLabel?: string;
  *                 sortBy?: 'name' | 'date';
  *                 sortDirection?: 'ASC' | 'DESC';
@@ -107,18 +103,18 @@ import file_types from "../utils/filetypes"
  *                 responseInterceptor?: Function;
  *             }
  *         };
- *         openai_dalle_source: {
- *              endpoint: string;
+ *         openai_dalle_source?: {
+ *              endpoint?: string;
  *              api_key: string;
  *              size: "1024x1024" | "1024x1792" | "1792x1024";
  *              n: number;
- *              model: "dall-e-3" | "dall-e-2";
- *              quality: "standard" | "hd";
+ *              model?: "dall-e-3" | "dall-e-2";
+ *              quality?: "standard" | "hd";
  *         };
  * };
- *      default_files?: Array<{file: string | File | Blob; isUploadable: boolean; headers: any}>;
+ *      default_files?: Array<{file: string | File | Blob; isUploadable?: boolean; headers?: any}>;
  *      count_default_files?: boolean;
- *      instance_attach?: Array<object>;
+ *      instance_attach?: Array<any>;
  *      single_upload?: boolean;
  *      persist_files?: boolean;
  *      persist_type?: 'soft' | 'hard';

@@ -1853,8 +1853,7 @@ export default class CustUpCore extends EventTarget {
     handleUploadFile (file=undefined) {
         if (!this.isUploadConditionsSatisfied()) return;
         const _class = this;
-        const form_field = _class.options.file_upload_settings.form_field
-        _class.file_upload_form_data = new FormData(form_field == '' ? undefined : form_field)
+        _class.file_upload_form_data = new FormData(this.get_attached_form_field());
 
         if (!file) {
             const files_to_upload = _class.selectedFiles.filter(file => _class.successfullyUploadedFiles.findIndex(f => f.name == file.name && f.size == file.size) == -1)
@@ -1876,9 +1875,8 @@ export default class CustUpCore extends EventTarget {
      */
     async handleUploadAllFiles () {
         if (!this.isUploadConditionsSatisfied()) return;
-        const _class = this
-        const form_field = _class.options.file_upload_settings.form_field
-        _class.file_upload_form_data = new FormData(form_field == '' ? undefined : form_field)
+        const _class = this;
+        _class.file_upload_form_data = new FormData(this.get_attached_form_field());
 
         if (_class.options.file_upload_settings.additional_data != undefined) { 
             for (const key in _class.options.file_upload_settings.additional_data) {
@@ -1906,7 +1904,7 @@ export default class CustUpCore extends EventTarget {
         attached_files.map(file => _class.file_upload_form_data.append(_class.options.file_upload_settings.files_field_name, file))
         
         const all_files = [...this.selectedFiles, ...attached_files];
-        const beforeUploadStartCheck = this.triggerEvent('upload_beforeStart', {files: all_files, formData: _class.file_upload_form_data, form: this.options.file_upload_settings.form_field})
+        const beforeUploadStartCheck = this.triggerEvent('upload_beforeStart', {files: all_files, formData: _class.file_upload_form_data, form: form_field})
         if (!beforeUploadStartCheck) {
             this.show_message("Please check that all requirements have been satisfied", "error");
             return;
@@ -1974,6 +1972,13 @@ export default class CustUpCore extends EventTarget {
     }
 
     /**
+     * @private @method get_attached_form_field
+     */
+    get_attached_form_field () {
+        return !_class.options.file_upload_settings.form_field ? undefined : document.querySelector(_class.options.file_upload_settings.form_field);
+    }
+
+    /**
      * @private @method handleUploadFileToEndpoint
      * @param {File} file - file to upload to the server
      * @param {HTMLDivElement} upload_element - html element containing elements to display upload data and status
@@ -1983,8 +1988,8 @@ export default class CustUpCore extends EventTarget {
     handleUploadFileToEndpoint (file, upload_element, chunking = false) {
         const _class = this;
         const chunk_size = _class.options.file_upload_settings.chunk_size;
-        const form_field = _class.options.file_upload_settings.form_field;
-        const uniq_formdata = new FormData(form_field == '' ? undefined : form_field)
+        
+        const uniq_formdata = new FormData(this.get_attached_form_field());
 
         if (_class.options.file_upload_settings.should_chunk) {
             if (Object.keys(this.file_chunks).includes(file.id)) {
@@ -2370,7 +2375,7 @@ export default class CustUpCore extends EventTarget {
      * @public @method on - Custom and shothand event listener
      * @typedef {import('../utils/eventNames.js').TEventNames} TEventNames
      * @param {TEventNames} eventName
-     * @param {Function} callback 
+     * @param {(e: Event & {detail?: any}) => any} callback 
      */
     on (eventName, callback) {
         this.addEventListener(eventName, callback);

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.5 (2024-03-05)
+
+- Fix: Typescript bugs caused by not setting optional options as optional.
+
+- Fix: The bug caused by not selecting the provided form field element by query selector before passing it to the FormData object.
+
+- Fix: Bug caused by trying to get `file` key from the returned data in the progress event listener in the elegant UI type before file upload.
+
 ## 1.1.4 (2024-03-05)
 
 - Fix: A bug caused by trying to update `_custupDefaultUploadSentence` option in `setOptions` method.

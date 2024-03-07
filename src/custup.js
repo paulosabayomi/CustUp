@@ -234,13 +234,14 @@ export default class CustUp extends CustUpCore {
         });
 
         this.on("upload.success", (e) => {
-            upload_btn.disabled = false
-            clear_all_btn.disabled = false
-            upload_btn.innerHTML = "Upload"
+            upload_btn.disabled = false;
+            clear_all_btn.disabled = false;
+            upload_btn.innerHTML = "Upload";
         })
 
         this.on("upload.error", (e) => {
-            upload_btn.disabled = false
+            if (this.options.single_upload) return;
+            upload_btn.disabled = false;
             clear_all_btn.disabled = false
             upload_btn.innerHTML = "Upload"
 
@@ -689,6 +690,7 @@ export default class CustUp extends CustUpCore {
             });
 
             this.on("upload.error", (e) => {
+                if (this.options.single_upload) return;
                 const file_error_el = this._custupEl.querySelector('#'+e.detail.file.id).querySelector('[id*="retry_"]');
                 file_error_el.style.display = "flex";
                 submitBtnEl_clone.innerHTML = "Upload";
@@ -696,6 +698,7 @@ export default class CustUp extends CustUpCore {
             });
 
             this.on("upload.retry", (e) => {
+                if (this.options.single_upload) return;
                 const file_error_el = this._custupEl.querySelector('#'+e.detail.file.id).querySelector('[id*="retry_"]');
                 file_error_el.style.display = "none";
             });

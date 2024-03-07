@@ -816,6 +816,10 @@ export default class CustUpCore extends EventTarget {
      */
     protected configure_axios(): void;
     /**
+     * @private @method get_attached_form_field
+     */
+    private get_attached_form_field;
+    /**
      * @private @method handleUploadFileToEndpoint
      * @param {File} file - file to upload to the server
      * @param {HTMLDivElement} upload_element - html element containing elements to display upload data and status
@@ -1016,9 +1020,11 @@ export default class CustUpCore extends EventTarget {
      * @public @method on - Custom and shothand event listener
      * @typedef {import('../utils/eventNames.js').TEventNames} TEventNames
      * @param {TEventNames} eventName
-     * @param {Function} callback
+     * @param {(e: Event & {detail?: any}) => any} callback
      */
-    public on(eventName: import("../utils/eventNames.js").TEventNames, callback: Function): void;
+    public on(eventName: import("../utils/eventNames.js").TEventNames, callback: (e: Event & {
+        detail?: any;
+    }) => any): void;
     /**
      * @method get_file_sources - Returns all the allowed file sources icons wrapped in HTML element
      * @param {HTMLElement | null} iconsContainer - An HTML element to automatically append the icons to
