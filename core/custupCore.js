@@ -1904,7 +1904,7 @@ export default class CustUpCore extends EventTarget {
         attached_files.map(file => _class.file_upload_form_data.append(_class.options.file_upload_settings.files_field_name, file))
         
         const all_files = [...this.selectedFiles, ...attached_files];
-        const beforeUploadStartCheck = this.triggerEvent('upload_beforeStart', {files: all_files, formData: _class.file_upload_form_data, form: form_field})
+        const beforeUploadStartCheck = this.triggerEvent('upload_beforeStart', {files: all_files, formData: _class.file_upload_form_data, form: this.get_attached_form_field()})
         if (!beforeUploadStartCheck) {
             this.show_message("Please check that all requirements have been satisfied", "error");
             return;
@@ -1975,7 +1975,7 @@ export default class CustUpCore extends EventTarget {
      * @private @method get_attached_form_field
      */
     get_attached_form_field () {
-        return !_class.options.file_upload_settings.form_field ? undefined : document.querySelector(_class.options.file_upload_settings.form_field);
+        return !this.options.file_upload_settings.form_field ? undefined : document.querySelector(this.options.file_upload_settings.form_field);
     }
 
     /**
@@ -2144,7 +2144,7 @@ export default class CustUpCore extends EventTarget {
      * @method upload - the method to upload file to the endpoint
      * @param {string | undefined} file_id - the id of the file to upload in the case of a single file, all the files will be uploaded serially if not provided
      */
-    upload (file_id) {
+    upload (file_id=undefined) {
         const file = this.selectedFiles.find(fl => fl.id == file_id)
         this.fileUploadHandler(file);
     }

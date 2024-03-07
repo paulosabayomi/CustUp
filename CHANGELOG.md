@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.1.5 (2024-03-05)
+## 1.1.6 (2024-03-06)
+
+- Fix: An undefined variable bug caused by the method that returns the attached form field as an HTML element or undefined if not provided.
+
+## 1.1.5 (2024-03-06)
 
 - Fix: Typescript bugs caused by not setting optional options as optional.
 

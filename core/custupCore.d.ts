@@ -889,7 +889,7 @@ export default class CustUpCore extends EventTarget {
      * @method upload - the method to upload file to the endpoint
      * @param {string | undefined} file_id - the id of the file to upload in the case of a single file, all the files will be uploaded serially if not provided
      */
-    upload(file_id: string | undefined): void;
+    upload(file_id?: string | undefined): void;
     /**
      * @method retry_upload - to retry uploading a file
      * @param {string} file_id - the id of the file to retry
