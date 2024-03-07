@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.7 (2024-03-06)
+
+- Fix: `file_upload_settings` not getting updated when set with `setOptions`, fixed it by calling the configure axios method
+
 ## 1.1.6 (2024-03-06)
 
 - Fix: An undefined variable bug caused by the method that returns the attached form field as an HTML element or undefined if not provided.

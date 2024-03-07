@@ -519,6 +519,10 @@ export default class CustUpCore extends EventTarget {
                 }
             }
 
+            if (key == "file_upload_settings") {
+                console.log("file_upload_settings",this.options[key] );
+            }
+
             if (no_update) continue;
             
             // update items that needs to be updated
@@ -526,6 +530,8 @@ export default class CustUpCore extends EventTarget {
                 this.set_file_preview_animations(true); // load animations
             }else if (key === 'default_files') {
                 this.load_default_files();                
+            }else if (key === 'file_upload_settings') {
+                this.configure_axios();                
             }else if (key === 'default_icons_override') {
                 this.map_override_icons_to_default_icons();
             }else if (key === "default_styles_override" || key === "persist_styles_override_across_instances") {
@@ -1959,6 +1965,7 @@ export default class CustUpCore extends EventTarget {
      * @protected @method configure_axios
      */
     configure_axios () {
+        console.log("config axios file_upload_settings", this.options.file_upload_settings.endpoint_url);
         this.__axios_instance = axios.create({
             baseURL: this.options.file_upload_settings.endpoint_url,
             timeout: 2000000,
