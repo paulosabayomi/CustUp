@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.8 (2025-03-05)
+
+- Updated: The documentation page url
+
 ## 1.1.7 (2024-03-06)
 
 - Fix: `file_upload_settings` not getting updated when set with `setOptions`, fixed it by calling the configure axios method

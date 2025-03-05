@@ -17,6 +17,11 @@
   
 CustUp is a highly customizable JavaScript file upload library with zero dependency that can be easily adapted to a wide range of applications.  
   
+## Quick Links
+
+- [Documentation](https://paulosabayomi.github.io/custup-doc/)
+- [Check out the demo](https://paulosabayomi.github.io/custup-doc/docs/intro)
+  
 ## Brief Overview
 
 CustUp which is the short for Customizable Uploader was made to be >95% customizable if not 100%, and it is very easy to customize it to suit any kind of project you're working on.  
