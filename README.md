@@ -36,11 +36,11 @@ CustUp which is the short for Customizable Uploader was made to be >95% customiz
 
 ## Documentation Homepage
 
-[CustUp documentation website](https://custup.pryxy.com)
+[CustUp documentation website](https://paulosabayomi.github.io/custup-doc/)
 
 ### Demo
 
-Check out the [demo here](https://custup.pryxy.com/examples), or check the CustUp [documentation homepage]((https://custup.pryxy.com)) to see different CustUp UIs
+Check out the [demo here](https://paulosabayomi.github.io/custup-doc/examples), or check the CustUp [documentation homepage](https://paulosabayomi.github.io/custup-doc/) to see different CustUp UIs
   
 ## Quick Start
 
@@ -164,7 +164,7 @@ const uploader = new CustUp(options)
 
 To overide the default class names the provided class name should be a string or an array with false as the second item like `fileUIOuterContainer: ['custup_file_display_outer', false],` and to append/add new css class name to the element the second item in the array should be `true` like `fileUIOuterContainer: ['custup_file_display_outer', true]`  
   
-Read more on how to customize CustUp elements with [properties here](https://custup.pryxy.com/docs/properties)
+Read more on how to customize CustUp elements with [properties here](https://paulosabayomi.github.io/custup-doc/docs/properties)
 
 File upload settings, you can also add additional data that should be sent along the files, and/or a form field data to be sent along with the upload and you can also set the axios settings
 
@@ -288,7 +288,7 @@ instance4.upload();
 
 `single_upload` when set to true and used with `instance_attach` it is useful if all files should be uploaded at once, if `false` then upload event will be triggered for each of the files in all of the attached instances.  
   
-See more guides on the [documentation page](https://custup.pryxy.com/docs/category/guides).  
+See more guides on the [documentation page](https://paulosabayomi.github.io/custup-doc/docs/category/guides).  
   
 ## Options
 
@@ -323,7 +323,7 @@ persist_files | `boolean` | `false` | Not required | To persist files in the bro
 persist_type | `soft` or `hard` | `soft` | Not required | To set the `persist_files` storage method, if `soft` CustUp will use `sessionStorage` to temporarily store files and if `hard` CustUp will use `localStorage` to store files.
 alert_timeout_time | `number` | `300` milliseconds | Not required | The timeout for CustUp alerts  
   
-There are many more other options, read the [documentation for more options](https://custup.pryxy.com/docs/category/options)  
+There are many more other options, read the [documentation for more options](https://paulosabayomi.github.io/custup-doc/docs/category/options)  
   
 ## All Options
 
@@ -490,7 +490,7 @@ options = {
 }
 ```
 
-See all available options [here](https://custup.pryxy.com/docs/category/options)
+See all available options [here](https://paulosabayomi.github.io/custup-doc/docs/category/options)
 
 ## Events
 
@@ -519,7 +519,7 @@ uploader.addEventListener('file.beforeAdded', (ev) => {
 | `'upload.error'` | Called when a file or collective upload was not successfully due to an error | `{err: Error, file: File, upload_element: HTMLELement | null, file_container: HTMLElement | null}` |
 | `'upload.retry'` | Called when an upload is about to be retried | `{file: File, file_container: HTMLElement | null}`  |
   
-And many more events, check the [documentation](https://custup.pryxy.com) for more events  
+And many more events, check the [documentation](https://paulosabayomi.github.io/custup-doc/) for more events  
   
 ### All Events
 
@@ -557,7 +557,7 @@ And many more events, check the [documentation](https://custup.pryxy.com) for mo
 */
 ```
 
-Check out more events [here](https://custup.pryxy.com/docs/events)
+Check out more events [here](https://paulosabayomi.github.io/custup-doc/docs/events)
 
 ## Methods
 
@@ -584,7 +584,7 @@ retry_upload | To trigger upload retry for all files that were not uploaded due 
 | clear_files | To clear all the added files from the memory, browser storage and UI | `None` |
 | get_total_file_count | Returns all total number of added files, it will only return total number of selected files if `count_default_files` is set to false | `None`   |
   
-And many more, read more about [CustUp methods in the documentation](https://custup.pryxy.com/docs/methods)
+And many more, read more about [CustUp methods in the documentation](https://paulosabayomi.github.io/custup-doc/docs/methods)
 
 ## Inspiration
 

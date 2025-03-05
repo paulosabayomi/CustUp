@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.9 (2025-03-05)
+
+- Updated: The documentation and author field in package.json
+
 ## 1.1.8 (2025-03-05)
 
 - Updated: The documentation page url

@@ -1,6 +1,6 @@
 {
   "name": "custup",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Highly customisable file upload library with zero dependencies",
   "main": "src/custup.min.js",
   "scripts": {
@@ -27,7 +27,10 @@
   ],
   "type": "module",
   "types": "./src/custup.d.ts",
-  "author": "Abayomi Amusa",
+  "author": {
+    "name": "Abayomi Amusa",
+    "url": "https://paulosabayomi.github.io/about-me/"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/paulosabayomi/CustUp/issues"
